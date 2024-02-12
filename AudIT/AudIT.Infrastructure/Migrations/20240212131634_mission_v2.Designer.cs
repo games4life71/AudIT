@@ -3,6 +3,7 @@ using System;
 using AudIT.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AudIT.Infrastructure.Migrations
 {
     [DbContext(typeof(AudITContext))]
-    partial class AudITContextModelSnapshot : ModelSnapshot
+    [Migration("20240212131634_mission_v2")]
+    partial class mission_v2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.1");
@@ -21,6 +24,9 @@ namespace AudIT.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("AuditMissionId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CreatedBy")
@@ -52,6 +58,8 @@ namespace AudIT.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AuditMissionId");
 
                     b.HasIndex("OwnerId");
 
@@ -142,27 +150,6 @@ namespace AudIT.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("AuditMissions");
-                });
-
-            modelBuilder.Entity("AudiT.Domain.Entities.AuditMissionDocument", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("AuditMissionId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("BaseDocumentId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuditMissionId");
-
-                    b.HasIndex("BaseDocumentId");
-
-                    b.ToTable("AuditMissionDocument");
                 });
 
             modelBuilder.Entity("AudiT.Domain.Entities.Department", b =>
@@ -322,6 +309,10 @@ namespace AudIT.Infrastructure.Migrations
 
             modelBuilder.Entity("AudIT.Domain.Misc.BaseDocument", b =>
                 {
+                    b.HasOne("AudiT.Domain.Entities.AuditMission", null)
+                        .WithMany("Documents")
+                        .HasForeignKey("AuditMissionId");
+
                     b.HasOne("AudiT.Domain.Entities.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
@@ -373,25 +364,6 @@ namespace AudIT.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("AudiT.Domain.Entities.AuditMissionDocument", b =>
-                {
-                    b.HasOne("AudiT.Domain.Entities.AuditMission", "AuditMission")
-                        .WithMany("AuditMissionDocuments")
-                        .HasForeignKey("AuditMissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AudIT.Domain.Misc.BaseDocument", "BaseDocument")
-                        .WithMany()
-                        .HasForeignKey("BaseDocumentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AuditMission");
-
-                    b.Navigation("BaseDocument");
-                });
-
             modelBuilder.Entity("AudiT.Domain.Entities.Department", b =>
                 {
                     b.HasOne("AudiT.Domain.Entities.Institution", "Institution")
@@ -429,7 +401,7 @@ namespace AudIT.Infrastructure.Migrations
                 {
                     b.Navigation("Activities");
 
-                    b.Navigation("AuditMissionDocuments");
+                    b.Navigation("Documents");
                 });
 
             modelBuilder.Entity("AudiT.Domain.Entities.Institution", b =>

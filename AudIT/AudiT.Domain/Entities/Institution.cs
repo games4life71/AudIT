@@ -33,7 +33,7 @@ public class Institution:AuditableEntity
 
     }
 
-    public Result<Institution> Create(string name, string address, string homePhoneNumber)
+    public static  Result<Institution> Create(string name, string address, string homePhoneNumber)
     {
 
         if (String.IsNullOrEmpty(name))
