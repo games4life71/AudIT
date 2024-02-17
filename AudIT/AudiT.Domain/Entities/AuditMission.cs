@@ -19,13 +19,11 @@ public class AuditMission : AuditableEntity
 
     public Guid DepartmentId { get; private set; }
 
-    public List<Activity> Activities { get; private set; } = new List<Activity>();
+    public List<Action> Actions { get; private set; } = new List<Action>();
 
     public List<AuditMissionDocument> AuditMissionDocuments { get; private set; } = [];
 
-
-
-
+    public List<AuditMissionObjectives> AuditMissionObjectives { get; private set; } = [];
 
     public AuditMission()
     {
@@ -63,4 +61,5 @@ public class AuditMission : AuditableEntity
 
 
 }
+
 

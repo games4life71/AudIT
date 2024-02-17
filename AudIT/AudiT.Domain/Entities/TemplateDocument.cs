@@ -8,7 +8,7 @@ public class TemplateDocument:BaseDocument
     //the state of which the document is in : Draft, Published, Archived etc
     public DocumentState State { get; private set; }
 
-    public TemplateType Type { get; private set; }
+    public TemplateTypeStage Type { get; private set; }
 
     public int Version { get; private set; }
 
@@ -24,7 +24,7 @@ public class TemplateDocument:BaseDocument
         User owner,
         Guid ownerId,
         DocumentState state,
-        TemplateType type,
+        TemplateTypeStage type,
         int version) : base(name, extension, owner, ownerId)
     {
         State = state;
@@ -39,7 +39,7 @@ public class TemplateDocument:BaseDocument
         User owner,
         Guid ownerId,
         DocumentState state,
-        TemplateType type,
+        TemplateTypeStage type,
         int version
     )
     {
@@ -53,19 +53,19 @@ public class TemplateDocument:BaseDocument
 
 }
 
-public enum TemplateType
+public enum TemplateTypeStage
 {
     //TODO : Add more types as the need arises
-    Word,
-    Excel,
-    Powerpoint,
-    PDF
+     PregatireaMisiunii,
+     InterventieLaFataLocului,
+     RaportareRezultate,
+     UrmarireaRecomandari
 }
 
 
 public enum DocumentState
 {
-    Draft,
-    Published,
-    Archived
+   Draft,
+   Published,
+   Archived
 }

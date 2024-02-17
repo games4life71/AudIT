@@ -7,7 +7,7 @@ namespace AudiT.Domain.Entities;
 /// <summary>
 /// This class models the atomic operations of a mission : activity
 /// </summary>
-public class Activity:AuditableEntity
+public class Action:AuditableEntity
 {
 
     public Guid Id { get; private set; }
@@ -26,13 +26,13 @@ public class Activity:AuditableEntity
     public Guid UserId { get; private set; }
 
 
-    public Activity()
+    public Action()
     {
 
     }
 
 
-    private Activity(
+    private Action(
         string name,
         ActivityType type,
         Department department,
@@ -49,11 +49,11 @@ public class Activity:AuditableEntity
         UserId = userId;
     }
 
-    public static Result<Activity> Create(string name, ActivityType type, Department department, Guid departmentId, User user, Guid userId)
+    public static Result<Action> Create(string name, ActivityType type, Department department, Guid departmentId, User user, Guid userId)
     {
         //TODO : Add validation logic here
 
-        return Result<Activity>.Success(new Activity(name, type, department, departmentId, user, userId));
+        return Result<Action>.Success(new Action(name, type, department, departmentId, user, userId));
     }
 
 }
