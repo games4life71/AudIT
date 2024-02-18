@@ -1,16 +1,16 @@
 ﻿using AudIT.Domain.Misc;
+using Microsoft.AspNetCore.Identity;
 
 namespace AudiT.Domain.Entities;
 
-public class User : AuditableEntity
+public class User : IdentityUser
 {
-    public Guid Id { get; private set; }
-
-    public string Username { get; private set; }
 
     public string FirstEmail { get; private set; }
 
     public string? SecondEmail { get; private set; }
+
+
 
     public string Adress{ get; private set; }
 
@@ -26,7 +26,11 @@ public class User : AuditableEntity
     }
 
     public Department Department { get; private set; }
-    private User(string username,
+
+
+    private User(
+        string username,
+        string password,
         string firstEmail,
         string secondEmail,
         string adress,
@@ -35,8 +39,9 @@ public class User : AuditableEntity
         string officephone,
         Department department)
     {
-        Id = new Guid();
-        Username = username;
+     // Id = Guid.NewGuid().ToString();
+        UserName = username;
+        PasswordHash = password;
         FirstEmail = firstEmail;
         SecondEmail = secondEmail;
         Adress = adress;
@@ -46,7 +51,7 @@ public class User : AuditableEntity
         Department = department;
     }
 
-    public static Result<User> Create( string username, string firstEmail, string secondEmail, string adress,
+    public static Result<User> Create(string username, string password ,string firstEmail, string secondEmail, string adress,
         string phoneNumber,string functie,string officephone,Department department)
     {
         //TODO make all the checks then construct the entity
@@ -54,6 +59,7 @@ public class User : AuditableEntity
         return Result<User>.Success(
             new User(
                 username,
+                password,
                 firstEmail,
                 secondEmail,
                 adress,

@@ -17,7 +17,7 @@ public class BaseDocument:AuditableEntity
 
     public User Owner { get; private set; }
 
-    public Guid OwnerId { get; private set; }
+    public string OwnerId { get; private set; }
 
 
 
@@ -27,7 +27,7 @@ public class BaseDocument:AuditableEntity
         Name = name;
         Extension = extension;
         Owner = owner;
-        OwnerId = ownerId;
+        OwnerId = ownerId.ToString();
     }
 
     public BaseDocument()

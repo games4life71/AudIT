@@ -13,7 +13,7 @@ public class AuditMission : AuditableEntity
 
     public User User { get; private set; }
 
-    public Guid UserId { get; private set; }
+    public string  UserId { get; private set; }
 
     public Department Department { get; private set; }
 
@@ -40,7 +40,7 @@ public class AuditMission : AuditableEntity
     {
         Name = name;
         User = user;
-        UserId = userId;
+        UserId = userId.ToString();
         Department = department;
         DepartmentId = departmentId;
     }

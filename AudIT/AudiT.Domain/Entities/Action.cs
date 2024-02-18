@@ -23,7 +23,7 @@ public class Action:AuditableEntity
     //the user who created the activity
     public User User { get; private set; }
 
-    public Guid UserId { get; private set; }
+    public string  UserId { get; private set; }
 
 
     public Action()
@@ -46,7 +46,7 @@ public class Action:AuditableEntity
         Department = department;
         DepartmentId = departmentId;
         User = user;
-        UserId = userId;
+        UserId = userId.ToString();
     }
 
     public static Result<Action> Create(string name, ActivityType type, Department department, Guid departmentId, User user, Guid userId)

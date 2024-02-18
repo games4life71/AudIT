@@ -1,16 +1,16 @@
 ﻿using AudiT.Domain.Entities;
+using AudIT.Domain.Misc;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Action = AudiT.Domain.Entities.Action;
 
 namespace AudIT.Infrastructure;
 
-public class AudITContext : DbContext
+public class AudITContext : IdentityDbContext<User>
 {
     public DbSet<Department> Departments { get; set; }
 
     public DbSet<Institution> Institutions { get; set; }
-
-    public DbSet<User> Users { get; set; }
 
     public DbSet<StandaloneDocument> StandaloneDocuments { get; set; }
 
@@ -35,4 +35,27 @@ public class AudITContext : DbContext
         optionsBuilder.UseSqlite(
             $"Data Source={"D:\\Projects\\AudIT\\AudIT\\AudIT\\AudIT.Infrastructure\\database.db"}");
     }
+
+    // protected override void OnModelCreating(ModelBuilder modelBuilder)
+    // {
+    //     modelBuilder.Entity<AuditMission>()
+    //         .HasOne(a => a.User)
+    //         .WithMany(u => u.AuditMissions)
+    //         .HasForeignKey(a => a.UserId)
+    //         .OnDelete(DeleteBehavior.Cascade);
+    //
+    //     modelBuilder.Entity<Action>()
+    //         .HasOne(a => a.User)
+    //         .WithMany(u => u.Actions)
+    //         .HasForeignKey(a => a.UserId)
+    //         .OnDelete(DeleteBehavior.Cascade);
+    //
+    //     modelBuilder.Entity<BaseDocument>()
+    //         .HasOne(b => b.User)
+    //         .WithMany(u => u.BaseDocuments)
+    //         .HasForeignKey(b => b.UserId)
+    //         .OnDelete(DeleteBehavior.Cascade);
+    //
+    //     base.OnModelCreating(modelBuilder);
+    // }
 }
