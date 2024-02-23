@@ -64,4 +64,10 @@ public class User : IdentityUser
                 department
             ));
     }
+
+    public bool VerifyUser()
+    {
+        Verified = true;
+        return Verified;
+    }
 }
