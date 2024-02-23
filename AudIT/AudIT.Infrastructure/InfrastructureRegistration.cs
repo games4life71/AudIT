@@ -1,5 +1,6 @@
 ﻿using AudIT.Applicationa.Contracts.AbstractRepositories;
 using AudIT.Applicationa.Contracts.Identity;
+using AudIT.Applicationa.Services.AuthorizationServices;
 using AudIT.Applicationa.Services.AuthServices;
 using AudIT.Applicationa.Services.EmailServices;
 using AudiT.Domain.Entities;
@@ -26,6 +27,7 @@ public static class InfrastructureRegistration
             .AddEntityFrameworkStores<AudITContext>()
             .AddDefaultTokenProviders();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAuthorization, AuthorizationService>();
         services.AddScoped<EmailService, EmailService>();
         return services;
     }

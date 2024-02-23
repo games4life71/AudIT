@@ -5,15 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AudIT.Infrastructure.Repositories;
 
-public class InstitutionRepository:BaseRepository<Institution>,IInstitutionRepository
+public class InstitutionRepository(AudITContext context) : BaseRepository<Institution>(context), IInstitutionRepository
 {
 
-    private readonly AudITContext _context;
-
-    public InstitutionRepository(AudITContext context) : base(context)
-    {
-        _context = context;
-    }
+    private readonly AudITContext _context = context;
 
     public Task<Result<Institution>> FindInstitutionByDomainAsync(string domain)
     {
