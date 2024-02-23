@@ -13,7 +13,7 @@ public class AuditMission : AuditableEntity
 
     public User User { get; private set; }
 
-    public string  UserId { get; private set; }
+    public string UserId { get; private set; }
 
     public Department Department { get; private set; }
 
@@ -58,8 +58,4 @@ public class AuditMission : AuditableEntity
 
         return Result<AuditMission>.Success(new AuditMission(name, user, userId, department, departmentId));
     }
-
-
 }
-
-

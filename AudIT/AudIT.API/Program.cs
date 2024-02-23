@@ -1,3 +1,5 @@
+using AudIT.Applicationa;
+using AudIT.Applicationa.MapperProfiles;
 using AudIT.Infrastructure;
 using Microsoft.OpenApi.Models;
 
@@ -7,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddApplicationServices();
+builder.Services.AddAutoMapper(typeof(InstitutionProfile).Assembly);
+
 builder.Services.AddSwaggerGen(c => c.SwaggerDoc(
     "v1",
     new OpenApiInfo

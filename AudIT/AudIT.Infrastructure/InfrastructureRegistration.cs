@@ -1,8 +1,10 @@
-﻿using AudIT.Applicationa.Contracts.AbstractRepositories;
+﻿using System.Reflection;
+using AudIT.Applicationa.Contracts.AbstractRepositories;
 using AudIT.Applicationa.Contracts.Identity;
 using AudIT.Applicationa.Services.AuthorizationServices;
 using AudIT.Applicationa.Services.AuthServices;
 using AudIT.Applicationa.Services.EmailServices;
+using AudIT.Applicationa.Services.UtilsServices;
 using AudiT.Domain.Entities;
 using AudIT.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -29,6 +31,8 @@ public static class InfrastructureRegistration
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IAuthorization, AuthorizationService>();
         services.AddScoped<EmailService, EmailService>();
+        services.AddScoped<UtilsService, UtilsService>();
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
         return services;
     }
 }
