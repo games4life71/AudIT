@@ -3,6 +3,7 @@ using System;
 using AudIT.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,12 +11,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AudIT.Infrastructure.Migrations
 {
     [DbContext(typeof(AudITContext))]
-    partial class AudITContextModelSnapshot : ModelSnapshot
+    [Migration("20240218222806_latestPLZ")]
+    partial class latestPLZ
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.2");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.1");
 
             modelBuilder.Entity("AudIT.Domain.Misc.BaseDocument", b =>
                 {
@@ -268,15 +271,8 @@ namespace AudIT.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("EmailDomains")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("HomePhoneNumber")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("InstitutionAdminId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LastModifiedBy")
@@ -290,8 +286,6 @@ namespace AudIT.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("InstitutionAdminId");
 
                     b.ToTable("Institutions");
                 });
@@ -363,7 +357,7 @@ namespace AudIT.Infrastructure.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("DepartmentId")
+                    b.Property<Guid>("DepartmentId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
@@ -418,9 +412,6 @@ namespace AudIT.Infrastructure.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
-
-                    b.Property<bool>("Verified")
-                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -701,15 +692,6 @@ namespace AudIT.Infrastructure.Migrations
                     b.Navigation("Institution");
                 });
 
-            modelBuilder.Entity("AudiT.Domain.Entities.Institution", b =>
-                {
-                    b.HasOne("AudiT.Domain.Entities.User", "InstitutionAdmin")
-                        .WithMany()
-                        .HasForeignKey("InstitutionAdminId");
-
-                    b.Navigation("InstitutionAdmin");
-                });
-
             modelBuilder.Entity("AudiT.Domain.Entities.Objective", b =>
                 {
                     b.HasOne("AudiT.Domain.Entities.AuditMission", "AuditMission")
@@ -732,7 +714,9 @@ namespace AudIT.Infrastructure.Migrations
                 {
                     b.HasOne("AudiT.Domain.Entities.Department", "Department")
                         .WithMany()
-                        .HasForeignKey("DepartmentId");
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Department");
                 });

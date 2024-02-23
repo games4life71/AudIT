@@ -29,6 +29,9 @@ public class AudITContext : IdentityDbContext<User>
     {
     }
 
+    public AudITContext(DbContextOptions<AudITContext> options) : base(options)
+    {
+    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
