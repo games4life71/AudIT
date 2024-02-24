@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\AudiT.Domain\AudiT.Domain.csproj" />
+      <ProjectReference Include="..\AudIT.Infrastructure\AudIT.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AWSSDK.S3" Version="3.3.110.19" />
+      <PackageReference Include="Azure.Identity" Version="1.10.4" />
+      <PackageReference Include="MailKit" Version="4.3.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.1" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
+      <PackageReference Include="Microsoft.Graph" Version="5.42.0" />
+      <PackageReference Include="Microsoft.Identity.Client" Version="4.59.0" />
+      <PackageReference Include="Microsoft.Identity.Web" Version="2.17.0" />
+      <PackageReference Include="Mnt.Microsoft.Exchange.WebServices.Data" Version="2.2.1.1" />
+    </ItemGroup>
+<ItemGroup>
+  <None Include="appsettings*.json">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </None>
+</ItemGroup>
+
+</Project>
