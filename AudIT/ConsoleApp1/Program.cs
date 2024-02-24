@@ -620,44 +620,110 @@
 // }
 
 
-using AudIT.Applicationa.Contracts.AbstractRepositories;
-using AudiT.Domain.Entities;
-using AudIT.Infrastructure;
-using AudIT.Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
+//upload a file to s3 bucket
 
-var db = new AudITContext();
 
-//
-// var user = AudiT.Domain.Entities.User.Create(
-//     "asdasd",
-//     "asdasd",
-//     "asdasd",
-//     "asdasd",
-//     "asdasd").Value;
-//
-//
-// db.Add(user);
-// db.SaveChanges();
+using Amazon;
+using Amazon.S3;
+using Amazon.S3.Model;
+using System;
+using System.Threading.Tasks;
 
-var inst = Institution.Create(
-    "test",
-    "adrres",
-    "asdasd"
+namespace Amazon.DocSamples.S3
+{
+    class UploadObjectTest
+    {
+        private const string bucketName = "auditdocbucket";
+        // For simplicity the example creates two objects from the same file.
+        // You specify key names for these objects.
+        private const string keyName1 = "key1";
+        private const string keyName2 = "key2";
+        private const string filePath = @"D:\Projects\AudIT\AudIT\AudIT\ConsoleApp1";
+        private static readonly RegionEndpoint bucketRegion = RegionEndpoint.EUCentral1;
 
-    ).Value;
+        private static IAmazonS3 client;
 
-inst.AddEmailDomain("asdasd");
-inst.AddEmailDomain("asdasd1");
-inst.AddEmailDomain("asdasd212");
-db.Add(inst);
-db.SaveChanges();
+        public static void Main()
+        {
+            client = new AmazonS3Client(bucketRegion);
+            // WritingAnObjectAsync().Wait();
+            GetObjectAsync().Wait();
+        }
 
-IInstitutionRepository institutionRepository = new InstitutionRepository(db);
+        static async Task WritingAnObjectAsync()
+        {
+            try
+            {
+                // 1. Put object-specify only key name for the new object.
+                var putRequest1 = new PutObjectRequest
+                {
+                    BucketName = bucketName,
+                    Key = "StandaloneDocs/"+keyName1,
+                    ContentBody = "sample text"
+                };
 
-var institution = institutionRepository.FindInstitutionByDomainAsync("asdasd").Result.Value;
+                PutObjectResponse response1 = await client.PutObjectAsync(putRequest1);
 
-Console.WriteLine("Institution:" + institution.InstitutionAdmin);
+                // 2. Put the object-set ContentType and add metadata.
+                var putRequest2 = new PutObjectRequest
+                {
+                    BucketName = bucketName,
+                    Key = keyName2,
+                    FilePath = filePath,
+                    ContentType = "text/plain"
+                };
+
+                putRequest2.Metadata.Add("x-amz-meta-title", "someTitle");
+                PutObjectResponse response2 = await client.PutObjectAsync(putRequest2);
+            }
+            catch (AmazonS3Exception e)
+            {
+                Console.WriteLine(
+                        "Error encountered ***. Message:'{0}' when writing an object"
+                        , e.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(
+                    "Unknown encountered on server. Message:'{0}' when writing an object"
+                    , e.Message);
+            }
+        }
+
+        static async Task GetObjectAsync()
+        {
+
+            try
+            {
+
+                GetObjectRequest request = new GetObjectRequest()
+                {
+                    BucketName = "auditdocbucket",
+                    Key = "StandaloneDocs/key1"
+                };
+
+                var response = await client.GetObjectAsync(request);
+
+                Console.WriteLine("Content type: " + response.Headers.ContentType);
+                Console.WriteLine("Content length: " + response.Headers.ContentLength);
+                Console.WriteLine("Content: ");
+                await response.WriteResponseStreamToFileAsync($"{filePath}\\file.txt", true, CancellationToken.None);
+
+
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+
+        }
+    }
+}
+
+
 
 
 

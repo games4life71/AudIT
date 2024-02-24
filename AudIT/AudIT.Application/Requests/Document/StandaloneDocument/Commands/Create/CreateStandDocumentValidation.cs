@@ -13,12 +13,12 @@ public class CreateStandDocumentValidation: AbstractValidator<CreateStandDocumen
             .MaximumLength(100)
             .WithMessage("{PropertyName} must not exceed 100 characters");
 
-        RuleFor(p => p.Extension)
-            .NotNull()
-            .NotEmpty()
-            .WithMessage("{PropertyName} is required")
-            .MaximumLength(10)
-            .WithMessage("{PropertyName} must not exceed 10 characters");
+        // RuleFor(p => p.Extension)
+        //     .NotNull()
+        //     .NotEmpty()
+        //     .WithMessage("{PropertyName} is required")
+        //     .MaximumLength(10)
+        //     .WithMessage("{PropertyName} must not exceed 10 characters");
 
         RuleFor(p => p.OwnerId)
             .NotNull()

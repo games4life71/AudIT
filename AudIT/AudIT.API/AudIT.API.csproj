@@ -18,4 +18,8 @@
       <ProjectReference Include="..\AudIT.Infrastructure\AudIT.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Controllers\AuditMission\" />
+    </ItemGroup>
+
 </Project>

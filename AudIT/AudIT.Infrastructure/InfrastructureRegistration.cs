@@ -1,8 +1,10 @@
 ﻿using System.Reflection;
 using AudIT.Applicationa.Contracts.AbstractRepositories;
+using AudIT.Applicationa.Contracts.DocumentServices;
 using AudIT.Applicationa.Contracts.Identity;
 using AudIT.Applicationa.Services.AuthorizationServices;
 using AudIT.Applicationa.Services.AuthServices;
+using AudIT.Applicationa.Services.DocumentServices;
 using AudIT.Applicationa.Services.EmailServices;
 using AudIT.Applicationa.Services.UtilsServices;
 using AudiT.Domain.Entities;
@@ -37,7 +39,7 @@ public static class InfrastructureRegistration
         services.AddScoped<IAuthorization, AuthorizationService>();
         services.AddScoped<EmailService, EmailService>();
         services.AddScoped<UtilsService, UtilsService>();
-
+        services.AddScoped<IDocumentManager, DocumentService>();
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
         return services;
     }

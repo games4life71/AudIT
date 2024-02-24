@@ -8,7 +8,7 @@ public class CreateStandDocumentCommand : IRequest<BaseDTOResponse<BaseStandalon
 {
     public string Name { get; set; }
 
-    public string Extension { get; set; }
+    public string? Extension { get; set; }
 
     public Guid OwnerId { get; set; }
 
@@ -20,5 +20,10 @@ public class CreateStandDocumentCommand : IRequest<BaseDTOResponse<BaseStandalon
         Extension = extension;
         OwnerId = ownerId;
         DepartmentId = departmentId;
+    }
+
+    public CreateStandDocumentCommand()
+    {
+
     }
 }
