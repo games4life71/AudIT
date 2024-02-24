@@ -10,7 +10,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddApplicationServices();
-builder.Services.AddAutoMapper(typeof(InstitutionProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(MyCustomProfile).Assembly);
 
 builder.Services.AddSwaggerGen(c => c.SwaggerDoc(
     "v1",

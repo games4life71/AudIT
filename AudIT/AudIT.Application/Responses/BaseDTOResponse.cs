@@ -36,6 +36,12 @@ public class BaseDTOResponse<T>:BaseResponse where T : class
         // Message = message;
     }
 
+    public BaseDTOResponse(string message, bool success) : base(message, success)
+    {
+        DtoResponse = null;
+        // Success = success;
+        // Message = message;
+    }
     public BaseDTOResponse(List<T> dtoResponses, string? message, bool success) : base(message, success)
     {
         DtoResponses = dtoResponses;

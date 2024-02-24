@@ -25,6 +25,11 @@ public static class InfrastructureRegistration
         (typeof(IRepository<>),
             typeof(BaseRepository<>));
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
+        services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+        services.AddScoped<IStandaloneDocRepository, StandaloneDocRepository>();
+        services.AddScoped<ITemplateDocRepository, TemplateDocRepository>();
+        services.AddScoped<IAuditMissionRepository, AuditMissionRepository>();
+
         services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<AudITContext>()
             .AddDefaultTokenProviders();
@@ -32,6 +37,7 @@ public static class InfrastructureRegistration
         services.AddScoped<IAuthorization, AuthorizationService>();
         services.AddScoped<EmailService, EmailService>();
         services.AddScoped<UtilsService, UtilsService>();
+
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
         return services;
     }

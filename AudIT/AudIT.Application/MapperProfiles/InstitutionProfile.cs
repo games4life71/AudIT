@@ -5,7 +5,7 @@ using AutoMapper;
 
 namespace AudIT.Applicationa.MapperProfiles;
 
-public class InstitutionProfile : Profile
+public class InstitutionProfile : MyCustomProfile
 {
     public InstitutionProfile()
     {
