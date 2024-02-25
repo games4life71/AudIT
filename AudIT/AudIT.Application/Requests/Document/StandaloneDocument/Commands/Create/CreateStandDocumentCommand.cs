@@ -6,7 +6,7 @@ namespace AudIT.Applicationa.Requests.Document.StandaloneDocument.Commands.Creat
 
 public class CreateStandDocumentCommand : IRequest<BaseDTOResponse<BaseStandaloneDto>>
 {
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     public string? Extension { get; set; }
 

@@ -639,7 +639,7 @@ namespace Amazon.DocSamples.S3
         private const string keyName1 = "key1";
         private const string keyName2 = "key2";
         private const string filePath = @"D:\Projects\AudIT\AudIT\AudIT\ConsoleApp1";
-        private static readonly RegionEndpoint bucketRegion = RegionEndpoint.EUCentral1;
+        private static readonly RegionEndpoint bucketRegion = RegionEn  dpoint.EUCentral1;
 
         private static IAmazonS3 client;
 
