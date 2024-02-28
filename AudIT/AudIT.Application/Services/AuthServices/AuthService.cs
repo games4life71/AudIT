@@ -1,6 +1,4 @@
-﻿
-using System.Security.Claims;
-
+﻿using System.Security.Claims;
 using AudIT.Applicationa.Contracts.AbstractRepositories;
 using AudIT.Applicationa.Models.AuthDTO;
 using AudIT.Applicationa.Services.EmailServices;
@@ -8,7 +6,6 @@ using AudIT.Applicationa.Services.UtilsServices;
 using AudiT.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace AudIT.Applicationa.Services.AuthServices;
@@ -29,6 +26,7 @@ public class AuthService(
     private readonly IInstitutionRepository _institutionRepository = institutionRepository;
     private readonly EmailService _emailService = emailService;
     private readonly UtilsService _utilsService = utilsService;
+
     public async Task<(int, string)> Registration(RegistrationModel model, string role)
     {
         var userExist = await userManager.FindByNameAsync(model.UserName);
@@ -94,18 +92,28 @@ public class AuthService(
 
         Console.WriteLine("FOUND THE INSTITURION");
         var institutionAdmin = institution.Value.InstitutionAdmin;
-        //TODO uncomment this after the institution admin is implemented
-        // if(institutionAdmin == null)
-        // {
-        //     return (0, "Institution admin not found");
-        // }
+        if(institutionAdmin == null)
+        {
+            Console.WriteLine("INSTITUTION ADMIN IS NULL");
+        }
+        Console.WriteLine("INSTITUTION : " + institution.Value.Id);
+        if (institutionAdmin == null)
+        {
+            return (0, "Institution admin not found");
+        }
 
         if (institutionAdmin != null)
         {
             Console.WriteLine("INSTITUTION ADMIN IS NOT NULL");
         }
 
-        // emailService.SendAuthorizeEmail(institutionAdmin.Id, newUserValue);
+        var emailResult = await emailService.SendAuthorizeEmail(institutionAdmin.Id, newUserValue);
+
+        if (emailResult.Item2 == false)
+        {
+            return (0, "Email not sent");
+        }
+
         return (1, "User created successfully!");
     }
 
@@ -145,6 +153,4 @@ public class AuthService(
 
         return (1, token);
     }
-
-
 }

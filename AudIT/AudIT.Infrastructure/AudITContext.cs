@@ -16,7 +16,7 @@ public class AudITContext : IdentityDbContext<User>
 
     public DbSet<TemplateDocument> TemplateDocuments { get; set; }
 
-    public DbSet<AuditMissionDocument> AuditMissionDocument{ get; set; }
+    public DbSet<AuditMissionDocument> AuditMissionDocument { get; set; }
     public DbSet<AuditMission> AuditMissions { get; set; }
 
     public DbSet<Action> Activities { get; set; }
@@ -24,6 +24,7 @@ public class AudITContext : IdentityDbContext<User>
     public DbSet<AuditMissionObjectives> AuditMissionObjectives { get; set; }
 
     public DbSet<Objective> Objective { get; set; }
+
 
     public AudITContext()
     {

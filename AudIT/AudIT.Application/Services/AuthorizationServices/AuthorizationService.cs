@@ -17,11 +17,24 @@ public class AuthorizationService(
     /// <returns></returns>
     public Task<(int, string)> ValidateUser(string token)
     {
-        string userID = "";
+
+        Console.WriteLine("Validating user");
+        string userId = "";
+        //validate the token
+        if (string.IsNullOrEmpty(token))
+        {
+            return Task.FromResult((0, "Token is empty"));
+        }
+        //validate the token signature
+        if (!utilsService.ValidateToken(token))
+        {
+            return Task.FromResult((0, "Invalid token"));
+        }
+
         //decode the token
         try
         {
-            userID = utilsService.DecodeTokenForValidating(token);
+            userId = utilsService.DecodeTokenForValidating(token);
         }
         catch (Exception e)
         {
@@ -32,10 +45,15 @@ public class AuthorizationService(
         //change the user status to active
         //TODO implement the logic to change the user status to active
 
-        var user = userManager.FindByIdAsync(userID);
+        var user = userManager.FindByIdAsync(userId);
         if (user.Result == null)
         {
             return Task.FromResult((0, "User not found"));
+        }
+
+        if(user.Result.Verified)
+        {
+            return Task.FromResult((0, "User already verified"));
         }
 
         //change the user status to active

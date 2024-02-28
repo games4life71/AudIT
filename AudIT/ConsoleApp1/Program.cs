@@ -622,108 +622,22 @@
 
 //upload a file to s3 bucket
 
+using AudIT.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
-using Amazon;
-using Amazon.S3;
-using Amazon.S3.Model;
-using System;
-using System.Threading.Tasks;
+var context = new AudITContext();
 
-namespace Amazon.DocSamples.S3
-{
-    class UploadObjectTest
-    {
-        private const string bucketName = "auditdocbucket";
-        // For simplicity the example creates two objects from the same file.
-        // You specify key names for these objects.
-        private const string keyName1 = "key1";
-        private const string keyName2 = "key2";
-        private const string filePath = @"D:\Projects\AudIT\AudIT\AudIT\ConsoleApp1";
-        private static readonly RegionEndpoint bucketRegion = RegionEn  dpoint.EUCentral1;
-
-        private static IAmazonS3 client;
-
-        public static void Main()
-        {
-            client = new AmazonS3Client(bucketRegion);
-            // WritingAnObjectAsync().Wait();
-            GetObjectAsync().Wait();
-        }
-
-        static async Task WritingAnObjectAsync()
-        {
-            try
-            {
-                // 1. Put object-specify only key name for the new object.
-                var putRequest1 = new PutObjectRequest
-                {
-                    BucketName = bucketName,
-                    Key = "StandaloneDocs/"+keyName1,
-                    ContentBody = "sample text"
-                };
-
-                PutObjectResponse response1 = await client.PutObjectAsync(putRequest1);
-
-                // 2. Put the object-set ContentType and add metadata.
-                var putRequest2 = new PutObjectRequest
-                {
-                    BucketName = bucketName,
-                    Key = keyName2,
-                    FilePath = filePath,
-                    ContentType = "text/plain"
-                };
-
-                putRequest2.Metadata.Add("x-amz-meta-title", "someTitle");
-                PutObjectResponse response2 = await client.PutObjectAsync(putRequest2);
-            }
-            catch (AmazonS3Exception e)
-            {
-                Console.WriteLine(
-                        "Error encountered ***. Message:'{0}' when writing an object"
-                        , e.Message);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(
-                    "Unknown encountered on server. Message:'{0}' when writing an object"
-                    , e.Message);
-            }
-        }
-
-        static async Task GetObjectAsync()
-        {
-
-            try
-            {
-
-                GetObjectRequest request = new GetObjectRequest()
-                {
-                    BucketName = "auditdocbucket",
-                    Key = "StandaloneDocs/key1"
-                };
-
-                var response = await client.GetObjectAsync(request);
-
-                Console.WriteLine("Content type: " + response.Headers.ContentType);
-                Console.WriteLine("Content length: " + response.Headers.ContentLength);
-                Console.WriteLine("Content: ");
-                await response.WriteResponseStreamToFileAsync($"{filePath}\\file.txt", true, CancellationToken.None);
-
-
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-
-
-        }
-    }
-}
+// get an institution based on the domain
+var institution = context.Institutions
+    .Where(i => i.EmailDomains.Contains("example.com"))
+    .Include(i=>i.InstitutionAdmin).FirstAsync();
+//
+// var institutionAdmins = context.InstitutionAdmins
+//     .Where(i => i.InstitutionId.ToString().Equals(institution.Id.ToString()))
+//     .Include(i => i.User).FirstAsync();
 
 
 
 
-
+Console.WriteLine("Institution:" + institution.Result.Name);
+Console.WriteLine("Institution Admin:" + institution.Result.InstitutionAdmin.UserName);
