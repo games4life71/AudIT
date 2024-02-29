@@ -24,7 +24,9 @@ public class AudITContext : IdentityDbContext<User>
     public DbSet<AuditMissionObjectives> AuditMissionObjectives { get; set; }
 
     public DbSet<Objective> Objective { get; set; }
+    public DbSet<ObjectiveAction> ObjectiveAction { get; set; }
 
+    public DbSet<ActionRisk> ActionRisk { get; set; }
 
     public AudITContext()
     {

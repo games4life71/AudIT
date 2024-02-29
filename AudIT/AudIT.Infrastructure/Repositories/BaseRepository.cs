@@ -6,7 +6,7 @@ namespace AudIT.Infrastructure.Repositories;
 
 public class BaseRepository<T> : IRepository<T> where T : class
 {
-    private readonly AudITContext _dbcContext;
+    public readonly AudITContext _dbcContext;
 
     public BaseRepository(AudITContext context)
     {

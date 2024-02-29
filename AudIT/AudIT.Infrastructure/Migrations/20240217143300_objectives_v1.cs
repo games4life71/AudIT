@@ -12,7 +12,7 @@ namespace AudIT.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Objective",
+                name: "Objectives",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
@@ -50,7 +50,7 @@ namespace AudIT.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_AuditMissionObjectives_Objective_ObjectiveId",
                         column: x => x.ObjectiveId,
-                        principalTable: "Objective",
+                        principalTable: "Objectives",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -72,7 +72,7 @@ namespace AudIT.Infrastructure.Migrations
                     table.ForeignKey(
                         name: "FK_ObjectiveAction_Objective_ObjectiveId",
                         column: x => x.ObjectiveId,
-                        principalTable: "Objective",
+                        principalTable: "Objectives",
                         principalColumn: "Id");
                 });
 
@@ -112,7 +112,7 @@ namespace AudIT.Infrastructure.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_Objective_AuditMissionId",
-                table: "Objective",
+                table: "Objectives",
                 column: "AuditMissionId");
 
             migrationBuilder.CreateIndex(
@@ -134,7 +134,7 @@ namespace AudIT.Infrastructure.Migrations
                 name: "ObjectiveAction");
 
             migrationBuilder.DropTable(
-                name: "Objective");
+                name: "Objectives");
         }
     }
 }

@@ -33,7 +33,9 @@ public static class InfrastructureRegistration
         services.AddScoped<IStandaloneDocRepository, StandaloneDocRepository>();
         services.AddScoped<ITemplateDocRepository, TemplateDocRepository>();
         services.AddScoped<IAuditMissionRepository, AuditMissionRepository>();
-
+        services.AddScoped<IObjectiveRepository, ObjectiveRepository>();
+        services.AddScoped<IObjectiveActionRepository, ObjectiveActionRepository>();
+        services.AddScoped<IActionRiskRepository, ActionRiskRepository>();
         services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<AudITContext>()
             .AddDefaultTokenProviders();
@@ -42,7 +44,7 @@ public static class InfrastructureRegistration
         services.AddScoped<EmailService, EmailService>();
         services.AddScoped<UtilsService, UtilsService>();
         services.AddScoped<IDocumentManager, DocumentService>();
-        services.AddScoped<IEmailService,EmailService>();
+        services.AddScoped<IEmailService, EmailService>();
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
         return services;
     }

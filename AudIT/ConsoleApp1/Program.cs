@@ -116,7 +116,7 @@
 // // //
 // // // //add a new objective
 // // //
-// // // var objective = Objective.Create(
+// // // var objective = Objectives.Create(
 // // //     "test objective",
 // // //     auditMission
 // // // ).Value;
@@ -154,11 +154,11 @@
 // // // //get the objectives of the audit mission
 // // //
 // // // var objectives = db.AuditMissionObjectives.Where(auditmissobj => auditmissobj.AuditMissionId == audit_mission.Id)
-// // //     .Include(audit_missionobj => audit_missionobj.Objective).ToList();
+// // //     .Include(audit_missionobj => audit_missionobj.Objectives).ToList();
 // // //
 // // // // foreach (var objective1 in objectives)
 // // // // {
-// // // //     Console.WriteLine("Objective:" + objective.Objective.Name);
+// // // //     Console.WriteLine("Objectives:" + objective.Objectives.Name);
 // // // // }
 // // //
 // // // //get all the documents of the audit mission
@@ -175,17 +175,17 @@
 // // //
 // // // //get all the objectives action and risks
 // // //
-// // // var objectives_actions = db.Objective.Where(objective => objective.AuditMissionId == audit_mission.Id)
+// // // var objectives_actions = db.Objectives.Where(objective => objective.AuditMissionId == audit_mission.Id)
 // // //     .Include(objective => objective.ObjectiveActions).ThenInclude(objectiveAction => objectiveAction.ActionRisks)
 // // //     .ToList();
 // // //
 // // //
 // // // foreach (var  objact in objectives_actions)
 // // // {
-// // //     Console.WriteLine("Objective:" + objact.Name);
+// // //     Console.WriteLine("Objectives:" + objact.Name);
 // // //     foreach (var objectt in objact.ObjectiveActions)
 // // //     {
-// // //         Console.WriteLine("Objective Action:" +  objectt.Name);
+// // //         Console.WriteLine("Objectives Action:" +  objectt.Name);
 // // //         foreach (var risk in  objectt.ActionRisks)
 // // //         {
 // // //             Console.WriteLine("Risk:" + risk.Name);
@@ -622,22 +622,26 @@
 
 //upload a file to s3 bucket
 
+using AudiT.Domain.Entities;
 using AudIT.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
 var context = new AudITContext();
 
-// get an institution based on the domain
-var institution = context.Institutions
-    .Where(i => i.EmailDomains.Contains("example.com"))
-    .Include(i=>i.InstitutionAdmin).FirstAsync();
-//
-// var institutionAdmins = context.InstitutionAdmins
-//     .Where(i => i.InstitutionId.ToString().Equals(institution.Id.ToString()))
-//     .Include(i => i.User).FirstAsync();
+var obj_act = context.ObjectiveAction.Include(obj_act => obj_act.ActionRisks).First();
+
+//add a new action risk to the objective action
+var actionRisk = ActionRisk.Create(
+    "test risk",
+    Risk.Mare,
+    obj_act.Id
+).Value;
+
+
+context.Add(actionRisk);
+context.SaveChanges();
 
 
 
 
-Console.WriteLine("Institution:" + institution.Result.Name);
-Console.WriteLine("Institution Admin:" + institution.Result.InstitutionAdmin.UserName);
+Console.WriteLine("Objective Action:" + obj_act.Name);
