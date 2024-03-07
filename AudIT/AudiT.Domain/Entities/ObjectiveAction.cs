@@ -20,7 +20,7 @@ public class ObjectiveAction
 
     public bool Selected { get; private set; } = true;
 
-    public Objective Objective { get; private set; }
+    [JsonIgnore] public Objective Objective { get; private set; }
 
     public Guid ObjectiveId { get; private set; }
 
@@ -58,6 +58,10 @@ public class ActionRisk
     public string Name { get; private set; }
     public Risk Risk { get; private set; }
 
+    public int Probability { get; private set; }
+
+    public int Impact { get; private set; }
+
     public Guid ObjectiveActionId { get; private set; }
 
     [JsonConstructor]
@@ -73,6 +77,45 @@ public class ActionRisk
     public static Result<ActionRisk> Create(string name, Risk risk, Guid objectiveActionId)
     {
         return Result<ActionRisk>.Success(new ActionRisk(name: name, risk: risk, objectiveActionId: objectiveActionId));
+    }
+
+    public static Result<ActionRisk> Create(string name, Risk risk, Guid objectiveActionId, int probability, int impact)
+    {
+        var actionRisk = new ActionRisk(name: name, risk: risk, objectiveActionId: objectiveActionId);
+        actionRisk.SetProbability(probability);
+        actionRisk.SetImpact(impact);
+        return Result<ActionRisk>.Success(actionRisk);
+    }
+
+
+    public void SetProbability(int probability)
+    {
+        Probability = probability;
+    }
+
+    public void SetImpact(int impact)
+    {
+        Impact = impact;
+    }
+
+    public void SetName(string name)
+    {
+        Name = name;
+    }
+
+    public void SetRisk(Risk risk)
+    {
+        Risk = risk;
+    }
+
+    public void SetObjectiveActionId(Guid objectiveActionId)
+    {
+        ObjectiveActionId = objectiveActionId;
+    }
+
+    public void SetId(Guid id)
+    {
+        Id = id;
     }
 }
 

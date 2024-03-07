@@ -24,7 +24,7 @@ public class ObjectiveActionRepository(AudITContext context)
         }
         catch (Exception e)
         {
-            Console.WriteLine("The execption occured in the AddActionRisk method in the ObjectiveActionRepository");
+            Console.WriteLine("The exception occured in the AddActionRisk method in the ObjectiveActionRepository");
             throw;
         }
     }
@@ -40,5 +40,25 @@ public class ObjectiveActionRepository(AudITContext context)
         }
 
         return Result<ObjectiveAction>.Success(objectiveAction);
+    }
+
+    /// <summary>
+    /// Gets all ObjectiveActions for a given Objective by its id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    public async Task<Result<List<ObjectiveAction>>> FindAllByObjectiveIdAsync(Guid id)
+    {
+        var objectiveActions = await _dbcContext.ObjectiveAction
+            .Where(o => o.ObjectiveId == id)
+            .Include(o => o.ActionRisks)
+            .ToListAsync();
+        if (objectiveActions.Count == 0)
+        {
+            return Result<List<ObjectiveAction>>.Failure($"ObjectiveActions for Objective with id {id} not found.");
+        }
+
+        return Result<List<ObjectiveAction>>.Success(objectiveActions);
+
     }
 }

@@ -44,4 +44,6 @@ app.UseRouting();
 //     endpoints.MapControllers();
 // });
 app.MapControllers();
+app.UseAuthentication();
+app.UseAuthorization();
 app.Run();

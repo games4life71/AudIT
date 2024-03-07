@@ -26,10 +26,10 @@ public class StandaloneDocumentController : BaseController
             StringBuilder key = new StringBuilder();
             var fileExtension = uploadDocument.FileName.Split('.').Last();
             key.Append("standalone-documents/");
-            key.Append(command.Name);
+            key.Append(uploadDocument.FileName.Split('.').First());
             key.Append('.');
             key.Append(fileExtension);
-
+            Console.WriteLine("THE KEY IS " + key.ToString());
             var uploadResult = Mediator.Send(new UploadStandDoc(uploadDocument, key.ToString()));
 
             if (!uploadResult.Result.Item1)

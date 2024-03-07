@@ -9,5 +9,8 @@ public class ObjectiveActionProfile : MyCustomProfile
     {
         CreateMap<BaseObjActionDto, ObjectiveAction>();
         CreateMap<ObjectiveAction, BaseObjActionDto>();
+        CreateMap<ObjectiveAction, ObjActionWithRisksDto>();
+
+
     }
 }

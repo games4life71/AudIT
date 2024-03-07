@@ -9,11 +9,28 @@ public class AddActionRiskCommand : IRequest<BaseDTOResponse<ObjActionWithRisksD
 {
     public Guid ObjectiveActionId { get; set; }
 
-    public ActionRisk ActionRisk { get; set; }
+    private ActionRisk ActionRisk { get; set; }
 
-    public AddActionRiskCommand(Guid objectiveActionId, ActionRisk actionRisk)
+    public string? ActionRiskName { get; set; }
+
+    public int Probability { get; set; }
+
+    public int Impact { get; set; }
+
+    public Risk Risk { get; set; }
+
+    public AddActionRiskCommand(Guid objectiveActionId, string actionRiskName, int probability, int impact, Risk risk)
     {
         ObjectiveActionId = objectiveActionId;
-        ActionRisk = actionRisk;
+        ActionRisk = ActionRisk.Create(actionRiskName, risk, objectiveActionId).Value;
+        ActionRisk.SetProbability(probability);
+        ActionRisk.SetImpact(impact);
     }
+
+    public ActionRisk GetActionRisk()
+    {
+        return ActionRisk;
+    }
+
+
 }

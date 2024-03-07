@@ -1,5 +1,7 @@
-﻿using AudiT.Domain.Entities;
+﻿using System.Security.Claims;
+using AudiT.Domain.Entities;
 using AudIT.Domain.Misc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Action = AudiT.Domain.Entities.Action;
@@ -28,12 +30,18 @@ public class AudITContext : IdentityDbContext<User>
 
     public DbSet<ActionRisk> ActionRisk { get; set; }
 
+
+    //Services
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+
     public AudITContext()
     {
     }
 
-    public AudITContext(DbContextOptions<AudITContext> options) : base(options)
+    public AudITContext(DbContextOptions<AudITContext> options , IHttpContextAccessor httpContextAccessor) : base(options)
     {
+        _httpContextAccessor = httpContextAccessor;
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -64,4 +72,55 @@ public class AudITContext : IdentityDbContext<User>
     //
     //     base.OnModelCreating(modelBuilder);
     // }
+
+
+    public override int SaveChanges()
+    {
+        UpdateAuditableEntities();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = new CancellationToken())
+    {
+        UpdateAuditableEntities();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
+
+
+    /// <summary>
+    /// This method is used to update the AuditableEntity properties before saving the changes
+    /// </summary>
+    private void UpdateAuditableEntities()
+    {
+
+        var now = DateTime.Now;
+        var user = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Entity.CreatedBy = user;
+                    entry.Entity.LastModifiedDate = now;
+                    entry.Entity.CreatedDate = now;
+                    entry.Entity.LastModifiedBy = user;
+                    break;
+                case EntityState.Modified:
+                    entry.Entity.LastModifiedBy = user;
+                    entry.Entity.LastModifiedDate = now;
+                    break;
+                case EntityState.Detached:
+                    break;
+                case EntityState.Unchanged:
+                    break;
+                case EntityState.Deleted:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+
+    }
 }

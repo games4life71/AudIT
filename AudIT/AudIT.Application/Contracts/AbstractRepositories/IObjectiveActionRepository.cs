@@ -8,5 +8,6 @@ public interface IObjectiveActionRepository:IRepository<ObjectiveAction>
 
     public Task<Result<ObjectiveAction>> FindByIdAsyncWithActionRisks(Guid id);
 
+    public Task<Result<List<ObjectiveAction>>> FindAllByObjectiveIdAsync(Guid id);
 
 }

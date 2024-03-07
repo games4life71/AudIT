@@ -24,10 +24,17 @@ public static class InfrastructureRegistration
     {
         services.AddDbContext<AudITContext>(options =>
             options.UseSqlite(configuration.GetConnectionString("AudITContext")));
-
+        services.AddAuthentication(
+            options =>
+            {
+                options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
+            });
         services.AddScoped
         (typeof(IRepository<>),
             typeof(BaseRepository<>));
+
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
         services.AddScoped<IDepartmentRepository, DepartmentRepository>();
         services.AddScoped<IStandaloneDocRepository, StandaloneDocRepository>();
@@ -45,6 +52,7 @@ public static class InfrastructureRegistration
         services.AddScoped<UtilsService, UtilsService>();
         services.AddScoped<IDocumentManager, DocumentService>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddHttpContextAccessor();
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
         return services;
     }

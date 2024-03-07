@@ -18,8 +18,8 @@ public class AuthService(
     IConfiguration configuration,
     IInstitutionRepository institutionRepository,
     EmailService emailService,
-    UtilsService utilsService
-)
+    UtilsService utilsService,
+    SignInManager<User> signInManager)
     : IAuthService // This is the implementation of the IAuthService interface
 {
     private readonly IConfiguration _configuration = configuration;
@@ -90,12 +90,13 @@ public class AuthService(
             return (0, institution.Error);
         }
 
-        Console.WriteLine("FOUND THE INSTITURION");
+        // Console.WriteLine("FOUND THE INSTITURION");
         var institutionAdmin = institution.Value.InstitutionAdmin;
-        if(institutionAdmin == null)
+        if (institutionAdmin == null)
         {
-            Console.WriteLine("INSTITUTION ADMIN IS NULL");
+            // Console.WriteLine("INSTITUTION ADMIN IS NULL");
         }
+
         Console.WriteLine("INSTITUTION : " + institution.Value.Id);
         if (institutionAdmin == null)
         {
@@ -141,6 +142,7 @@ public class AuthService(
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+
 
         foreach (var userRole in userRoles)
         {

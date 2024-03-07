@@ -8,13 +8,13 @@ public class ObjActionWithRisksDto
 
     public string Name { get; private set; }
 
-    public List<ActionRisk> Risks { get; private set; }
+    public List<ActionRisk> ActionRisks { get; private set; }
 
 
-    public ObjActionWithRisksDto(Guid id, string name, List<ActionRisk> risks)
+    public ObjActionWithRisksDto(Guid id, string name, List<ActionRisk> actionRisks)
     {
         Id = id;
         Name = name;
-        Risks = risks;
+        ActionRisks = actionRisks;
     }
 }

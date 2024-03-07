@@ -17,7 +17,7 @@ public class AddActionRiskHandler(
         try
         {
             var objectveAction = await _objectiveActionRepository.FindByIdAsync(request.ObjectiveActionId);
-            Console.WriteLine("the name of the action risk " + request.ActionRisk.Name);
+            Console.WriteLine("the name of the action risk " + request.ActionRiskName);
 
             if (!objectveAction.IsSuccess)
                 return new BaseDTOResponse<ObjActionWithRisksDto>(
@@ -25,13 +25,13 @@ public class AddActionRiskHandler(
 
             // Add the risk to the objective action
 
-            bool succes = objectveAction.Value.AddRisk(request.ActionRisk);
+            bool succes = objectveAction.Value.AddRisk(request.GetActionRisk());
             if (!succes)
                 return new BaseDTOResponse<ObjActionWithRisksDto>(
-                    $"Risk with id {request.ActionRisk.Id} already exists in the objective action", false);
+                    $"Risk with id {request.GetActionRisk().Id} already exists in the objective action", false);
 
             Console.WriteLine(objectveAction.Value.ActionRisks.Count + " is the number of risks");
-            var result = await _actionRiskRepository.AddAsync(request.ActionRisk);
+            var result = await _actionRiskRepository.AddAsync(request.GetActionRisk());
 
 
             if (!result.IsSuccess)

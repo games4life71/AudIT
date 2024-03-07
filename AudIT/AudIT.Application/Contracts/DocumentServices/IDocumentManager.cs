@@ -17,4 +17,5 @@ public interface IDocumentManager
     public Task<(bool, string)> DeleteDocumentAsync(string key);
 
     public Task<(bool, string)> UpdateDocumentAsync(string key, IFormFile file);
+    Task<(bool success, string message, string version)> UploadBigDocumentAsync(IFormFile requestFile, string requestKey, bool b);
 }
