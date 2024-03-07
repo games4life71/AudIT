@@ -10,7 +10,7 @@ public class TemplateDocument:BaseDocument
 
     public TemplateTypeStage Type { get; private set; }
 
-    public int Version { get; private set; }
+    public string Version { get; private set; }
 
 
     public TemplateDocument()
@@ -25,7 +25,7 @@ public class TemplateDocument:BaseDocument
         Guid ownerId,
         DocumentState state,
         TemplateTypeStage type,
-        int version) : base(name, extension, owner, ownerId)
+        string version) : base(name, extension, owner, ownerId)
     {
         State = state;
         Type = type;
@@ -40,7 +40,7 @@ public class TemplateDocument:BaseDocument
         Guid ownerId,
         DocumentState state,
         TemplateTypeStage type,
-        int version
+        string version
     )
     {
         //TODO: Add validation logic here

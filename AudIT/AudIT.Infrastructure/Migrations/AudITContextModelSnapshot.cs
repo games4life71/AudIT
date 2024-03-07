@@ -115,12 +115,18 @@ namespace AudIT.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Impact")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("ObjectiveActionId")
+                    b.Property<Guid>("ObjectiveActionId")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("Probability")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Risk")
                         .HasColumnType("INTEGER");
@@ -276,7 +282,10 @@ namespace AudIT.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("InstitutionAdminId")
+                    b.Property<Guid>("InstitutionAdminId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("InstitutionAdminId1")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LastModifiedBy")
@@ -291,7 +300,7 @@ namespace AudIT.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InstitutionAdminId");
+                    b.HasIndex("InstitutionAdminId1");
 
                     b.ToTable("Institutions");
                 });
@@ -334,7 +343,7 @@ namespace AudIT.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("ObjectiveId")
+                    b.Property<Guid>("ObjectiveId")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("Selected")
@@ -586,8 +595,9 @@ namespace AudIT.Infrastructure.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Version")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasDiscriminator().HasValue("TemplateDocument");
                 });
@@ -630,7 +640,9 @@ namespace AudIT.Infrastructure.Migrations
                 {
                     b.HasOne("AudiT.Domain.Entities.ObjectiveAction", null)
                         .WithMany("ActionRisks")
-                        .HasForeignKey("ObjectiveActionId");
+                        .HasForeignKey("ObjectiveActionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("AudiT.Domain.Entities.AuditMission", b =>
@@ -705,7 +717,7 @@ namespace AudIT.Infrastructure.Migrations
                 {
                     b.HasOne("AudiT.Domain.Entities.User", "InstitutionAdmin")
                         .WithMany()
-                        .HasForeignKey("InstitutionAdminId");
+                        .HasForeignKey("InstitutionAdminId1");
 
                     b.Navigation("InstitutionAdmin");
                 });
@@ -723,9 +735,13 @@ namespace AudIT.Infrastructure.Migrations
 
             modelBuilder.Entity("AudiT.Domain.Entities.ObjectiveAction", b =>
                 {
-                    b.HasOne("AudiT.Domain.Entities.Objective", null)
+                    b.HasOne("AudiT.Domain.Entities.Objective", "Objective")
                         .WithMany("ObjectiveActions")
-                        .HasForeignKey("ObjectiveId");
+                        .HasForeignKey("ObjectiveId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Objective");
                 });
 
             modelBuilder.Entity("AudiT.Domain.Entities.User", b =>

@@ -3,11 +3,8 @@ using Microsoft.AspNetCore.Http;
 
 namespace AudIT.Applicationa.Requests.Document.StandaloneDocument.Commands.Upload;
 
-public class UploadStandDoc : IRequest<bool>
+public class UploadStandDoc : IRequest<(bool,string)>
 {
-    private readonly string FolderName = "StandaloneDocs";
-    private readonly string BucketName = "auditdocbucket";
-
     public IFormFile File { get; set; }
 
     /// <summary>

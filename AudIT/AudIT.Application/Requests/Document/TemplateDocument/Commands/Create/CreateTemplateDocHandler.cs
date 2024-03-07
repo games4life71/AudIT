@@ -17,16 +17,16 @@ public class CreateTemplateDocHandler(
         CancellationToken cancellationToken)
     {
         //validate
-        var validation = await new CreateTemplateDocValidator().ValidateAsync(request, cancellationToken);
+        // var validation = await new CreateTemplateDocValidator().ValidateAsync(request, cancellationToken);
 
-        if (!validation.IsValid)
-        {
-            return new BaseDTOResponse<BaseTemplateDocDto>
-            {
-                Message = validation.Errors.Select(x => x.ErrorMessage).ToList().ToString(),
-                Success = false
-            };
-        }
+        // if (!validation.IsValid)
+        // {
+        //     return new BaseDTOResponse<BaseTemplateDocDto>
+        //     {
+        //         Message = validation.Errors.Select(x => x.ErrorMessage).ToList().ToString(),
+        //         Success = false
+        //     };
+        // }
 
 
         //get the user

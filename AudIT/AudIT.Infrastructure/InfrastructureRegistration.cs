@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using AudIT.Applicationa.Contracts.AbstractRepositories;
 using AudIT.Applicationa.Contracts.DocumentServices;
+using AudIT.Applicationa.Contracts.EmailServices;
 using AudIT.Applicationa.Contracts.Identity;
 using AudIT.Applicationa.Services.AuthorizationServices;
 using AudIT.Applicationa.Services.AuthServices;
@@ -10,6 +11,7 @@ using AudIT.Applicationa.Services.UtilsServices;
 using AudiT.Domain.Entities;
 using AudIT.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,16 +24,25 @@ public static class InfrastructureRegistration
     {
         services.AddDbContext<AudITContext>(options =>
             options.UseSqlite(configuration.GetConnectionString("AudITContext")));
-
+        services.AddAuthentication(
+            options =>
+            {
+                options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
+            });
         services.AddScoped
         (typeof(IRepository<>),
             typeof(BaseRepository<>));
+
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
         services.AddScoped<IDepartmentRepository, DepartmentRepository>();
         services.AddScoped<IStandaloneDocRepository, StandaloneDocRepository>();
         services.AddScoped<ITemplateDocRepository, TemplateDocRepository>();
         services.AddScoped<IAuditMissionRepository, AuditMissionRepository>();
-
+        services.AddScoped<IObjectiveRepository, ObjectiveRepository>();
+        services.AddScoped<IObjectiveActionRepository, ObjectiveActionRepository>();
+        services.AddScoped<IActionRiskRepository, ActionRiskRepository>();
         services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<AudITContext>()
             .AddDefaultTokenProviders();
@@ -40,6 +51,8 @@ public static class InfrastructureRegistration
         services.AddScoped<EmailService, EmailService>();
         services.AddScoped<UtilsService, UtilsService>();
         services.AddScoped<IDocumentManager, DocumentService>();
+        services.AddScoped<IEmailService, EmailService>();
+        services.AddHttpContextAccessor();
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly()));
         return services;
     }

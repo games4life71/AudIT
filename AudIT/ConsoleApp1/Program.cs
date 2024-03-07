@@ -116,7 +116,7 @@
 // // //
 // // // //add a new objective
 // // //
-// // // var objective = Objective.Create(
+// // // var objective = Objectives.Create(
 // // //     "test objective",
 // // //     auditMission
 // // // ).Value;
@@ -154,11 +154,11 @@
 // // // //get the objectives of the audit mission
 // // //
 // // // var objectives = db.AuditMissionObjectives.Where(auditmissobj => auditmissobj.AuditMissionId == audit_mission.Id)
-// // //     .Include(audit_missionobj => audit_missionobj.Objective).ToList();
+// // //     .Include(audit_missionobj => audit_missionobj.Objectives).ToList();
 // // //
 // // // // foreach (var objective1 in objectives)
 // // // // {
-// // // //     Console.WriteLine("Objective:" + objective.Objective.Name);
+// // // //     Console.WriteLine("Objectives:" + objective.Objectives.Name);
 // // // // }
 // // //
 // // // //get all the documents of the audit mission
@@ -175,17 +175,17 @@
 // // //
 // // // //get all the objectives action and risks
 // // //
-// // // var objectives_actions = db.Objective.Where(objective => objective.AuditMissionId == audit_mission.Id)
+// // // var objectives_actions = db.Objectives.Where(objective => objective.AuditMissionId == audit_mission.Id)
 // // //     .Include(objective => objective.ObjectiveActions).ThenInclude(objectiveAction => objectiveAction.ActionRisks)
 // // //     .ToList();
 // // //
 // // //
 // // // foreach (var  objact in objectives_actions)
 // // // {
-// // //     Console.WriteLine("Objective:" + objact.Name);
+// // //     Console.WriteLine("Objectives:" + objact.Name);
 // // //     foreach (var objectt in objact.ObjectiveActions)
 // // //     {
-// // //         Console.WriteLine("Objective Action:" +  objectt.Name);
+// // //         Console.WriteLine("Objectives Action:" +  objectt.Name);
 // // //         foreach (var risk in  objectt.ActionRisks)
 // // //         {
 // // //             Console.WriteLine("Risk:" + risk.Name);
@@ -622,108 +622,26 @@
 
 //upload a file to s3 bucket
 
+using AudiT.Domain.Entities;
+using AudIT.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
-using Amazon;
-using Amazon.S3;
-using Amazon.S3.Model;
-using System;
-using System.Threading.Tasks;
+var context = new AudITContext();
 
-namespace Amazon.DocSamples.S3
-{
-    class UploadObjectTest
-    {
-        private const string bucketName = "auditdocbucket";
-        // For simplicity the example creates two objects from the same file.
-        // You specify key names for these objects.
-        private const string keyName1 = "key1";
-        private const string keyName2 = "key2";
-        private const string filePath = @"D:\Projects\AudIT\AudIT\AudIT\ConsoleApp1";
-        private static readonly RegionEndpoint bucketRegion = RegionEndpoint.EUCentral1;
+var obj_act = context.ObjectiveAction.Include(obj_act => obj_act.ActionRisks).First();
 
-        private static IAmazonS3 client;
-
-        public static void Main()
-        {
-            client = new AmazonS3Client(bucketRegion);
-            // WritingAnObjectAsync().Wait();
-            GetObjectAsync().Wait();
-        }
-
-        static async Task WritingAnObjectAsync()
-        {
-            try
-            {
-                // 1. Put object-specify only key name for the new object.
-                var putRequest1 = new PutObjectRequest
-                {
-                    BucketName = bucketName,
-                    Key = "StandaloneDocs/"+keyName1,
-                    ContentBody = "sample text"
-                };
-
-                PutObjectResponse response1 = await client.PutObjectAsync(putRequest1);
-
-                // 2. Put the object-set ContentType and add metadata.
-                var putRequest2 = new PutObjectRequest
-                {
-                    BucketName = bucketName,
-                    Key = keyName2,
-                    FilePath = filePath,
-                    ContentType = "text/plain"
-                };
-
-                putRequest2.Metadata.Add("x-amz-meta-title", "someTitle");
-                PutObjectResponse response2 = await client.PutObjectAsync(putRequest2);
-            }
-            catch (AmazonS3Exception e)
-            {
-                Console.WriteLine(
-                        "Error encountered ***. Message:'{0}' when writing an object"
-                        , e.Message);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(
-                    "Unknown encountered on server. Message:'{0}' when writing an object"
-                    , e.Message);
-            }
-        }
-
-        static async Task GetObjectAsync()
-        {
-
-            try
-            {
-
-                GetObjectRequest request = new GetObjectRequest()
-                {
-                    BucketName = "auditdocbucket",
-                    Key = "StandaloneDocs/key1"
-                };
-
-                var response = await client.GetObjectAsync(request);
-
-                Console.WriteLine("Content type: " + response.Headers.ContentType);
-                Console.WriteLine("Content length: " + response.Headers.ContentLength);
-                Console.WriteLine("Content: ");
-                await response.WriteResponseStreamToFileAsync($"{filePath}\\file.txt", true, CancellationToken.None);
+//add a new action risk to the objective action
+var actionRisk = ActionRisk.Create(
+    "test risk",
+    Risk.Mare,
+    obj_act.Id
+).Value;
 
 
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-
-
-        }
-    }
-}
+context.Add(actionRisk);
+context.SaveChanges();
 
 
 
 
-
+Console.WriteLine("Objective Action:" + obj_act.Name);

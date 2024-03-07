@@ -32,10 +32,37 @@ public class UtilsService(IConfiguration configuration)
     public string DecodeTokenForValidating(string token)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var securityToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
-        if (securityToken == null)
+        if (tokenHandler.ReadToken(token) is not JwtSecurityToken securityToken)
             throw new Exception("Invalid token");
 
         return securityToken.Claims.First(claim => claim.Type == JwtRegisteredClaimNames.Sid).Value;
+    }
+
+
+    public bool ValidateToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]!));
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = authSigningKey,
+            ValidateIssuer = true,
+            ValidIssuer = configuration["JWT:ValidIssuer"]!,
+            ValidateAudience = true,
+            ValidAudience = configuration["JWT:ValidAudience"]!,
+            ValidateLifetime = true
+        };
+
+        try
+        {
+            tokenHandler.ValidateToken(token, validationParameters, out _);
+        }
+        catch
+        {
+            return false;
+        }
+
+        return true;
     }
 }

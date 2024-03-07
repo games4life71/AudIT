@@ -16,10 +16,10 @@ public class BaseTemplateDocDto
 
     public DocumentState State { get; set; }
 
-    public int Version { get; set; }
+    public string Version { get; set; }
 
     public BaseTemplateDocDto(Guid id, string name, string extension, Guid ownerId, TemplateTypeStage type,
-        DocumentState state, int version)
+        DocumentState state, string version)
     {
         Id = id;
         Name = name;

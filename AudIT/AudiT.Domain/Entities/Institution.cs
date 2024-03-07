@@ -26,6 +26,7 @@ public class Institution : AuditableEntity
 
     public User? InstitutionAdmin { get; private set; }
 
+    public Guid InstitutionAdminId { get; private set; }
     // public string InstitutionAdminId { get; private set; }
 
     private Institution(string name, string address, string homePhoneNumber)
@@ -67,7 +68,7 @@ public class Institution : AuditableEntity
         // InstitutionAdminId = user.Id.ToString();
     }
 
-    public   void AddEmailDomain(string domain)
+    public void AddEmailDomain(string domain)
     {
         EmailDomains.Add(domain);
     }

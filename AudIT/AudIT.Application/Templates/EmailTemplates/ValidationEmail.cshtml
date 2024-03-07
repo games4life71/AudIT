@@ -1,0 +1,22 @@
+﻿@page
+@inherits Microsoft.AspNetCore.Mvc.Razor.RazorPage<dynamic>
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Verification Email</title>
+</head>
+<body>
+    <h1>User Verification</h1>
+    <p>Dear Admin,</p>
+    <p>A new user has registered on our website and requires verification.</p>
+    <p>User details:</p>
+    <p>Username: @Model.UserName</p>
+    <p>Email: @Model.Email</p>
+    <p>Please click the link below to verify the user:</p>
+    <a href='@Model.VerificationLink'>Verify User</a>
+    <p>Best Regards,</p>
+    <p>Your Website Team</p>
+</body>
+</html>

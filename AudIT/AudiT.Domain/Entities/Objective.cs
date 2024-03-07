@@ -19,28 +19,26 @@ public class Objective
     public List<ObjectiveAction> ObjectiveActions { get; private set; } = [];
 
 
-    public Objective()
-    {
 
-    }
 
-    private  Objective( string name, AuditMission auditMission, Guid auditMissionId)
+    private Objective(string name, Guid auditMissionId)
     {
-        Id =new Guid();
+        Id = new Guid();
         Name = name;
-        AuditMission = auditMission;
+        // AuditMission = auditMission;
         AuditMissionId = auditMissionId;
     }
 
 
-    public static Result<Objective> Create(string name, AuditMission auditMission)
+    public static Result<Objective> Create(string name, Guid auditMissionId)
     {
         //TODO : Add validation logic here
-        return Result<Objective>.Success(new Objective(name, auditMission, auditMission.Id));
+        return Result<Objective>.Success(new Objective(name, auditMissionId));
     }
 
 
-
-
-
+    public void AddObjectiveAction(ObjectiveAction objectiveAction)
+    {
+        ObjectiveActions.Add(objectiveAction);
+    }
 }
