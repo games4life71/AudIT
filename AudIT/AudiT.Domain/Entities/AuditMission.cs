@@ -17,6 +17,8 @@ public class AuditMission : AuditableEntity
 
     public Department Department { get; private set; }
 
+    public AuditMissionStatus Status { get; private set; } = AuditMissionStatus.Creata;
+
     public Guid DepartmentId { get; private set; }
 
     public List<Action> Actions { get; private set; } = new List<Action>();
@@ -58,4 +60,16 @@ public class AuditMission : AuditableEntity
 
         return Result<AuditMission>.Success(new AuditMission(name, user, userId, department, departmentId));
     }
+}
+
+public enum AuditMissionStatus
+{
+    Creata,
+    PregatireaMisiunii,
+    InterventiaLaFataLocului,
+    RezultateleMisiunii,
+    UrmarireaRecomandarilor,
+    Finalizata,
+    Arhivata,
+    Anulata
 }

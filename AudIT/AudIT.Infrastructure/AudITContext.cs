@@ -21,6 +21,11 @@ public class AudITContext : IdentityDbContext<User>
     public DbSet<AuditMissionDocument> AuditMissionDocument { get; set; }
     public DbSet<AuditMission> AuditMissions { get; set; }
 
+    public DbSet<Recommendation> Recommendations { get; set; }
+
+    public DbSet<AuditMissionRecommendations> AuditMissionRecommendations { get; set; }
+
+
     public DbSet<Action> Activities { get; set; }
 
     public DbSet<AuditMissionObjectives> AuditMissionObjectives { get; set; }
@@ -39,7 +44,8 @@ public class AudITContext : IdentityDbContext<User>
     {
     }
 
-    public AudITContext(DbContextOptions<AudITContext> options , IHttpContextAccessor httpContextAccessor) : base(options)
+    public AudITContext(DbContextOptions<AudITContext> options, IHttpContextAccessor httpContextAccessor) :
+        base(options)
     {
         _httpContextAccessor = httpContextAccessor;
     }
@@ -80,7 +86,8 @@ public class AudITContext : IdentityDbContext<User>
         return base.SaveChanges();
     }
 
-    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = new CancellationToken())
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
+        CancellationToken cancellationToken = new CancellationToken())
     {
         UpdateAuditableEntities();
         return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
@@ -92,7 +99,6 @@ public class AudITContext : IdentityDbContext<User>
     /// </summary>
     private void UpdateAuditableEntities()
     {
-
         var now = DateTime.Now;
         var user = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -120,7 +126,5 @@ public class AudITContext : IdentityDbContext<User>
                     throw new ArgumentOutOfRangeException();
             }
         }
-
-
     }
 }

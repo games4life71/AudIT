@@ -10,6 +10,7 @@ using AudIT.Applicationa.Services.EmailServices;
 using AudIT.Applicationa.Services.UtilsServices;
 using AudiT.Domain.Entities;
 using AudIT.Infrastructure.Repositories;
+using AudIT.Infrastructure.Security.AuthorizationHandlers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,18 @@ public static class InfrastructureRegistration
         services.AddScoped
         (typeof(IRepository<>),
             typeof(BaseRepository<>));
+
+
+        //register a policy for the EntityOwnerAuthorizationHandler
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("EntityOwnerPolicy", policy =>
+            {
+                policy.Requirements.Add(new EntityOwnerAuthorizationHandler());
+            });
+        });
+
+
 
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
         services.AddScoped<IDepartmentRepository, DepartmentRepository>();

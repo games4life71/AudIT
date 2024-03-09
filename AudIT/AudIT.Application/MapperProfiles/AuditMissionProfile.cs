@@ -9,7 +9,7 @@ public class AuditMissionProfile:MyCustomProfile
     public AuditMissionProfile()
     {
         CreateMap<AuditMission, BaseAuditMissionDto>();
-
+        CreateMap<AuditMission,IReadOnlyList<AuditMission>>();
     }
 
 }

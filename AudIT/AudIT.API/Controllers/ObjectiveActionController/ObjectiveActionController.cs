@@ -1,6 +1,7 @@
 ﻿using AudIT.Applicationa.Requests.ObjectiveActions.Commands.Add.AddActionRisk;
 using AudIT.Applicationa.Requests.ObjectiveActions.Commands.Create;
 using AudIT.Applicationa.Requests.ObjectiveActions.DTO;
+using AudIT.Applicationa.Requests.ObjectiveActions.Queries.GetAllSelected;
 using AudIT.Applicationa.Requests.ObjectiveActions.Queries.GetBy.ObjectiveId;
 using AudIT.Applicationa.Requests.ObjectiveActions.Update.UpdateActionRisk;
 using AudIT.Applicationa.Responses;
@@ -87,11 +88,25 @@ public class ObjectiveActionController : BaseController
             {
                 return BadRequest(result.Message);
             }
+
             lastResult = result;
         }
 
         return Ok(lastResult);
-
     }
 
+
+    [HttpGet]
+    [Route("get-selected-objective-actions/{objectiveId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetSelectedObjectiveActions(Guid objectiveId)
+    {
+        var result = await Mediator.Send(new GetAllObjActionsCommand(new Guid(objectiveId.ToString())));
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
 }

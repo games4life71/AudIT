@@ -59,6 +59,21 @@ public class ObjectiveActionRepository(AudITContext context)
         }
 
         return Result<List<ObjectiveAction>>.Success(objectiveActions);
+    }
 
+    public async Task<Result<List<ObjectiveAction>>> GetAllSelectedByObjectiveId(Guid requestObjectiveId)
+    {
+        var objectiveActions = await _dbcContext.ObjectiveAction
+            .Where(o => o.ObjectiveId == requestObjectiveId)
+            .Where(o => o.Selected == true)
+            .Include(o => o.ActionRisks)
+            .ToListAsync();
+
+        if (objectiveActions.Count == 0)
+        {
+            return Result<List<ObjectiveAction>>.Failure($"ObjectiveActions that are selected for auditing for Objective with id {requestObjectiveId} not found.");
+        }
+
+        return Result<List<ObjectiveAction>>.Success(objectiveActions);
     }
 }
