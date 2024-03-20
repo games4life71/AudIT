@@ -3,10 +3,12 @@ using AudIT.Applicationa.Contracts.AbstractRepositories;
 using AudIT.Applicationa.Contracts.DocumentServices;
 using AudIT.Applicationa.Contracts.EmailServices;
 using AudIT.Applicationa.Contracts.Identity;
+using AudIT.Applicationa.Contracts.ObjectiveActionServices;
 using AudIT.Applicationa.Services.AuthorizationServices;
 using AudIT.Applicationa.Services.AuthServices;
 using AudIT.Applicationa.Services.DocumentServices;
 using AudIT.Applicationa.Services.EmailServices;
+using AudIT.Applicationa.Services.ObjectiveActionServices;
 using AudIT.Applicationa.Services.UtilsServices;
 using AudiT.Domain.Entities;
 using AudIT.Infrastructure.Repositories;
@@ -56,6 +58,10 @@ public static class InfrastructureRegistration
         services.AddScoped<IObjectiveRepository, ObjectiveRepository>();
         services.AddScoped<IObjectiveActionRepository, ObjectiveActionRepository>();
         services.AddScoped<IActionRiskRepository, ActionRiskRepository>();
+        services.AddScoped<IRecommendationRepository, RecommendationRepository>();
+
+        services.AddScoped<IObjectiveActionService, ObjectiveActionService>();
+
         services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<AudITContext>()
             .AddDefaultTokenProviders();

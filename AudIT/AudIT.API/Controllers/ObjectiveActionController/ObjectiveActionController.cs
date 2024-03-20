@@ -1,20 +1,45 @@
-﻿using AudIT.Applicationa.Requests.ObjectiveActions.Commands.Add.AddActionRisk;
+﻿using AudIT.Applicationa.Contracts.ObjectiveActionServices;
+using AudIT.Applicationa.Requests.ObjectiveActions.Commands.Add.AddActionRisk;
 using AudIT.Applicationa.Requests.ObjectiveActions.Commands.Create;
 using AudIT.Applicationa.Requests.ObjectiveActions.DTO;
 using AudIT.Applicationa.Requests.ObjectiveActions.Queries.GetAllSelected;
+using AudIT.Applicationa.Requests.ObjectiveActions.Queries.GetBy.Id;
 using AudIT.Applicationa.Requests.ObjectiveActions.Queries.GetBy.ObjectiveId;
 using AudIT.Applicationa.Requests.ObjectiveActions.Update.UpdateActionRisk;
 using AudIT.Applicationa.Responses;
 using AudiT.Domain.Entities;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AudIT.API.Controllers.ObjectiveActionController;
 
 public class ObjectiveActionController : BaseController
 {
-    public ObjectiveActionController()
+
+    private readonly IMapper _mapper;
+    private readonly IObjectiveActionService ObjectiveActionService;
+
+    public ObjectiveActionController(IMapper mapper, IObjectiveActionService objectiveActionService)
     {
+        _mapper = mapper;
+        ObjectiveActionService = objectiveActionService;
     }
+
+
+    [HttpGet]
+    [Route("get-objective-action/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetObjectiveAction(Guid id)
+    {
+        var result = await Mediator.Send(new GetObjectiveActionByIdQuery(new Guid(id.ToString())));
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
+
 
     [HttpPost]
     [Route("add-new-objective-action")]
@@ -108,5 +133,41 @@ public class ObjectiveActionController : BaseController
         }
 
         return Ok(result);
+    }
+
+    [HttpGet]
+    [Route("get-objective-action-score/{objectiveActionId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetObjectiveActionScore(Guid objectiveActionId)
+    {
+
+        var objectiveAction = await Mediator.Send(new GetObjectiveActionByIdQuery(new Guid(objectiveActionId.ToString())));
+        if (!objectiveAction.Success)
+        {
+            return BadRequest(objectiveAction.Message);
+        }
+
+
+
+
+        //compute the score using the service
+
+        var objActionEntity  = _mapper.Map<ObjectiveAction>(objectiveAction.DtoResponse);
+
+        foreach (var risk in objActionEntity.ActionRisks)
+        {
+            Console.WriteLine(risk.Name);
+        }
+
+        var serviceResult = await ObjectiveActionService.ComputeObjectiveActionScore(objActionEntity);
+
+        if (!serviceResult.Item2)
+        {
+            return BadRequest("Error computing the score");
+        }
+
+
+        return Ok(serviceResult.Item1);
+
     }
 }
