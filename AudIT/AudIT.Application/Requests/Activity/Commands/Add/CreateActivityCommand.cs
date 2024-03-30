@@ -17,13 +17,17 @@ public class CreateActivityCommand:IRequest<BaseDTOResponse<BaseActivityDto>>
 
     public Guid UserId { get; set; }
 
-    public CreateActivityCommand(string name, ActivityType type, Guid departmentId, Guid userId,Guid auditMissionId)
+    public Guid? ObjectiveActionId { get; set; }
+
+
+    public CreateActivityCommand(string name, ActivityType type, Guid departmentId, Guid userId,Guid auditMissionId,Guid? objectiveActionId = null)
     {
         Name = name;
         Type = type;
         DepartmentId = departmentId;
         UserId = userId;
         AuditMissionId = auditMissionId;
+        ObjectiveActionId = objectiveActionId;
     }
 
 }

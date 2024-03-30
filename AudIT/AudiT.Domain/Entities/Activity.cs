@@ -25,7 +25,13 @@ public class Activity:AuditableEntity
 
     public string  UserId { get; private set; }
 
+
+    public Guid? ObjectiveActionId { get; private set; }
+
     public Guid AuditMissionId { get; private set; }
+
+
+
 
     public List<BaseDocument> AttachedDocuments { get; private set; }
 
@@ -51,7 +57,8 @@ public class Activity:AuditableEntity
         Guid departmentId,
         User user,
         Guid userId,
-        Guid auditMissionId
+        Guid auditMissionId,
+        Guid? objectiveActionId = null
     )
     {
         Name = name;
@@ -62,6 +69,7 @@ public class Activity:AuditableEntity
         UserId = userId.ToString();
         AttachedDocuments = new List<BaseDocument>();
         AuditMissionId = auditMissionId;
+        ObjectiveActionId = objectiveActionId;
     }
 
     public bool AddDocument(BaseDocument document)
@@ -74,11 +82,11 @@ public class Activity:AuditableEntity
         return true;
     }
 
-    public static Result<Activity> Create(string name, ActivityType type, Department department, Guid departmentId, User user, Guid userId, Guid auditMissionId)
+    public static Result<Activity> Create(string name, ActivityType type, Department department, Guid departmentId, User user, Guid userId, Guid auditMissionId, Guid? objectiveActionId = null)
     {
         //TODO : Add validation logic here
 
-        return Result<Activity>.Success(new Activity(name, type, department, departmentId, user, userId, auditMissionId));
+        return Result<Activity>.Success(new Activity(name, type, department, departmentId, user, userId, auditMissionId, objectiveActionId));
     }
 
 }
@@ -89,5 +97,6 @@ public enum ActivityType
     //the activity is a mission
     Mission,
     //the activity is a task
-    Task
+    Task,
+    ForObjectiveAction //the activity is binded to an objective action
 }

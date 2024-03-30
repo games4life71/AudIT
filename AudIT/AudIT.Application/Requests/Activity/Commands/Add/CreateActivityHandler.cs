@@ -41,7 +41,8 @@ public class CreateActivityHandler(
                 request.DepartmentId,
                 user,
                 request.UserId,
-                request.AuditMissionId
+                request.AuditMissionId,
+                request.ObjectiveActionId
             );
 
             if (!newActivity.IsSuccess)

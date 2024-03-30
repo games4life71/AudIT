@@ -8,7 +8,7 @@ public class ActivityWIthDocumentsDto : BaseActivityDto
     public List<BaseDocument> AttachedDocuments { get; set; }
 
     public ActivityWIthDocumentsDto(Guid id, string name, ActivityType type, Guid departmentId, string userId,
-        List<BaseDocument> attachedDocuments) : base(id, name, type, departmentId, userId)
+        List<BaseDocument> attachedDocuments,Guid? ObjectiveActionId = null) : base(id, name, type, departmentId, userId, ObjectiveActionId)
     {
         AttachedDocuments = attachedDocuments;
     }
