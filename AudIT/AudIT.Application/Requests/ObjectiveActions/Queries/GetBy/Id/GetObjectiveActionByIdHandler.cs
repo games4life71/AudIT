@@ -20,7 +20,7 @@ public class GetObjectiveActionByIdHandler(
 
         if (!objectiveAction.IsSuccess)
         {
-            return new BaseDTOResponse<ObjActionWithRisksDto>("Objective Action not found", false);
+            return new BaseDTOResponse<ObjActionWithRisksDto>("Objective Activity not found", false);
         }
 
         var objectiveActionDto = mapper.Map<ObjActionWithRisksDto>(objectiveAction.Value);

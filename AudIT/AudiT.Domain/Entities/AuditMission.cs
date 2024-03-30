@@ -1,4 +1,5 @@
-﻿using AudIT.Domain.Misc;
+﻿using System.Diagnostics;
+using AudIT.Domain.Misc;
 
 namespace AudiT.Domain.Entities;
 
@@ -21,7 +22,7 @@ public class AuditMission : AuditableEntity
 
     public Guid DepartmentId { get; private set; }
 
-    public List<Action> Actions { get; private set; } = new List<Action>();
+    public List<Entities.Activity> Actions { get; private set; } = new List<Activity>();
 
     public List<AuditMissionDocument> AuditMissionDocuments { get; private set; } = [];
 

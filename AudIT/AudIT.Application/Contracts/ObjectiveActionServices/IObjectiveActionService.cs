@@ -6,7 +6,7 @@ namespace AudIT.Applicationa.Contracts.ObjectiveActionServices;
 
 /// <summary>
 /// This interface models the ObjectiveActionService which consists of
-///methods to compute a score for each Objection Action based on the Obhection Action entity risks
+///methods to compute a score for each Objection Activity based on the Obhection Activity entity risks
 /// and probability of occurence of the risk
 /// </summary>
 public interface IObjectiveActionService

@@ -42,12 +42,9 @@ public static class InfrastructureRegistration
         //register a policy for the EntityOwnerAuthorizationHandler
         services.AddAuthorization(options =>
         {
-            options.AddPolicy("EntityOwnerPolicy", policy =>
-            {
-                policy.Requirements.Add(new EntityOwnerAuthorizationHandler());
-            });
+            options.AddPolicy("EntityOwnerPolicy",
+                policy => { policy.Requirements.Add(new EntityOwnerAuthorizationHandler()); });
         });
-
 
 
         services.AddScoped<IInstitutionRepository, InstitutionRepository>();
@@ -59,9 +56,9 @@ public static class InfrastructureRegistration
         services.AddScoped<IObjectiveActionRepository, ObjectiveActionRepository>();
         services.AddScoped<IActionRiskRepository, ActionRiskRepository>();
         services.AddScoped<IRecommendationRepository, RecommendationRepository>();
-
+        services.AddScoped<IActivityRepository, ActivityRepository>();
         services.AddScoped<IObjectiveActionService, ObjectiveActionService>();
-
+        services.AddScoped<IBaseDocumentRepository, BaseDocumentRepository>();
         services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<AudITContext>()
             .AddDefaultTokenProviders();

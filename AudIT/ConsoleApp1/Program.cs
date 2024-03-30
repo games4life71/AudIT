@@ -185,7 +185,7 @@
 // // //     Console.WriteLine("Objectives:" + objact.Name);
 // // //     foreach (var objectt in objact.ObjectiveActions)
 // // //     {
-// // //         Console.WriteLine("Objectives Action:" +  objectt.Name);
+// // //         Console.WriteLine("Objectives Activity:" +  objectt.Name);
 // // //         foreach (var risk in  objectt.ActionRisks)
 // // //         {
 // // //             Console.WriteLine("Risk:" + risk.Name);
@@ -644,4 +644,4 @@ context.SaveChanges();
 
 
 
-Console.WriteLine("Objective Action:" + obj_act.Name);
+Console.WriteLine("Objective Activity:" + obj_act.Name);

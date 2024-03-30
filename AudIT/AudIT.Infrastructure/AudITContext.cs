@@ -1,10 +1,11 @@
-﻿using System.Security.Claims;
+﻿using System.Diagnostics;
+using System.Security.Claims;
 using AudiT.Domain.Entities;
 using AudIT.Domain.Misc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Action = AudiT.Domain.Entities.Action;
+using Activity = AudiT.Domain.Entities.Activity;
 
 namespace AudIT.Infrastructure;
 
@@ -25,8 +26,9 @@ public class AudITContext : IdentityDbContext<User>
 
     public DbSet<AuditMissionRecommendations> AuditMissionRecommendations { get; set; }
 
+    public DbSet<BaseDocument> BaseDocuments { get; set; }
 
-    public DbSet<Action> Activities { get; set; }
+    public DbSet<Activity> Activities { get; set; }
 
     public DbSet<AuditMissionObjectives> AuditMissionObjectives { get; set; }
 
@@ -64,7 +66,7 @@ public class AudITContext : IdentityDbContext<User>
     //         .HasForeignKey(a => a.UserId)
     //         .OnDelete(DeleteBehavior.Cascade);
     //
-    //     modelBuilder.Entity<Action>()
+    //     modelBuilder.Entity<Activity>()
     //         .HasOne(a => a.User)
     //         .WithMany(u => u.Actions)
     //         .HasForeignKey(a => a.UserId)

@@ -3,6 +3,7 @@ using System;
 using AudIT.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AudIT.Infrastructure.Migrations
 {
     [DbContext(typeof(AudITContext))]
-    partial class AudITContextModelSnapshot : ModelSnapshot
+    [Migration("20240330143438_activity_doc")]
+    partial class activity_doc
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.2");
@@ -61,7 +64,7 @@ namespace AudIT.Infrastructure.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("BaseDocuments");
+                    b.ToTable("BaseDocument");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("BaseDocument");
 
@@ -103,7 +106,7 @@ namespace AudIT.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("AuditMissionId")
+                    b.Property<Guid?>("AuditMissionId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CreatedBy")
@@ -697,9 +700,7 @@ namespace AudIT.Infrastructure.Migrations
                 {
                     b.HasOne("AudiT.Domain.Entities.AuditMission", null)
                         .WithMany("Actions")
-                        .HasForeignKey("AuditMissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AuditMissionId");
 
                     b.HasOne("AudiT.Domain.Entities.Department", "Department")
                         .WithMany()
