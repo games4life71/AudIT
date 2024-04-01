@@ -20,6 +20,7 @@ public class User : IdentityUser
     public Department? Department { get; private set; }
 
     public bool Verified { get; private set; } = false;
+
     public User()
     {
     }
@@ -51,6 +52,33 @@ public class User : IdentityUser
         string officephone = "not set")
     {
         //TODO make all the checks then construct the entity
+
+        if (string.IsNullOrEmpty(username))
+        {
+            return Result<User>.Failure("Username is required");
+        }
+
+        if (string.IsNullOrEmpty(firstEmail))
+        {
+            return Result<User>.Failure("First email is required");
+        }
+
+
+        if (string.IsNullOrEmpty(adress))
+        {
+            return Result<User>.Failure("Adress is required");
+        }
+
+        if (string.IsNullOrEmpty(phoneNumber))
+        {
+            return Result<User>.Failure("Phone number is required");
+        }
+
+        if (secondEmail == firstEmail)
+        {
+            return Result<User>.Failure("Second email cannot be the same as the first email");
+        }
+
 
         return Result<User>.Success(
             new User(
