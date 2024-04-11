@@ -2,12 +2,14 @@
 using AudIT.Applicationa.Contracts.AbstractRepositories;
 using AudIT.Applicationa.Contracts.DocumentServices;
 using AudIT.Applicationa.Contracts.EmailServices;
+using AudIT.Applicationa.Contracts.ExportService;
 using AudIT.Applicationa.Contracts.Identity;
 using AudIT.Applicationa.Contracts.ObjectiveActionServices;
 using AudIT.Applicationa.Services.AuthorizationServices;
 using AudIT.Applicationa.Services.AuthServices;
 using AudIT.Applicationa.Services.DocumentServices;
 using AudIT.Applicationa.Services.EmailServices;
+using AudIT.Applicationa.Services.ExportServices.ExportAsCSVService;
 using AudIT.Applicationa.Services.ObjectiveActionServices;
 using AudIT.Applicationa.Services.UtilsServices;
 using AudiT.Domain.Entities;
@@ -59,6 +61,7 @@ public static class InfrastructureRegistration
         services.AddScoped<IActivityRepository, ActivityRepository>();
         services.AddScoped<IObjectiveActionService, ObjectiveActionService>();
         services.AddScoped<IBaseDocumentRepository, BaseDocumentRepository>();
+        services.AddScoped<IExporterService, CSVExporterService>();
         services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<AudITContext>()
             .AddDefaultTokenProviders();
