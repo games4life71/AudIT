@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using AudIT.Applicationa.Contracts.ExportService;
 using AudIT.Applicationa.Mappings.CSVMappings;
+using AudIT.Applicationa.Models.Export.Activity;
 using AudiT.Domain.Entities;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -11,7 +12,7 @@ public class CSVExporterService : IExporterService
 {
     private static readonly Dictionary<Type, Type> _classMappingDictionary = new Dictionary<Type, Type>()
     {
-        { typeof(Activity), typeof(ActivityMap) }
+        { typeof(ActivityExportModel), typeof(ActivityMap) }
     };
 
 

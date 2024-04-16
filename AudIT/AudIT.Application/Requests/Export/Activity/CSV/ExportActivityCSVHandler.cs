@@ -1,5 +1,6 @@
 ﻿using AudIT.Applicationa.Contracts.AbstractRepositories;
 using AudIT.Applicationa.Contracts.ExportService;
+using AudIT.Applicationa.Models.Export.Activity;
 using AudIT.Applicationa.Requests.Export.DTO;
 using AudIT.Applicationa.Responses;
 using AutoMapper;
@@ -15,11 +16,11 @@ public class ExportActivityCSVHandler(
     public async Task<BaseDTOResponse<BaseExportDto>> Handle(ExportActivityCSVCommand request,
         CancellationToken cancellationToken)
     {
-        List<AudiT.Domain.Entities.Activity> activities = [];
+        List<ActivityExportModel> activities = [];
 
         foreach (var activityId in request.ActivityIds)
         {
-            var activity = await activityRepository.FindByIdAsync(activityId);
+            var activity = await activityRepository.FindByIdForExportAsync(activityId);
 
             if (!activity.IsSuccess)
             {
@@ -30,8 +31,10 @@ public class ExportActivityCSVHandler(
             activities.Add(activity.Value);
         }
 
-        //TODO  change the name of the file maybe ?
-        var exportedActivities = await exporterService.ExportAsync(activities, "Activities.csv");
+        var fileName = $"Activities_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv";
+
+
+        var exportedActivities = await exporterService.ExportAsync(activities, fileName);
 
         if (!exportedActivities.Item1)
         {

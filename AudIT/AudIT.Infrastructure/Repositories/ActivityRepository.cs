@@ -1,4 +1,5 @@
 ﻿using AudIT.Applicationa.Contracts.AbstractRepositories;
+using AudIT.Applicationa.Models.Export.Activity;
 using AudiT.Domain.Entities;
 using AudIT.Domain.Misc;
 using Microsoft.EntityFrameworkCore;
@@ -67,6 +68,28 @@ public class ActivityRepository(AudITContext context) : BaseRepository<Activity>
 
         return new Result<Activity>(true, updatedActivity.Value,
             $"Document with id {documentId} removed from activity with id {activityId}");
+    }
+
+    public async Task<Result<ActivityExportModel>> FindByIdForExportAsync(Guid id)
+    {
+        var activity = await _dbcContext.Activities.Include(a => a.Department)
+            .Include(a => a.AuditMission)
+            .Include(a => a.ObjectiveAction)
+            .Include(a => a.User).Include(activity => activity.AttachedDocuments)
+            .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (activity == null)
+            return new Result<ActivityExportModel>(false, null, $"Activity with id {id} not found");
+
+
+        return new Result<ActivityExportModel>(true, new ActivityExportModel(
+            activity.Name ?? string.Empty,
+            activity.Type.ToString(),
+            activity.Department?.Name ?? string.Empty,
+            activity.ObjectiveAction?.Name ?? string.Empty,
+            activity.AuditMission?.Name ?? string.Empty,
+            activity.AttachedDocuments?.Select(d => d.Name).ToList() ?? new List<string>()
+        ), null);
 
     }
 }

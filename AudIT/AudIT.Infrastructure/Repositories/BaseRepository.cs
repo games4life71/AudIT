@@ -1,4 +1,5 @@
-﻿using AudIT.Applicationa.Contracts.AbstractRepositories;
+﻿using System.Linq.Expressions;
+using AudIT.Applicationa.Contracts.AbstractRepositories;
 using AudIT.Domain.Misc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,18 @@ public class BaseRepository<T> : IRepository<T> where T : class
         _dbcContext = context;
     }
 
+
+    public async Task<Result<IReadOnlyList<T>>> GetByFilterAsync(Expression<Func<T, bool>> filter)
+    {
+        var result = await _dbcContext.Set<T>().Where(filter).ToListAsync();
+
+        if (result == null)
+        {
+            return Result<IReadOnlyList<T>>.Failure("No entities found.");
+        }
+
+        return Result<IReadOnlyList<T>>.Success(result);
+    }
 
     public virtual async Task<Result<T>> AddAsync(T entity)
     {
@@ -33,7 +46,6 @@ public class BaseRepository<T> : IRepository<T> where T : class
         //get all the entities of type T with all the related entities
         var entities = _dbcContext.Set<T>().AsNoTracking().ToListAsync();
         return Task.FromResult(Result<IReadOnlyList<T>>.Success(entities.Result));
-
     }
 
     public virtual async Task<Result<T>> RemoveAsync(T entity)
@@ -50,6 +62,7 @@ public class BaseRepository<T> : IRepository<T> where T : class
         {
             return Result<T>.Failure($"Entity with id {id} not found.");
         }
+
         _dbcContext.Set<T>().Remove(entity);
         await _dbcContext.SaveChangesAsync();
         return Result<T>.Success(entity);
@@ -62,6 +75,7 @@ public class BaseRepository<T> : IRepository<T> where T : class
         {
             return Result<T>.Failure($"Entity with id {id} not found.");
         }
+
         return Result<T>.Success(entity);
     }
 
@@ -70,5 +84,4 @@ public class BaseRepository<T> : IRepository<T> where T : class
         var result = await _dbcContext.Set<T>().Skip(page).Take(size).AsNoTracking().ToListAsync();
         return Result<IReadOnlyList<T>>.Success(result);
     }
-
 }

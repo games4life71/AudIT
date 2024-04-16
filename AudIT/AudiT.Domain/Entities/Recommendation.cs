@@ -19,7 +19,8 @@ public class Recommendation : AuditableEntity
     public ObjectiveAction ObjectiveAction { get; private set; }
     public Guid ObjectiveActionId { get; private set; }
 
-    private Recommendation(string description, DateTime dueDate, Guid objectiveActionId,ObjectiveAction objectiveAction)
+    private Recommendation(string description, DateTime dueDate, Guid objectiveActionId,
+        ObjectiveAction objectiveAction)
     {
         Description = description;
         Status = Status.NotImplemented;
@@ -31,12 +32,19 @@ public class Recommendation : AuditableEntity
 
     public Recommendation()
     {
-
     }
-    public static Result<Recommendation> Create(string description, DateTime dueDate, Guid objectiveActionId, ObjectiveAction objectiveAction)
+
+    public void SetStatus(Status newStatus)
+    {
+        this.Status = newStatus;
+    }
+
+    public static Result<Recommendation> Create(string description, DateTime dueDate, Guid objectiveActionId,
+        ObjectiveAction objectiveAction)
     {
         //TODO : Add validation logic here
-        return Result<Recommendation>.Success(new Recommendation(description, dueDate, objectiveActionId, objectiveAction));
+        return Result<Recommendation>.Success(new Recommendation(description, dueDate, objectiveActionId,
+            objectiveAction));
     }
 }
 

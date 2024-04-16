@@ -11,7 +11,7 @@ public class ExportController:BaseController
 
 
     [HttpGet]
-    public async Task<IActionResult> ExportActivitiesCSV([FromBody] List<Guid> activityIds)
+    public async Task<IActionResult> ExportActivitiesCSV([FromQuery] List<Guid> activityIds)
     {
         var command = new ExportActivityCSVCommand
         {
@@ -26,7 +26,7 @@ public class ExportController:BaseController
         }
         return new FileStreamResult(response.DtoResponse.ExportedData, "text/csv")
         {
-            FileDownloadName = "Activities.csv"
+            FileDownloadName = $"Activities_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv"
         };
 
 
