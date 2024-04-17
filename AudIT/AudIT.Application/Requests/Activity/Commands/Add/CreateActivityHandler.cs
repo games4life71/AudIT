@@ -12,6 +12,7 @@ public class CreateActivityHandler(
     IActivityRepository _activityRepository,
     IDepartmentRepository _departmentRepository,
     UserManager<User> _userManager,
+    IAuditMissionRepository _auditMissionRepository,
     IMapper mapper
 )
     : IRequestHandler<CreateActivityCommand, BaseDTOResponse<BaseActivityDto>>
@@ -27,6 +28,10 @@ public class CreateActivityHandler(
             if (!department.IsSuccess)
                 return new BaseDTOResponse<BaseActivityDto>($"Department with id {request.DepartmentId} not found",
                     false);
+            var auditMission = await _auditMissionRepository.FindByIdAsync(request.AuditMissionId);
+            if (!auditMission.IsSuccess)
+                return new BaseDTOResponse<BaseActivityDto>(
+                    $"Audit Mission with id {request.AuditMissionId} not found", false);
 
 
             var user = await _userManager.FindByIdAsync(request.UserId.ToString());
@@ -45,7 +50,7 @@ public class CreateActivityHandler(
                 request.ObjectiveActionId
             );
 
-            if (!newActivity.IsSuccess)
+            if (!newActivity.IsSuccess || newActivity.Value == null)
             {
                 return new BaseDTOResponse<BaseActivityDto>("Failed to create activity", false);
             }

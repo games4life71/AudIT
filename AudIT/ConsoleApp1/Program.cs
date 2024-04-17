@@ -638,8 +638,25 @@ var newDepar = Department.Create(
     context.Institutions.First()
 );
 
+
+var newActivity = Activity.Create(
+    "activity",
+    ActivityType.Mission,
+    newDepar.Value,
+    newDepar.Value.Id,
+    context.Users.First(),
+    Guid.Parse( context.Users.First().Id),
+    context.AuditMissions.First().Id
+).Value;
+
+
+context.Add(newActivity);
+
+
+
+
 //save the department
-context.Add(newDepar.Value);
+// context.Add(newDepar.Value);
 context.SaveChanges();
 
 //

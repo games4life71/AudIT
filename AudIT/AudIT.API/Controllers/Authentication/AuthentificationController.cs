@@ -120,18 +120,5 @@ public class AuthentificationController : ControllerBase
         }
     }
 
-    [HttpGet]
-    [Route("test")]
-    [Authorize]
-    public async Task<IActionResult> GetUser()
-    {
-        //if the user is not logged in return unauthorized
-        if (User.Identity?.Name == null)
-        {
-            return Unauthorized();
-        }
 
-        return Ok("User is logged in");
-
-    }
 }

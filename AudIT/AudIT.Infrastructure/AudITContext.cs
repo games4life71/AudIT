@@ -85,14 +85,14 @@ public class AudITContext : IdentityDbContext<User>
 
     public override int SaveChanges()
     {
-        UpdateAuditableEntities();
+        // UpdateAuditableEntities();
         return base.SaveChanges();
     }
 
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
         CancellationToken cancellationToken = new CancellationToken())
     {
-        UpdateAuditableEntities();
+        // UpdateAuditableEntities();
         return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }
 
@@ -100,37 +100,37 @@ public class AudITContext : IdentityDbContext<User>
     /// <summary>
     /// This method is used to update the AuditableEntity properties before saving the changes
     /// </summary>
-    private void UpdateAuditableEntities()
-    {
-        var now = DateTime.Now;
-        var user = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-        // if (user == null)
-        //     throw new AuthenticationException("User not authenticated.");
-
-        foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
-        {
-            switch (entry.State)
-            {
-                case EntityState.Added:
-                    entry.Entity.CreatedBy = user;
-                    entry.Entity.LastModifiedDate = now;
-                    entry.Entity.CreatedDate = now;
-                    entry.Entity.LastModifiedBy = user;
-                    entry.Entity.AccesUserId.Add(Guid.Parse(user));
-                    break;
-                case EntityState.Modified:
-                    entry.Entity.LastModifiedBy = user;
-                    entry.Entity.LastModifiedDate = now;
-                    break;
-                case EntityState.Detached:
-                    break;
-                case EntityState.Unchanged:
-                    break;
-                case EntityState.Deleted:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-    }
+    // private void UpdateAuditableEntities()
+    // {
+    //     var now = DateTime.Now;
+    //     var user = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    //     // if (user == null)
+    //     //     throw new AuthenticationException("User not authenticated.");
+    //
+    //     foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
+    //     {
+    //         switch (entry.State)
+    //         {
+    //             case EntityState.Added:
+    //                 entry.Entity.CreatedBy = user;
+    //                 entry.Entity.LastModifiedDate = now;
+    //                 entry.Entity.CreatedDate = now;
+    //                 entry.Entity.LastModifiedBy = user;
+    //                 entry.Entity.AccesUserId.Add(Guid.Parse(user));
+    //                 break;
+    //             case EntityState.Modified:
+    //                 entry.Entity.LastModifiedBy = user;
+    //                 entry.Entity.LastModifiedDate = now;
+    //                 break;
+    //             case EntityState.Detached:
+    //                 break;
+    //             case EntityState.Unchanged:
+    //                 break;
+    //             case EntityState.Deleted:
+    //                 break;
+    //             default:
+    //                 throw new ArgumentOutOfRangeException();
+    //         }
+    //     }
+    // }
 }

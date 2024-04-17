@@ -55,7 +55,7 @@ public class Activity : AuditableEntity
         User user,
         Guid userId,
         Guid auditMissionId,
-        Guid? objectiveActionId = null
+        Guid? objectiveActionId     
     )
     {
         Name = name;
@@ -80,7 +80,7 @@ public class Activity : AuditableEntity
     }
 
     public static Result<Activity> Create(string name, ActivityType type, Department department, Guid departmentId,
-        User user, Guid userId, Guid auditMissionId, Guid? objectiveActionId = null)
+        User user, Guid userId, Guid auditMissionId, Guid? objectiveActionId)
     {
         //TODO : Add validation logic here
 
