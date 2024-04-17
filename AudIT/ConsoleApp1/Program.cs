@@ -628,20 +628,35 @@ using Microsoft.EntityFrameworkCore;
 
 var context = new AudITContext();
 
-var obj_act = context.ObjectiveAction.Include(obj_act => obj_act.ActionRisks).First();
 
-//add a new action risk to the objective action
-var actionRisk = ActionRisk.Create(
-    "test risk",
-    Risk.Mare,
-    obj_act.Id
-).Value;
+//retrieve a institution
 
+var newDepar = Department.Create(
+    "departemant",
+    "adress123",
+    "123",
+    context.Institutions.First()
+);
 
-context.Add(actionRisk);
+//save the department
+context.Add(newDepar.Value);
 context.SaveChanges();
 
-
-
-
-Console.WriteLine("Objective Activity:" + obj_act.Name);
+//
+// var obj_act = context.ObjectiveAction.Include(obj_act => obj_act.ActionRisks).First();
+//
+// //add a new action risk to the objective action
+// var actionRisk = ActionRisk.Create(
+//     "test risk",
+//     Risk.Mare,
+//     obj_act.Id
+// ).Value;
+//
+//
+// context.Add(actionRisk);
+// context.SaveChanges();
+//
+//
+//
+//
+// Console.WriteLine("Objective Activity:" + obj_act.Name);

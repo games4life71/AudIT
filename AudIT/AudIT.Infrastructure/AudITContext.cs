@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Security.Authentication;
 using System.Security.Claims;
 using AudiT.Domain.Entities;
 using AudIT.Domain.Misc;
@@ -103,6 +104,8 @@ public class AudITContext : IdentityDbContext<User>
     {
         var now = DateTime.Now;
         var user = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        // if (user == null)
+        //     throw new AuthenticationException("User not authenticated.");
 
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
         {
@@ -113,6 +116,7 @@ public class AudITContext : IdentityDbContext<User>
                     entry.Entity.LastModifiedDate = now;
                     entry.Entity.CreatedDate = now;
                     entry.Entity.LastModifiedBy = user;
+                    entry.Entity.AccesUserId.Add(Guid.Parse(user));
                     break;
                 case EntityState.Modified:
                     entry.Entity.LastModifiedBy = user;

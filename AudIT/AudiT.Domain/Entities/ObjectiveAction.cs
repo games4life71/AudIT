@@ -6,7 +6,7 @@ namespace AudiT.Domain.Entities;
 /// <summary>
 /// This class models the action in a specific objective of an audit mission
 /// </summary>
-public class ObjectiveAction
+public class ObjectiveAction:AuditableEntity
 {
     public Guid Id { get; private set; }
 
