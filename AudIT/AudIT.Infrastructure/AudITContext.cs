@@ -38,6 +38,7 @@ public class AudITContext : IdentityDbContext<User>
 
     public DbSet<ActionRisk> ActionRisk { get; set; }
 
+    public DbSet<ObjectiveActionFiap> ObjectiveActionFiap { get; set; }
 
     //Services
     private readonly IHttpContextAccessor _httpContextAccessor;

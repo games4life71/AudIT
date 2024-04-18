@@ -55,7 +55,7 @@ public class Activity : AuditableEntity
         User user,
         Guid userId,
         Guid auditMissionId,
-        Guid? objectiveActionId     
+        Guid? objectiveActionId
     )
     {
         Name = name;

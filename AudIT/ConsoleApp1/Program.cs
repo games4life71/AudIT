@@ -631,26 +631,7 @@ var context = new AudITContext();
 
 //retrieve a institution
 
-var newDepar = Department.Create(
-    "departemant",
-    "adress123",
-    "123",
-    context.Institutions.First()
-);
 
-
-var newActivity = Activity.Create(
-    "activity",
-    ActivityType.Mission,
-    newDepar.Value,
-    newDepar.Value.Id,
-    context.Users.First(),
-    Guid.Parse( context.Users.First().Id),
-    context.AuditMissions.First().Id
-).Value;
-
-
-context.Add(newActivity);
 
 
 

@@ -61,6 +61,9 @@ public static class InfrastructureRegistration
         services.AddScoped<IActivityRepository, ActivityRepository>();
         services.AddScoped<IObjectiveActionService, ObjectiveActionService>();
         services.AddScoped<IBaseDocumentRepository, BaseDocumentRepository>();
+        services.AddScoped<IObjectiveActionFiapRepository, ObjectiveActionFiapRepository>();
+
+
         services.AddScoped<IExporterService, CSVExporterService>();
         services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<AudITContext>()
