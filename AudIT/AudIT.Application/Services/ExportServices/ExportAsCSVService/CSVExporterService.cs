@@ -8,7 +8,7 @@ using CsvHelper.Configuration;
 
 namespace AudIT.Applicationa.Services.ExportServices.ExportAsCSVService;
 
-public class CSVExporterService : IExporterService
+public class CSVExporterService<T> : IExporterService<T>
 {
     private static readonly Dictionary<Type, Type> _classMappingDictionary = new Dictionary<Type, Type>()
     {
@@ -16,7 +16,7 @@ public class CSVExporterService : IExporterService
     };
 
 
-    public async Task<(bool, Stream, string)> ExportAsync<T>(IEnumerable<T> data, string fileName)
+    public async Task<(bool, Stream, string)> ExportMultipleAsync(IEnumerable<T> data, string fileName)
     {
         try
         {
@@ -41,5 +41,11 @@ public class CSVExporterService : IExporterService
         {
             return (false, null, $"An error occurred: {ex.Message}");
         }
+    }
+
+
+    public async Task<(bool, Stream, string)> ExportSingleAsync(T data, string fileName)
+    {
+        throw new NotImplementedException();
     }
 }

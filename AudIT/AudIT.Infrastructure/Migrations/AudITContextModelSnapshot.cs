@@ -803,7 +803,7 @@ namespace AudIT.Infrastructure.Migrations
             modelBuilder.Entity("AudiT.Domain.Entities.ActionRisk", b =>
                 {
                     b.HasOne("AudiT.Domain.Entities.ObjectiveAction", null)
-                        .WithMany("ActionRisks")
+                        .WithMany("ObjectiveActions")
                         .HasForeignKey("ObjectiveActionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1087,7 +1087,7 @@ namespace AudIT.Infrastructure.Migrations
 
             modelBuilder.Entity("AudiT.Domain.Entities.ObjectiveAction", b =>
                 {
-                    b.Navigation("ActionRisks");
+                    b.Navigation("ObjectiveActions");
                 });
 #pragma warning restore 612, 618
         }

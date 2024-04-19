@@ -120,7 +120,7 @@ public class ActionRisk
 }
 
 public enum Risk
-{
+{   None,
     Mic,
     Mediu,
     Mare

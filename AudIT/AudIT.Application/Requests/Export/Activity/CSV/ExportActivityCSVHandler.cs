@@ -10,7 +10,7 @@ namespace AudIT.Applicationa.Requests.Export.Activity.CSV;
 
 public class ExportActivityCSVHandler(
     IActivityRepository activityRepository,
-    IExporterService exporterService,
+    IExporterService<ActivityExportModel> exporterService,
     IMapper mapper) : IRequestHandler<ExportActivityCSVCommand, BaseDTOResponse<BaseExportDto>>
 {
     public async Task<BaseDTOResponse<BaseExportDto>> Handle(ExportActivityCSVCommand request,
@@ -34,7 +34,7 @@ public class ExportActivityCSVHandler(
         var fileName = $"Activities_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv";
 
 
-        var exportedActivities = await exporterService.ExportAsync(activities, fileName);
+        var exportedActivities = await exporterService.ExportMultipleAsync(activities, fileName);
 
         if (!exportedActivities.Item1)
         {
