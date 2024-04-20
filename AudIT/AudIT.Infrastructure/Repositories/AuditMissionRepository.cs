@@ -50,4 +50,21 @@ public class AuditMissionRepository(AudITContext context)
             return Result<IReadOnlyList<AuditMission>>.Failure("Error: " + e.Message);
         }
     }
+
+    public override async Task<Result<AuditMission>> FindByIdAsync(Guid id)
+    {
+        var result = await _context.AuditMissions
+            .Where(a => a.Id == id)
+            .Include(a => a.User)
+            .Include(a=>a.Department)
+            .FirstAsync();
+
+
+        if (result == null)
+        {
+            return Result<AuditMission>.Failure("No audit mission found with this id");
+        }
+
+        return Result<AuditMission>.Success(result);
+    }
 }
