@@ -27,6 +27,9 @@ public class BaseRepository<T> : IRepository<T> where T : class
         return Result<IReadOnlyList<T>>.Success(result);
     }
 
+
+
+
     public virtual async Task<Result<T>> AddAsync(T entity)
     {
         await _dbcContext.Set<T>().AddAsync(entity);

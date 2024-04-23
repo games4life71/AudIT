@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AudIT.Infrastructure.Security.AuthorizationHandlers;
 
-public class EntityOwnerAuthorizationHandler : AuthorizationHandler<EntityOwnerAuthorizationHandler, AuditableEntity>,
+public class EntityWriteOwnerAuthorizationHandler : AuthorizationHandler<EntityWriteOwnerAuthorizationHandler, AuditableEntity>,
     IAuthorizationRequirement
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
-        EntityOwnerAuthorizationHandler requirement,
+        EntityWriteOwnerAuthorizationHandler requirement,
         AuditableEntity resource)
     {
         // if (context.User.Identity?.Name == resource.CreatedBy)
@@ -22,7 +22,7 @@ public class EntityOwnerAuthorizationHandler : AuthorizationHandler<EntityOwnerA
         // return Task.CompletedTask;
         var userId = Guid.Parse(context.User.Identity?.Name);
 
-        if (resource.AccesUserId.Contains(userId))
+        if (resource.WriteAccesUserId.Contains(userId))
         {
             context.Succeed(requirement);
         }

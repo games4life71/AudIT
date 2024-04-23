@@ -44,11 +44,11 @@ public static class InfrastructureRegistration
             typeof(BaseRepository<>));
 
 
-        //register a policy for the EntityOwnerAuthorizationHandler
+        //register a policy for the EntityWriteOwnerAuthorizationHandler
         services.AddAuthorization(options =>
         {
             options.AddPolicy("EntityOwnerPolicy",
-                policy => { policy.Requirements.Add(new EntityOwnerAuthorizationHandler()); });
+                policy => { policy.Requirements.Add(new EntityWriteOwnerAuthorizationHandler()); });
         });
 
 
@@ -66,7 +66,10 @@ public static class InfrastructureRegistration
         services.AddScoped<IBaseDocumentRepository, BaseDocumentRepository>();
         services.AddScoped<IObjectiveActionFiapRepository, ObjectiveActionFiapRepository>();
 
+        services.AddScoped(typeof(IRepositoryAcces<>), typeof(BaseAccesRepository<>));
+        services.AddScoped<IRepositoryFactory, RepositoryFactory>();
 
+        services.AddScoped(typeof(IRepositoryAcces<>), typeof(BaseAccesRepository<>));
         services.AddScoped(typeof(IExporterService<ObjectiveAndActionsExportModel>),
             provider => new ExportObjAndActionXLS());
         services.AddScoped(typeof(IExporterService<ActivityExportModel>),

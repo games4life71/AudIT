@@ -28,6 +28,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Requests\Access\WriteAcces\" />
       <Folder Include="Requests\AuditMission\Queries\GetAll\" />
       <Folder Include="Requests\Document\StandaloneDocument\Queries\" />
       <Folder Include="Requests\Document\TemplateDocument\Queries\" />

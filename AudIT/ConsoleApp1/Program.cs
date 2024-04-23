@@ -618,136 +618,142 @@
 //         // Now you can use the graphClient to make requests
 //     }
 // }
+//
+// using System.Data;
+// using OfficeOpenXml;
+// using System.IO;
+// using Microsoft.Graph.Models;
+//
+// string path = @"D:\Projects\AudIT\AudIT\AudIT\ConsoleApp1\Book1.xlsx"; // Replace with your file path
+//
+// using (ExcelPackage package = new ExcelPackage(new FileInfo(path)))
+// {
+//
+//     DataTable dataTable = new DataTable();
+//
+//     //add three colums to the datatable
+//     dataTable.Columns.Add("NrCrt", typeof(int));
+//     dataTable.Columns.Add("Obiective", typeof(string));
+//     dataTable.Columns.Add("Actiuni ", typeof(string));
+//     dataTable.Columns.Add("Riscuri Identificate", typeof(string));
+//     dataTable.Columns.Add("Ierarhizare A riscurilor", typeof(string));
+//
+//     //<start cell , length of the merge>
+//     Dictionary<int, int>
+//         mergeCellLarge =
+//             new Dictionary<int, int>(); //store the start cell and the length of the merge for the large cells
+//     Dictionary<int, int>
+//         mergeCellMedium =
+//             new Dictionary<int, int>(); //store the start cell and the length of the merge for the medium cells
+//
+//
+//     List<List<string>> ActivAndRisks = [];
+//     ActivAndRisks.Add(new List<string> { "Risc 0", "Risc 1", "Risc 2", "Risc 3" });
+//     ActivAndRisks.Add(new List<string> { "Risc 0", "Risc 1", "Risc 2", "Risc 3" });
+//     ActivAndRisks.Add(new List<string> { "Risc 0", "Risc 1", "Risc 2", "Risc 3" });
+//     ActivAndRisks.Add(new List<string> { "Risc 0", "Risc 1", "Risc 2", "Risc 3" });
+//     ActivAndRisks.Add(new List<string> { "Risc 0", "Risc 1", "Risc 2", "Risc 3" });
+//     ActivAndRisks.Add(new List<string> { "Risc 0", "Risc 1", "Risc 2", "Risc 3" });
+//     ActivAndRisks.Add(new List<string> { "Risc 0", "Risc 1", "Risc 2", "Risc 3" });
+//
+//
+//     for (int k = 0; k < 3; k++)
+//     {
+//         int currentRow = 13;
+//         //each action
+//         for (int i = 0; i < ActivAndRisks.Count; i++)
+//         {
+//             // mergeCellMedium.Add(currentRow, ActivAndRisks[i].Count);
+//             // currentRow += ActivAndRisks[i].Count; //increment the current row with the number of risks in the action
+//             //if it is the first action in the list
+//             if (i == 0)
+//             {
+//                 dataTable.Rows.Add(
+//                     1,
+//                     "Obiectiv"+k.ToString(),
+//                     "actiune1",
+//                     ActivAndRisks[i][0],
+//                     "Ierarhizare 1");
+//             }
+//
+//
+//             //each risk in the action
+//             for (int j = 0; j < ActivAndRisks[i].Count; j++)
+//             {
+//                 if (j == 0 && i != 0)
+//                 {
+//                     // For the first string, add the "Obiectiv" value
+//                     dataTable.Rows.Add(
+//                         null,
+//                         "",
+//                         "actiune",
+//                         ActivAndRisks[i][j],
+//                         "ierar");
+//                 }
+//                 else if (j != 0)
+//                 {
+//                     // For the rest of the strings, leave the "Obiectiv" cell empty
+//                     dataTable.Rows.Add(
+//                         null,
+//                         "",
+//                         "",
+//                         ActivAndRisks[i][j],
+//                         "");
+//                 }
+//             }
+//         }
+//
+//         // int longcount = ActivAndRisks.Sum(list => list.Count);
+//         // mergeCellLarge.Add(13, longcount);
+//     }
+//
+//     //create a WorkSheet
+//     ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("ta");
+//
+//     //add all the content from the DataTable, starting at cell A1
+//     worksheet.Cells["B12"].LoadFromDataTable(dataTable, true);
+//     //merge the cells
+//     // foreach (var cell in cellStartAndLength)
+//     // {
+//     //     worksheet.Cells[cell.Key + ":" + "C" + (cell.Value + 12)].Merge = true;
+//     // }
+//
+//     // foreach (var mergeMedium in mergeCellMedium)
+//     // {
+//     //     var startCell = "D" + mergeMedium.Key;
+//     //     var endCell = "D" + (mergeMedium.Key + mergeMedium.Value - 1);
+//     //     worksheet.Cells[$"{startCell}:{endCell}"].Merge = true;
+//     //     //make the text centered
+//     //     worksheet.Cells[$"{startCell}:{endCell}"].Style.HorizontalAlignment =
+//     //         OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+//     //     worksheet.Cells[$"{startCell}:{endCell}"].Style.VerticalAlignment =
+//     //         OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+//     // }
+//     //
+//     // foreach (var mergeLarge in mergeCellLarge)
+//     // {
+//     //     var startCell = "B" + mergeLarge.Key;
+//     //     var endCell = "B" + (mergeLarge.Key + mergeLarge.Value - 1);
+//     //     worksheet.Cells[$"{startCell}:{endCell}"].Merge = true;
+//     //     worksheet.Cells[$"{startCell}:{endCell}"].Style.HorizontalAlignment =
+//     //         OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+//     //     worksheet.Cells[$"{startCell}:{endCell}"].Style.VerticalAlignment =
+//     //         OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+//     //
+//     //     startCell = "C" + mergeLarge.Key;
+//     //     endCell = "C" + (mergeLarge.Key + mergeLarge.Value - 1);
+//     //     worksheet.Cells[$"{startCell}:{endCell}"].Merge = true;
+//     //     worksheet.Cells[$"{startCell}:{endCell}"].Style.HorizontalAlignment =
+//     //         OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
+//     //     worksheet.Cells[$"{startCell}:{endCell}"].Style.VerticalAlignment =
+//     //         OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
+//     // }
+//
+//     package.Save();
+// }
 
-using System.Data;
-using OfficeOpenXml;
-using System.IO;
-using Microsoft.Graph.Models;
 
-string path = @"D:\Projects\AudIT\AudIT\AudIT\ConsoleApp1\Book1.xlsx"; // Replace with your file path
+using AudIT.Infrastructure;
 
-using (ExcelPackage package = new ExcelPackage(new FileInfo(path)))
-{
+AudITContext context = new AudITContext();
 
-    DataTable dataTable = new DataTable();
-
-    //add three colums to the datatable
-    dataTable.Columns.Add("NrCrt", typeof(int));
-    dataTable.Columns.Add("Obiective", typeof(string));
-    dataTable.Columns.Add("Actiuni ", typeof(string));
-    dataTable.Columns.Add("Riscuri Identificate", typeof(string));
-    dataTable.Columns.Add("Ierarhizare A riscurilor", typeof(string));
-
-    //<start cell , length of the merge>
-    Dictionary<int, int>
-        mergeCellLarge =
-            new Dictionary<int, int>(); //store the start cell and the length of the merge for the large cells
-    Dictionary<int, int>
-        mergeCellMedium =
-            new Dictionary<int, int>(); //store the start cell and the length of the merge for the medium cells
-
-
-    List<List<string>> ActivAndRisks = [];
-    ActivAndRisks.Add(new List<string> { "Risc 0", "Risc 1", "Risc 2", "Risc 3" });
-    ActivAndRisks.Add(new List<string> { "Risc 0", "Risc 1", "Risc 2", "Risc 3" });
-    ActivAndRisks.Add(new List<string> { "Risc 0", "Risc 1", "Risc 2", "Risc 3" });
-    ActivAndRisks.Add(new List<string> { "Risc 0", "Risc 1", "Risc 2", "Risc 3" });
-    ActivAndRisks.Add(new List<string> { "Risc 0", "Risc 1", "Risc 2", "Risc 3" });
-    ActivAndRisks.Add(new List<string> { "Risc 0", "Risc 1", "Risc 2", "Risc 3" });
-    ActivAndRisks.Add(new List<string> { "Risc 0", "Risc 1", "Risc 2", "Risc 3" });
-
-
-    for (int k = 0; k < 3; k++)
-    {
-        int currentRow = 13;
-        //each action
-        for (int i = 0; i < ActivAndRisks.Count; i++)
-        {
-            // mergeCellMedium.Add(currentRow, ActivAndRisks[i].Count);
-            // currentRow += ActivAndRisks[i].Count; //increment the current row with the number of risks in the action
-            //if it is the first action in the list
-            if (i == 0)
-            {
-                dataTable.Rows.Add(
-                    1,
-                    "Obiectiv"+k.ToString(),
-                    "actiune1",
-                    ActivAndRisks[i][0],
-                    "Ierarhizare 1");
-            }
-
-
-            //each risk in the action
-            for (int j = 0; j < ActivAndRisks[i].Count; j++)
-            {
-                if (j == 0 && i != 0)
-                {
-                    // For the first string, add the "Obiectiv" value
-                    dataTable.Rows.Add(
-                        null,
-                        "",
-                        "actiune",
-                        ActivAndRisks[i][j],
-                        "ierar");
-                }
-                else if (j != 0)
-                {
-                    // For the rest of the strings, leave the "Obiectiv" cell empty
-                    dataTable.Rows.Add(
-                        null,
-                        "",
-                        "",
-                        ActivAndRisks[i][j],
-                        "");
-                }
-            }
-        }
-
-        // int longcount = ActivAndRisks.Sum(list => list.Count);
-        // mergeCellLarge.Add(13, longcount);
-    }
-
-    //create a WorkSheet
-    ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("ta");
-
-    //add all the content from the DataTable, starting at cell A1
-    worksheet.Cells["B12"].LoadFromDataTable(dataTable, true);
-    //merge the cells
-    // foreach (var cell in cellStartAndLength)
-    // {
-    //     worksheet.Cells[cell.Key + ":" + "C" + (cell.Value + 12)].Merge = true;
-    // }
-
-    // foreach (var mergeMedium in mergeCellMedium)
-    // {
-    //     var startCell = "D" + mergeMedium.Key;
-    //     var endCell = "D" + (mergeMedium.Key + mergeMedium.Value - 1);
-    //     worksheet.Cells[$"{startCell}:{endCell}"].Merge = true;
-    //     //make the text centered
-    //     worksheet.Cells[$"{startCell}:{endCell}"].Style.HorizontalAlignment =
-    //         OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-    //     worksheet.Cells[$"{startCell}:{endCell}"].Style.VerticalAlignment =
-    //         OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-    // }
-    //
-    // foreach (var mergeLarge in mergeCellLarge)
-    // {
-    //     var startCell = "B" + mergeLarge.Key;
-    //     var endCell = "B" + (mergeLarge.Key + mergeLarge.Value - 1);
-    //     worksheet.Cells[$"{startCell}:{endCell}"].Merge = true;
-    //     worksheet.Cells[$"{startCell}:{endCell}"].Style.HorizontalAlignment =
-    //         OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-    //     worksheet.Cells[$"{startCell}:{endCell}"].Style.VerticalAlignment =
-    //         OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-    //
-    //     startCell = "C" + mergeLarge.Key;
-    //     endCell = "C" + (mergeLarge.Key + mergeLarge.Value - 1);
-    //     worksheet.Cells[$"{startCell}:{endCell}"].Merge = true;
-    //     worksheet.Cells[$"{startCell}:{endCell}"].Style.HorizontalAlignment =
-    //         OfficeOpenXml.Style.ExcelHorizontalAlignment.Center;
-    //     worksheet.Cells[$"{startCell}:{endCell}"].Style.VerticalAlignment =
-    //         OfficeOpenXml.Style.ExcelVerticalAlignment.Center;
-    // }
-
-    package.Save();
-}

@@ -15,6 +15,8 @@ namespace AudIT.Domain.Misc
         public string? LastModifiedBy { get; set; }
         public DateTime LastModifiedDate { get; set; }
 
-        public List<Guid>? AccesUserId { get; set; } = [];
+        public List<Guid>? WriteAccesUserId { get; set; } = [];
+
+        public List<Guid>? ReadAccesUserId { get; set; } = [];
     }
 }
