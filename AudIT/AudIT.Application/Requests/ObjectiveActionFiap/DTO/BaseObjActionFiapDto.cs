@@ -1,4 +1,5 @@
-﻿using AudiT.Domain.Entities;
+﻿using AudIT.Applicationa.Requests.AuditMission.DTO;
+using AudiT.Domain.Entities;
 
 namespace AudIT.Applicationa.Requests.ObjectiveActionFiap.DTO;
 
@@ -6,12 +7,13 @@ public class BaseObjActionFiapDto
 {
     public Guid Id { get; set; }
 
-
     public string Name { get; set; }
 
     public Guid AuditMissionId { get; set; }
 
-    public AudiT.Domain.Entities.AuditMission AuditMission { get; set; }
+    // public AudiT.Domain.Entities.AuditMission AuditMission { get; set; }
+
+    public BaseAuditMissionDto AuditMission { get; set; }
 
     public Guid ObjectiveActionId { get; set; }
 

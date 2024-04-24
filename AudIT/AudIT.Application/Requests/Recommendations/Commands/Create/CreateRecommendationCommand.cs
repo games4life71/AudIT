@@ -15,11 +15,28 @@ public class CreateRecommendationCommand : IRequest<BaseDTOResponse<BaseRecommen
 
     public Guid ObjectiveActionId { get; set; }
 
-    public CreateRecommendationCommand(string description, Status status, DateTime dueDate, Guid objectiveActionId)
+    public string Problem { get; set; }
+
+    public string? AditionalFindings { get; set; }
+
+    public string? Cause { get; set; }
+
+    public string? Consequence { get; set; }
+
+    public string RecommendationDescription { get; set; }
+
+
+
+    public CreateRecommendationCommand(string description, Status status, DateTime dueDate, Guid objectiveActionId, string problem, string? aditionalFindings, string? cause, string? consequence, string recommendationDescription)
     {
         Description = description;
         Status = status;
         DueDate = dueDate;
         ObjectiveActionId = objectiveActionId;
+        Problem = problem;
+        AditionalFindings = aditionalFindings;
+        Cause = cause;
+        Consequence = consequence;
+        RecommendationDescription = recommendationDescription;
     }
 }

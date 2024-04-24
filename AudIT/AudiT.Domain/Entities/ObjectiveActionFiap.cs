@@ -80,4 +80,23 @@ public class ObjectiveActionFiap : AuditableEntity
             consequence
         ));
     }
+
+    public void Update(string name,
+        DateTime auditedPeriodStart,
+        DateTime auditedPeriodEnd,
+        string problem,
+        string recommendation,
+        string aditionalFindings = "empty",
+        string cause = "empty",
+        string consequence = "empty")
+    {
+        this.Name = name;
+        this.AuditedPeriodStart = auditedPeriodStart;
+        this.AuditedPeriodEnd = auditedPeriodEnd;
+        this.Problem = problem;
+        this.AditionalFindings = aditionalFindings;
+        this.Cause = cause;
+        this.Consequence = consequence;
+        this.Recommendation = recommendation;
+    }
 }

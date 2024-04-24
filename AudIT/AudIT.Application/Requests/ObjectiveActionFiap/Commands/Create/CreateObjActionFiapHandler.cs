@@ -10,6 +10,7 @@ public class CreateObjActionFiapHandler(
     IObjectiveActionFiapRepository objectiveActionFiapRepository,
     IAuditMissionRepository auditMissionRepository,
     IObjectiveActionRepository objectiveActionRepository,
+    IRecommendationRepository recommendationRepository,
     IMapper mapper
 ) : IRequestHandler<CreateObjActionFiapCommand, BaseDTOResponse<BaseObjActionFiapDto>>
 {
@@ -54,13 +55,38 @@ public class CreateObjActionFiapHandler(
                     $"Cannot create Objective Action FIAP: {newObjActionFiap.Error}", false);
             }
 
-            var result = await objectiveActionFiapRepository.AddAsync(newObjActionFiap.Value);
+            var objResult = await objectiveActionFiapRepository.AddAsync(newObjActionFiap.Value);
 
-            if (!result.IsSuccess)
+            if (!objResult.IsSuccess)
             {
                 return new BaseDTOResponse<BaseObjActionFiapDto>(
-                    $"Cannot insert into DB {result.Error}", false);
+                    $"Cannot insert into DB {objResult.Error}", false);
             }
+
+            //automatially create a new Recommendation for the ObjectiveActionFiap
+
+            var newRecommendation = AudiT.Domain.Entities.Recommendation.Create(
+                request.Recommendation,
+                DateTime.Now,
+                request.Problem,
+                request.AditionalFindings,
+                request.Cause,
+                request.Consequence,
+                request.Recommendation,
+                newObjActionFiap.Value.ObjectiveAction,
+                newObjActionFiap.Value.ObjectiveActionId
+            );
+
+            var resultRecommendation = await recommendationRepository.AddAsync(newRecommendation.Value);
+
+            if (!resultRecommendation.IsSuccess)
+            {
+                return new BaseDTOResponse<BaseObjActionFiapDto>(
+                    $"Cannot insert into DB {resultRecommendation.Error}", false);
+            }
+
+
+
 
             return new BaseDTOResponse<BaseObjActionFiapDto>(mapper.Map<BaseObjActionFiapDto>(newObjActionFiap.Value),
                 "succesfully created", true);

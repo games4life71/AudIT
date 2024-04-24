@@ -17,9 +17,10 @@ public class ObjectiveActionFiapRepository : BaseRepository<ObjectiveActionFiap>
         var result = await _dbcContext.ObjectiveActionFiap
             .Include(a => a.AuditMission)
             .Include(a => a.ObjectiveAction)
-            .FirstAsync(a => a.Id == id);
+            .FirstOrDefaultAsync(a => a.Id == id);
 
-
+        if(result == null)
+            return Result<ObjectiveActionFiap>.Failure($"Cannot find ObjectiveActionFiap with id {id}");
         return Result<ObjectiveActionFiap>.Success(result);
 
     }

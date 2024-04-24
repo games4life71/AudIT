@@ -1,5 +1,6 @@
 ﻿using AudIT.Applicationa.Requests.ObjectiveActionFiap.Commands.Create;
 using AudIT.Applicationa.Requests.ObjectiveActionFiap.Commands.Queries.GetById;
+using AudIT.Applicationa.Requests.ObjectiveActionFiap.Commands.Update;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AudIT.API.Controllers.ObjectiveActionFiap;
@@ -30,6 +31,22 @@ public class ObjActionFiapController : BaseController
     public async Task<IActionResult> GetObjActionFiapById(Guid id)
     {
         var result = await Mediator.Send(new GetObjActionFiapByIdQuery(id));
+
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
+
+    [HttpPut]
+    [Route("update-obj-action-fiap/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> UpdateObjActionFiap(Guid id, [FromBody] UpdateObjectiveActionFiapCommand command)
+    {
+        command.Id = id;
+        var result = await Mediator.Send(command);
 
         if (!result.Success)
         {

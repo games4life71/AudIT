@@ -23,8 +23,17 @@ public class CreateRecommendationHandler(
             return new BaseDTOResponse<BaseRecommendationDTO>("Objective Action not found", false);
         }
 
-        var newRecommendation = Recommendation.Create(request.Description, request.DueDate, request.ObjectiveActionId,
-            objAction.Value);
+        var newRecommendation = Recommendation.Create(
+            request.Description,
+            request.DueDate,
+            request.Problem,
+            request.AditionalFindings,
+            request.Cause,
+            request.Consequence,
+            request.RecommendationDescription,
+            objAction.Value,
+            request.ObjectiveActionId
+        );
 
         if (!newRecommendation.IsSuccess)
             return new BaseDTOResponse<BaseRecommendationDTO>(newRecommendation.Error, false);

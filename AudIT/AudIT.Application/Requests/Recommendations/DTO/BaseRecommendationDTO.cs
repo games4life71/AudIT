@@ -14,13 +14,27 @@ public class BaseRecommendationDTO
 
     public ObjectiveAction ObjectiveAction { get; private set; }
 
-    public BaseRecommendationDTO(Guid id, string description, DateTime dueDate, ObjectiveAction objectiveAction,
-        Status status)
+    public string Problem { get; set; }
+
+    public string? AditionalFindings { get; set; }
+
+    public string? Cause { get; set; }
+
+    public string? Consequence { get; set; }
+
+    public string RecommendationDescription { get; set; }
+
+    public BaseRecommendationDTO(Guid id, string description, DateTime dueDate, Status status, ObjectiveAction objectiveAction, string problem, string? aditionalFindings, string? cause, string? consequence, string recommendationDescription)
     {
         Id = id;
         Description = description;
         DueDate = dueDate;
-        ObjectiveAction = objectiveAction;
         Status = status;
+        ObjectiveAction = objectiveAction;
+        Problem = problem;
+        AditionalFindings = aditionalFindings;
+        Cause = cause;
+        Consequence = consequence;
+        RecommendationDescription = recommendationDescription;
     }
 }

@@ -16,6 +16,38 @@ public class Recommendation : AuditableEntity
 
     public DateTime DueDate { get; private set; }
 
+    public string Problem { get; set; }
+
+    public string? AditionalFindings { get; set; }
+
+    public string? Cause { get; set; }
+
+    public string? Consequence { get; set; }
+
+    public string RecommendationDescription { get; set; }
+
+    private Recommendation(
+        string description,
+        DateTime dueDate,
+        string problem,
+        string? aditionalFindings,
+        string? cause,
+        string? consequence,
+        string recommendationDescription,
+        ObjectiveAction objectiveAction,
+        Guid objectiveActionId)
+    {
+        Description = description;
+        DueDate = dueDate;
+        Problem = problem;
+        AditionalFindings = aditionalFindings;
+        Cause = cause;
+        Consequence = consequence;
+        RecommendationDescription = recommendationDescription;
+        ObjectiveAction = objectiveAction;
+        ObjectiveActionId = objectiveActionId;
+    }
+
     public ObjectiveAction ObjectiveAction { get; private set; }
     public Guid ObjectiveActionId { get; private set; }
 
@@ -39,12 +71,28 @@ public class Recommendation : AuditableEntity
         this.Status = newStatus;
     }
 
-    public static Result<Recommendation> Create(string description, DateTime dueDate, Guid objectiveActionId,
-        ObjectiveAction objectiveAction)
+    public static Result<Recommendation> Create(
+        string description,
+        DateTime dueDate,
+        string problem,
+        string? aditionalFindings,
+        string? cause,
+        string? consequence,
+        string recommendationDescription,
+        ObjectiveAction objectiveAction,
+        Guid objectiveActionId)
     {
         //TODO : Add validation logic here
-        return Result<Recommendation>.Success(new Recommendation(description, dueDate, objectiveActionId,
-            objectiveAction));
+        return Result<Recommendation>.Success(new Recommendation(
+            description,
+            dueDate,
+            problem,
+            aditionalFindings,
+            cause,
+            consequence,
+            recommendationDescription,
+            objectiveAction,
+            objectiveActionId));
     }
 }
 

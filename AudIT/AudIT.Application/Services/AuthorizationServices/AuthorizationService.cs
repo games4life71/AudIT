@@ -69,6 +69,7 @@ public class AuthorizationService(
         {
             userManager.RemoveFromRoleAsync(user.Result, UserRoles.Unverified);
             userManager.AddToRoleAsync(user.Result, UserRoles.Verified);
+            userManager.AddToRoleAsync(user.Result, UserRoles.User);
         }
 
 
