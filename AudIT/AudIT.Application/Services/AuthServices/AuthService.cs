@@ -35,7 +35,7 @@ public class AuthService(
             return (0, "User already exists!");
         }
 
-        Console.WriteLine("Email is aaaaaa: " + model.EmailAddress);
+        // Console.WriteLine("Email is aaaaaa: " + model.EmailAddress);
 
         var emailExist = await userManager.FindByEmailAsync(model.EmailAddress);
         if (emailExist != null)

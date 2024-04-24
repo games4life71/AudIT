@@ -1,4 +1,5 @@
-﻿using AudIT.Applicationa.Services.UtilsServices;
+﻿using AudIT.Applicationa.Models.Misc;
+using AudIT.Applicationa.Services.UtilsServices;
 using AudiT.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
@@ -8,7 +9,9 @@ using AudIT.Applicationa.Contracts.Identity;
 
 public class AuthorizationService(
     UtilsService utilsService,
-    UserManager<User> userManager) : IAuthorization
+    UserManager<User> userManager,
+    RoleManager<IdentityRole> roleManager
+    ) : IAuthorization
 {
     /// <summary>
     /// Decodes the token and validates the user.
@@ -60,6 +63,15 @@ public class AuthorizationService(
         user.Result.VerifyUser();
         //save the changes
         userManager.UpdateAsync(user.Result);
+            //update the user role
+
+        if (!roleManager.RoleExistsAsync(UserRoles.Verified).Result)
+        {
+            userManager.RemoveFromRoleAsync(user.Result, UserRoles.Unverified);
+            userManager.AddToRoleAsync(user.Result, UserRoles.Verified);
+        }
+
+
 
         return Task.FromResult((1, "User verified successfully"));
     }

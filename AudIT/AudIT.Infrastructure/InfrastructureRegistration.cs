@@ -47,8 +47,10 @@ public static class InfrastructureRegistration
         //register a policy for the EntityWriteOwnerAuthorizationHandler
         services.AddAuthorization(options =>
         {
-            options.AddPolicy("EntityOwnerPolicy",
+            options.AddPolicy("EntityWritePolicy",
                 policy => { policy.Requirements.Add(new EntityWriteOwnerAuthorizationHandler()); });
+            options.AddPolicy("EntityReadPolicy",
+                policy => { policy.Requirements.Add(new EntityReadOwnerAuthorizationHandler()); });
         });
 
 

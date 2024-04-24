@@ -31,6 +31,7 @@ public class BaseAccesRepository<TEntity> : IRepositoryAcces<TEntity> where TEnt
         return Result<TEntity>.Success(entity);
     }
 
+
     public async Task<Result<TEntity>> SetReadAccesAsync(Guid userId, Guid entityId)
     {
         var entity = await _context.Set<TEntity>().FindAsync(entityId);
