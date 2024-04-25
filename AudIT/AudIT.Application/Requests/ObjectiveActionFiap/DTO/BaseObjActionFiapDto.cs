@@ -11,8 +11,6 @@ public class BaseObjActionFiapDto
 
     public Guid AuditMissionId { get; set; }
 
-    // public AudiT.Domain.Entities.AuditMission AuditMission { get; set; }
-
     public BaseAuditMissionDto AuditMission { get; set; }
 
     public Guid ObjectiveActionId { get; set; }

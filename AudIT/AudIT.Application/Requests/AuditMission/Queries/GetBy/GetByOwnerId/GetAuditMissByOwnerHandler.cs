@@ -15,6 +15,10 @@ public class GetAuditMissByOwnerHandler(IAuditMissionRepository _repository, IMa
         try
         {
             var result = await _repository.GetByOwnerId(request.Id);
+            if(!result.IsSuccess)
+            {
+                return new BaseDTOResponse<BaseAuditMissionDto>(result.Error, false);
+            }
             var mappedResult = _mapper.Map<IEnumerable<BaseAuditMissionDto>>(result.Value).ToList();
             return new BaseDTOResponse<BaseAuditMissionDto>(mappedResult, "Success", true);
         }

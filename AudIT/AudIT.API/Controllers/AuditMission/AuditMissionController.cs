@@ -34,6 +34,7 @@ public class AuditMissionController(
     [Route("get-audit-mission/{id}")]
     // [Authorize(Policy = "EntityOwnerPolicy")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetAuditMission(Guid id)
     {
@@ -51,7 +52,7 @@ public class AuditMissionController(
 
         if (!authorizationResult.Succeeded)
         {
-            return StatusCode(StatusCodes.Status403Forbidden);
+            return StatusCode(StatusCodes.Status403Forbidden, "You are not authorized to access this resource");
         }
 
 
@@ -61,6 +62,7 @@ public class AuditMissionController(
 
     [HttpGet]
     [Route("get-audit-mission-by-owner/{id}")]
+    [Authorize(Roles = "Admin")] // only admin can access this route
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAuditMissionByOwner(Guid id)
     {
@@ -83,6 +85,16 @@ public class AuditMissionController(
         if (!result.Success)
         {
             return BadRequest(result.Message);
+        }
+
+        var auditMission = await auditMissionRepository.FindByIdAsync(id);
+        // var auditableEntity = (AuditableEntity)auditMission.Value;
+        var authorizationResult =
+            await authorizationService.AuthorizeAsync(User, auditMission.Value, "EntityReadPolicy");
+
+        if (!authorizationResult.Succeeded)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, "You are not authorized to access this resource");
         }
 
         return Ok(result);

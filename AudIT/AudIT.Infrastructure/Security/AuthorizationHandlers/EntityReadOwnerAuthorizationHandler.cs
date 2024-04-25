@@ -1,4 +1,5 @@
-﻿using AudIT.Domain.Misc;
+﻿using System.Security.Claims;
+using AudIT.Domain.Misc;
 using Microsoft.AspNetCore.Authorization;
 
 namespace AudIT.Infrastructure.Security.AuthorizationHandlers;
@@ -10,7 +11,9 @@ public class EntityReadOwnerAuthorizationHandler :
         EntityReadOwnerAuthorizationHandler requirement,
         AuditableEntity resource)
     {
-        var userId = Guid.Parse(context.User.Identity?.Name);
+
+        var userId = Guid.Parse(context.User.FindFirstValue(ClaimTypes.NameIdentifier));
+
 
         if (resource.ReadAccesUserId.Contains(userId))
         {

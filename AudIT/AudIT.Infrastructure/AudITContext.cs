@@ -60,28 +60,7 @@ public class AudITContext : IdentityDbContext<User>
             $"Data Source={"D:\\Projects\\AudIT\\AudIT\\AudIT\\AudIT.Infrastructure\\database.db"}");
     }
 
-    // protected override void OnModelCreating(ModelBuilder modelBuilder)
-    // {
-    //     modelBuilder.Entity<AuditMission>()
-    //         .HasOne(a => a.User)
-    //         .WithMany(u => u.AuditMissions)
-    //         .HasForeignKey(a => a.UserId)
-    //         .OnDelete(DeleteBehavior.Cascade);
-    //
-    //     modelBuilder.Entity<Activity>()
-    //         .HasOne(a => a.User)
-    //         .WithMany(u => u.Actions)
-    //         .HasForeignKey(a => a.UserId)
-    //         .OnDelete(DeleteBehavior.Cascade);
-    //
-    //     modelBuilder.Entity<BaseDocument>()
-    //         .HasOne(b => b.User)
-    //         .WithMany(u => u.BaseDocuments)
-    //         .HasForeignKey(b => b.UserId)
-    //         .OnDelete(DeleteBehavior.Cascade);
-    //
-    //     base.OnModelCreating(modelBuilder);
-    // }
+
 
 
     public override int SaveChanges()
@@ -101,37 +80,38 @@ public class AudITContext : IdentityDbContext<User>
     /// <summary>
     /// This method is used to update the AuditableEntity properties before saving the changes
     /// </summary>
-    // private void UpdateAuditableEntities()
-    // {
-    //     var now = DateTime.Now;
-    //     var user = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-    //     // if (user == null)
-    //     //     throw new AuthenticationException("User not authenticated.");
-    //
-    //     foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
-    //     {
-    //         switch (entry.State)
-    //         {
-    //             case EntityState.Added:
-    //                 entry.Entity.CreatedBy = user;
-    //                 entry.Entity.LastModifiedDate = now;
-    //                 entry.Entity.CreatedDate = now;
-    //                 entry.Entity.LastModifiedBy = user;
-    //                 entry.Entity.AccesUserId.Add(Guid.Parse(user));
-    //                 break;
-    //             case EntityState.Modified:
-    //                 entry.Entity.LastModifiedBy = user;
-    //                 entry.Entity.LastModifiedDate = now;
-    //                 break;
-    //             case EntityState.Detached:
-    //                 break;
-    //             case EntityState.Unchanged:
-    //                 break;
-    //             case EntityState.Deleted:
-    //                 break;
-    //             default:
-    //                 throw new ArgumentOutOfRangeException();
-    //         }
-    //     }
-    // }
+    private void UpdateAuditableEntities()
+    {
+        var now = DateTime.Now;
+        var user = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        // if (user == null)
+        //     throw new AuthenticationException("User not authenticated.");
+
+        foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Entity.CreatedBy = user;
+                    entry.Entity.LastModifiedDate = now;
+                    entry.Entity.CreatedDate = now;
+                    entry.Entity.LastModifiedBy = user;
+                    entry.Entity.WriteAccesUserId.Add(Guid.Parse(user));
+                    entry.Entity.ReadAccesUserId.Add(Guid.Parse(user));
+                    break;
+                case EntityState.Modified:
+                    entry.Entity.LastModifiedBy = user;
+                    entry.Entity.LastModifiedDate = now;
+                    break;
+                case EntityState.Detached:
+                    break;
+                case EntityState.Unchanged:
+                    break;
+                case EntityState.Deleted:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+    }
 }
