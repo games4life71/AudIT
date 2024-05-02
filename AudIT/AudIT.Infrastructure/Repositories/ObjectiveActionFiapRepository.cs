@@ -17,6 +17,7 @@ public class ObjectiveActionFiapRepository : BaseRepository<ObjectiveActionFiap>
         var result = await _dbcContext.ObjectiveActionFiap
             .Include(a => a.AuditMission)
             .Include(a => a.ObjectiveAction)
+
             .FirstOrDefaultAsync(a => a.Id == id);
 
         if(result == null)

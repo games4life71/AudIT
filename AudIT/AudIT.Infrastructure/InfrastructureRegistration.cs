@@ -6,12 +6,14 @@ using AudIT.Applicationa.Contracts.ExportService;
 using AudIT.Applicationa.Contracts.Identity;
 using AudIT.Applicationa.Contracts.ObjectiveActionServices;
 using AudIT.Applicationa.Models.Export.Activity;
+using AudIT.Applicationa.Models.Export.Fiap;
 using AudIT.Applicationa.Models.Export.ObjectiveAndActions;
 using AudIT.Applicationa.Services.AuthorizationServices;
 using AudIT.Applicationa.Services.AuthServices;
 using AudIT.Applicationa.Services.DocumentServices;
 using AudIT.Applicationa.Services.EmailServices;
 using AudIT.Applicationa.Services.ExportServices.ExportAsCSVService;
+using AudIT.Applicationa.Services.ExportServices.ExportFiapTemplateDoc;
 using AudIT.Applicationa.Services.ExportServices.ExportTemplateObjAndActionXLS;
 using AudIT.Applicationa.Services.ObjectiveActionServices;
 using AudIT.Applicationa.Services.UtilsServices;
@@ -72,10 +74,19 @@ public static class InfrastructureRegistration
         services.AddScoped<IRepositoryFactory, RepositoryFactory>();
 
         services.AddScoped(typeof(IRepositoryAcces<>), typeof(BaseAccesRepository<>));
+
         services.AddScoped(typeof(IExporterService<ObjectiveAndActionsExportModel>),
             provider => new ExportObjAndActionXLS());
+
         services.AddScoped(typeof(IExporterService<ActivityExportModel>),
             provider => new CSVExporterService<ActivityExportModel>());
+
+        // services.AddScoped(typeof(IExporterService<FiapDocModel>),
+        //     provider => new ExportFiapDoc<FiapDocModel>);
+
+        services.AddScoped(typeof(IExporterService<FiapDocModel>),
+            provider => new ExportFiapDoc());
+
         services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<AudITContext>()
             .AddDefaultTokenProviders();

@@ -753,7 +753,22 @@
 // }
 
 
-using AudIT.Infrastructure;
+using OpenXMLTemplates.Documents;
+using OpenXMLTemplates.Engine;
+using OpenXMLTemplates.Variables;
 
-AudITContext context = new AudITContext();
+using var doc = new TemplateDocument("D:\\Projects\\AudIT\\AudIT\\AudIT\\ConsoleApp1\\template_test.docx");
+
+var dict  = new Dictionary<string, string>
+{
+    {"name", "Stefan"},
+    {"text", "23"}
+};
+
+var src = new VariableSource(dict);
+
+var engine = new DefaultOpenXmlTemplateEngine();
+engine.ReplaceAll(doc, src);
+
+doc.SaveAs("D:\\Projects\\AudIT\\AudIT\\AudIT\\ConsoleApp1\\Output\\result.docx");
 

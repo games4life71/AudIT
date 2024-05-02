@@ -24,11 +24,15 @@
       <PackageReference Include="Microsoft.Identity.Client" Version="4.59.0" />
       <PackageReference Include="Microsoft.Identity.Web" Version="2.17.0" />
       <PackageReference Include="Mnt.Microsoft.Exchange.WebServices.Data" Version="2.2.1.1" />
+      <PackageReference Include="OpenXMLTemplates" Version="2.0.6" />
     </ItemGroup>
 <ItemGroup>
   <None Include="appsettings*.json">
     <CopyToOutputDirectory>Always</CopyToOutputDirectory>
   </None>
+</ItemGroup>
+<ItemGroup>
+  <Folder Include="Output\" />
 </ItemGroup>
 
 </Project>
