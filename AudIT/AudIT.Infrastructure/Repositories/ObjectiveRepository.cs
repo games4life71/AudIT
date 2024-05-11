@@ -22,4 +22,14 @@ public class ObjectiveRepository(AudITContext context) : BaseRepository<Objectiv
 
         return Result<List<Objective>>.Success(objectives);
     }
+
+    public override async Task<Result<Objective>> FindByIdAsync(Guid id)
+    {
+        var objective = await _context.Objective.Include(o => o.ObjectiveActions).FirstOrDefaultAsync(o => o.Id == id);
+
+
+        if (objective != null) return Result<Objective>.Success(objective);
+
+        return Result<Objective>.Failure($"Objective with id {id} not found.");
+    }
 }

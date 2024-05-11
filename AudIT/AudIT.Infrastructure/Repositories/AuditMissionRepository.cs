@@ -56,7 +56,7 @@ public class AuditMissionRepository(AudITContext context)
         var result = await _context.AuditMissions
             .Where(a => a.Id == id)
             .Include(a => a.User)
-            .Include(a=>a.Department)
+            .Include(a => a.Department)
             .FirstAsync();
 
 
@@ -67,4 +67,31 @@ public class AuditMissionRepository(AudITContext context)
 
         return Result<AuditMission>.Success(result);
     }
+
+    // public override async Task<Result<AuditMission>> UpdateAsync(AuditMission entity)
+    // {
+    //     var result = await _context.AuditMissions.FindAsync(entity.Id);
+    //
+    //
+    //     if (result == null)
+    //     {
+    //         return Result<AuditMission>.Failure("No audit mission found with this id");
+    //     }
+    //
+    //
+    //     //update the entity
+    //
+    //     result.Update(
+    //         name: entity.Name,
+    //         department: entity.Department,
+    //         departmentId: entity.DepartmentId
+    //     );
+    //
+    //
+    //     _context.AuditMissions.Update(result);
+    //
+    //     await _context.SaveChangesAsync();
+    //
+    //     return Result<AuditMission>.Success(result);
+    // }
 }

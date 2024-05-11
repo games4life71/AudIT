@@ -1,6 +1,7 @@
 ﻿using AudIT.Applicationa.Requests.Activity.Commands.Add;
 using AudIT.Applicationa.Requests.Activity.Commands.AttachDocument;
 using AudIT.Applicationa.Requests.Activity.Commands.RemoveDocument;
+using AudIT.Applicationa.Requests.Activity.Commands.Update;
 using AudIT.Applicationa.Requests.Activity.Queries;
 using AudIT.Applicationa.Requests.Activity.Queries.GetByDate;
 using Microsoft.AspNetCore.Mvc;
@@ -75,6 +76,20 @@ public class ActivityController : BaseController
     public async Task<IActionResult> GetActivityByDate(DateTime startDate, DateTime endDate)
     {
         var result = await Mediator.Send(new GetActivityByDateCommand(startDate, endDate));
+
+        if (!result.Success)
+            return BadRequest(result.Message);
+
+        return Ok(result);
+    }
+
+
+    [HttpPut]
+    [Route("update-activity")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> UpdateActivity(UpdateActivityCommand command)
+    {
+        var result = await Mediator.Send(command);
 
         if (!result.Success)
             return BadRequest(result.Message);

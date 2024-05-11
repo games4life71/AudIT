@@ -8,4 +8,6 @@ public interface IAuditMissionRepository : IRepository<AuditMission>
     public Task<Result<IReadOnlyList<AuditMission>>> GetByOwnerId(string id);
 
     Task<Result<IReadOnlyList<AuditMission>>> GetByDepartmentId(Guid requestDepartmentId);
+
+
 }

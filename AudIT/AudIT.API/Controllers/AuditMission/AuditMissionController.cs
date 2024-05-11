@@ -1,5 +1,6 @@
 ﻿using AudIT.Applicationa.Contracts.AbstractRepositories;
 using AudIT.Applicationa.Requests.AuditMission.Commands.Create;
+using AudIT.Applicationa.Requests.AuditMission.Commands.Update;
 using AudIT.Applicationa.Requests.AuditMission.Queries.GetBy.GetByDepartmentId;
 using AudIT.Applicationa.Requests.AuditMission.Queries.GetBy.GetByOwnerId;
 using AudIT.Applicationa.Requests.AuditMission.Queries.GetById;
@@ -95,6 +96,20 @@ public class AuditMissionController(
         if (!authorizationResult.Succeeded)
         {
             return StatusCode(StatusCodes.Status403Forbidden, "You are not authorized to access this resource");
+        }
+
+        return Ok(result);
+    }
+
+    [HttpPut]
+    [Route("update-audit-mission")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> UpdateAuditMission(UpdateAuditMissionCommand command)
+    {
+        var result = await Mediator.Send(command);
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
         }
 
         return Ok(result);

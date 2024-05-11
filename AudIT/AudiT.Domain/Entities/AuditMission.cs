@@ -61,6 +61,19 @@ public class AuditMission : AuditableEntity
 
         return Result<AuditMission>.Success(new AuditMission(name, user, userId, department, departmentId));
     }
+
+    public void Update(
+        string name,
+        Department department,
+        Guid departmentId
+    )
+    {
+        //TODO : Add validation logic here
+
+        Name = name;
+        Department = department;
+        DepartmentId = departmentId;
+    }
 }
 
 public enum AuditMissionStatus

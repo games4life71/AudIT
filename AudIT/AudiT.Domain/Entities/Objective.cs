@@ -36,9 +36,18 @@ public class Objective:AuditableEntity
         return Result<Objective>.Success(new Objective(name, auditMissionId));
     }
 
+    public void Update(string name)
+    {
+        Name = name;
+    }
 
     public void AddObjectiveAction(ObjectiveAction objectiveAction)
     {
         ObjectiveActions.Add(objectiveAction);
+    }
+
+    public void RemoveObjectiveAction(ObjectiveAction objectiveAction)
+    {
+        ObjectiveActions.Remove(objectiveAction);
     }
 }

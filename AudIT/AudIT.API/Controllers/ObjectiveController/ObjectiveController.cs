@@ -1,4 +1,6 @@
 ﻿using AudIT.Applicationa.Requests.Objective.Commands.Create;
+using AudIT.Applicationa.Requests.Objectives.Commands.Patch.RemoveObjectiveAction;
+using AudIT.Applicationa.Requests.Objectives.Commands.Patch.UpdateObjName;
 using AudIT.Applicationa.Requests.Objectives.Queries.GeyBy.Id;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,6 +35,46 @@ public class ObjectiveController : BaseController
         try
         {
             var response = await Mediator.Send(new GetObjByIdQuery(id));
+            if (!response.Success)
+            {
+                return BadRequest(response.Message);
+            }
+
+            return Ok(response);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [HttpPatch]
+    [Route("update-objective-name")]
+    public async Task<IActionResult> UpdateObjectiveName(UpdateObjectiveNameCommand command)
+    {
+        try
+        {
+            var response = await Mediator.Send(command);
+            if (!response.Success)
+            {
+                return BadRequest(response.Message);
+            }
+
+            return Ok(response);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [HttpPatch]
+    [Route("remove-objective-action")]
+    public async Task<IActionResult> RemoveObjectiveAction(RemoveObjActionCommand command)
+    {
+        try
+        {
+            var response = await Mediator.Send(command);
             if (!response.Success)
             {
                 return BadRequest(response.Message);

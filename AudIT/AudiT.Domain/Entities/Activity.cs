@@ -69,6 +69,22 @@ public class Activity : AuditableEntity
         ObjectiveActionId = objectiveActionId;
     }
 
+    public void Update(
+        string name,
+        ActivityType type,
+        Department department,
+        Guid departmentId,
+        Guid auditMissionId,
+        Guid? objectiveActionId)
+    {
+        Name = name;
+        Type = type;
+        Department = department;
+        DepartmentId = departmentId;
+        AuditMissionId = auditMissionId;
+        ObjectiveActionId = objectiveActionId;
+    }
+
     public bool AddDocument(BaseDocument document)
     {
         //TODO : Add validation logic here
