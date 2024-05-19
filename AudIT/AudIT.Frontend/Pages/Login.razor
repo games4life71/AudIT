@@ -1,0 +1,57 @@
+﻿@page "/Login"
+
+
+<RadzenStack Gap="0" Class="rz-my-12 rz-mx-auto rz-border-radius-6 rz-shadow-10" Style="width: 100%; max-width: 600px; overflow: hidden;">
+    <RadzenCard Class="rz-shadow-0 rz-border-radius-0 rz-background-color-info rz-p-12" style="text-align: center;">
+        <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.H5" Class="rz-color-white rz-mb-0">Login</RadzenText>
+    </RadzenCard>
+    <RadzenCard Class="rz-shadow-0 rz-p-12" Style="width: 100%; max-width: 1000px; overflow: hidden;">
+        <RadzenTemplateForm Data=@("SimpleLogin") Action="http://www.google.com">
+            @* <RadzenLogin AllowRegister="false" AllowResetPassword="true" /> *@
+            <RadzenFormField Text="Email" Variant="Variant.Text" Style="width: 100%">
+
+                <RadzenTextBox ></RadzenTextBox>
+            </RadzenFormField>
+            <RadzenFormField Text="Password" Variant="Variant.Text">
+
+                <RadzenPassword></RadzenPassword>
+            </RadzenFormField>
+            <RadzenSplitter></RadzenSplitter>
+            <RadzenButton IsBusy=@buttonBusy Icon="" Style="width: 50%;" Text="Login" Click=@OnLogin></RadzenButton>
+        </RadzenTemplateForm>
+        <RadzenCard Class=" rz-mt-10">
+            <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
+                <RadzenText Text="Don't have an account ?"></RadzenText>
+                <RadzenButton ButtonStyle="ButtonStyle.Info" Style="opacity:0.7; " Text="Register" Click=@(() => OnRegister("Register"))></RadzenButton>
+            </RadzenRow>
+        </RadzenCard>
+
+    </RadzenCard>
+</RadzenStack>
+
+
+@code {
+    string userName = "admin";
+    string password = "admin";
+    bool rememberMe = true;
+    bool buttonBusy = false;
+
+    async Task OnLogin()
+    {
+// console.Log($"{name} -> Username: {args.Username}, password: {args.Password}, remember me: {args.RememberMe}");
+        buttonBusy = true;
+        await Task.Delay(2000);
+        buttonBusy = false;
+    }
+
+    void OnRegister(string name)
+    {
+// console.Log($"{name} -> Register");
+    }
+
+    void OnResetPassword(string value, string name)
+    {
+// console.Log($"{name} -> ResetPassword for user: {value}");
+    }
+
+}
