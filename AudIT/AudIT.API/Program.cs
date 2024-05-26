@@ -65,7 +65,7 @@ app.UseRouting();
 // });
 app.MapControllers();
 app.UseAuthentication();
-app.UseCors(x => x.WithOrigins("https://localhost:7299").AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+app.UseCors(x => x.WithOrigins("https://localhost:7299","http://localhost:5283").AllowAnyMethod().AllowAnyHeader().AllowCredentials());
 
 app.UseAuthorization();
 app.Run();

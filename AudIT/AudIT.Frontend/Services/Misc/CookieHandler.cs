@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.WebAssembly.Http;
 
-namespace Frontend.Services;
+namespace Frontend.Services.Misc;
 
 public class CookieHandler : DelegatingHandler
 {

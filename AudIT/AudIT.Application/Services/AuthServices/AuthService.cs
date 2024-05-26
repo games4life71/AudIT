@@ -65,6 +65,42 @@ public class AuthService(
 
         IdentityResult result;
         var newUserValue = new_user.Value;
+
+
+        var emailDomain = model.EmailAddress.Split('@')[1];
+
+        var institution = await _institutionRepository.FindInstitutionByDomainAsync(emailDomain);
+
+        if (institution.IsSuccess == false)
+        {
+            return (0, $"No institutioon with domain {emailDomain} found");
+        }
+
+        // Console.WriteLine("FOUND THE INSTITURION");
+        var institutionAdmin = institution.Value.InstitutionAdmin;
+        if (institutionAdmin == null)
+        {
+            // Console.WriteLine("INSTITUTION ADMIN IS NULL");
+        }
+
+        Console.WriteLine("INSTITUTION : " + institution.Value.Id);
+        // if (institutionAdmin == null)
+        // {
+        //     return (0, "Institution admin not found");
+        // }
+
+        if (institutionAdmin != null)
+        {
+            Console.WriteLine("INSTITUTION ADMIN IS NOT NULL");
+        }
+
+        var emailResult = await emailService.SendAuthorizeEmail(institutionAdmin.Id, newUserValue);
+
+        if (emailResult.Item2 == false)
+        {
+            return (0, "Email not sent");
+        }
+
         try
         {
             result = await userManager.CreateAsync(newUserValue, model.Password);
@@ -84,40 +120,6 @@ public class AuthService(
 
         await roleManager.CreateAsync(new IdentityRole(role));
         await userManager.AddToRoleAsync(newUserValue, role);
-
-        var emailDomain = model.EmailAddress.Split('@')[1];
-
-        var institution = await _institutionRepository.FindInstitutionByDomainAsync(emailDomain);
-
-        if (institution.IsSuccess == false)
-        {
-            return (0, institution.Error);
-        }
-
-        // Console.WriteLine("FOUND THE INSTITURION");
-        var institutionAdmin = institution.Value.InstitutionAdmin;
-        if (institutionAdmin == null)
-        {
-            // Console.WriteLine("INSTITUTION ADMIN IS NULL");
-        }
-
-        Console.WriteLine("INSTITUTION : " + institution.Value.Id);
-        if (institutionAdmin == null)
-        {
-            return (0, "Institution admin not found");
-        }
-
-        if (institutionAdmin != null)
-        {
-            Console.WriteLine("INSTITUTION ADMIN IS NOT NULL");
-        }
-
-        var emailResult = await emailService.SendAuthorizeEmail(institutionAdmin.Id, newUserValue);
-
-        if (emailResult.Item2 == false)
-        {
-            return (0, "Email not sent");
-        }
 
         return (1, "User created successfully!");
     }

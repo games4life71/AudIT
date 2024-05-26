@@ -10,8 +10,9 @@
 
     <RadzenFormField  Text="First Name" Variant="Variant.Text">
         <RadzenRow>
-        <RadzenEmailValidator Style="position: absolute" Component="FirstName" Text="Email has to be valid !"></RadzenEmailValidator>
+        @* <RadzenEmailValidator Style="position: absolute" Component="FirstName" Text="emailAddress has to be valid !"></RadzenEmailValidator> *@
         <RadzenTextBox style="display: block"  Name="FirstName" @bind-Value="_valueModel.FirstName"></RadzenTextBox>
+            <RadzenCustomValidator  Value="@_valueModel.FirstName" Style="position: absolute" class="w-100"  Validator="@(() => CheckLength(_valueModel.FirstName))" Component="FirstName" Text="Password is not strong"></RadzenCustomValidator>
         </RadzenRow>
     </RadzenFormField>
 
@@ -41,5 +42,10 @@
     void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
     {
         // console.Log($"InvalidSubmit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() {  WriteIndented = true })}");
+    }
+
+     bool CheckLength(string  password)
+    {
+        return password.Length > 5;
     }
 }

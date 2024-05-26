@@ -15,10 +15,10 @@
         <RadzenTemplateForm TItem="LoginModel" Data="@_loginModel" Submit="@OnLogin" InvalidSubmit="@OnInvalid">
             @* <RadzenLogin AllowRegister="false" AllowResetPassword="true" /> *@
 
-            <RadzenFormField Text="Email" Style="width: 100%; margin-bottom: 20px;">
+            <RadzenFormField Text="Email Address" Style="width: 100%; margin-bottom: 20px;">
                 <RadzenColumn Gap="10px">
                     <RadzenTextBox style="display: block; width: 100%;" Name="email" @bind-Value="@_loginModel.email"></RadzenTextBox>
-                    <RadzenRequiredValidator Component="email" Popup="@popup" Style="position: absolute" class="w-100" Text="Email is required"></RadzenRequiredValidator>
+                    <RadzenRequiredValidator Component="email" Popup="@popup" Style="position: absolute" class="w-100" Text="emailAddress is required"></RadzenRequiredValidator>
                     <RadzenEmailValidator Component="email" Text="Provide a valid email address" Popup="@popup" Style="position: absolute" class="w-100"/>
                 </RadzenColumn>
             </RadzenFormField>
@@ -27,7 +27,7 @@
                 <RadzenColumn Gap="10px" class="rz.mx-10">
                     <RadzenPassword style="display: block; width: 100%;" Name="password" @bind-Value="@_loginModel.password"> </RadzenPassword>
                     <RadzenRequiredValidator Component="password" Style="position: absolute" class="w-100" Popup=@popup Text="Password is required !"></RadzenRequiredValidator>
-                    @* <RadzenCustomValidator  Popup="@popup" @Validator="@(() => ValidatePassword(@_loginModel.password))" Component="password" Text="Password is not strong"></RadzenCustomValidator> *@
+                    @* <RadzenCustomValidator Style="position: absolute" Popup="@popup" @Validator="@(() => ValidatePassword(@_loginModel.password))" Component="password" Text="Password is not strong"></RadzenCustomValidator> *@
                    
                 </RadzenColumn>
             </RadzenFormField>
@@ -76,7 +76,9 @@
         {
             // Console.WriteLine("the message is " + _loginModel.email);
             // Console.WriteLine(_loginModel.password);
-            var response = await _Client.PostAsJsonAsync("https://localhost:7248/api/v1/Authentification/login", _loginModel);
+            buttonBusy = true;
+                var response = await _Client.PostAsJsonAsync("https://localhost:7248/api/v1/Authentification/login", _loginModel);
+           buttonBusy = false;
             msg = response.Content.ReadAsStringAsync().Result;
             if (!response.IsSuccessStatusCode)
             {
