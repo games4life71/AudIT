@@ -65,14 +65,14 @@ public class AudITContext : IdentityDbContext<User>
 
     public override int SaveChanges()
     {
-        // UpdateAuditableEntities();
+         UpdateAuditableEntities();
         return base.SaveChanges();
     }
 
     public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess,
         CancellationToken cancellationToken = new CancellationToken())
     {
-        // UpdateAuditableEntities();
+         UpdateAuditableEntities();
         return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
     }
 

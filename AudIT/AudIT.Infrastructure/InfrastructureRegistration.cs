@@ -20,6 +20,7 @@ using AudIT.Applicationa.Services.UtilsServices;
 using AudiT.Domain.Entities;
 using AudIT.Infrastructure.Repositories;
 using AudIT.Infrastructure.Security.AuthorizationHandlers;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -34,12 +35,18 @@ public static class InfrastructureRegistration
     {
         services.AddDbContext<AudITContext>(options =>
             options.UseSqlite(configuration.GetConnectionString("AudITContext")));
-        services.AddAuthentication(
-            options =>
+        // services.AddAuthentication(
+        //     options =>
+        //     {
+        //         options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+        //         options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+        //         options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
+        //     });
+        services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
             {
-                options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
-                options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
-                options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
+                options.LoginPath = "/api/v1/authentification/login";
+                options.AccessDeniedPath = "/api/v1/authentification/accessdenied";
             });
         services.AddScoped
         (typeof(IRepository<>),

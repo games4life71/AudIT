@@ -4,7 +4,11 @@ using AudIT.Applicationa.Models.AuthDTO;
 using AudIT.Applicationa.Services.EmailServices;
 using AudIT.Applicationa.Services.UtilsServices;
 using AudiT.Domain.Entities;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
@@ -140,7 +144,8 @@ public class AuthService(
         {
             new Claim(ClaimTypes.Name, user.UserName),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim("UserId", "asdasdas")
         };
 
 
@@ -148,11 +153,23 @@ public class AuthService(
         {
             authClaims.Add(new Claim(ClaimTypes.Role, userRole));
         }
+        // Add the claims to the user
+        foreach (var claim in authClaims)
+        {
+            if ((await userManager.GetClaimsAsync(user)).All(c => c.Type != claim.Type))
+            {
+                await userManager.AddClaimAsync(user, claim);
+            }
+        }
+        var claimsIdentity = new ClaimsIdentity(authClaims, CookieAuthenticationDefaults.AuthenticationScheme);
 
+        var authProperties = new AuthenticationProperties();
+
+        await signInManager.Context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
         var token = utilsService.GenerateToken(authClaims);
 
-
         return (1, token);
     }
+
 }

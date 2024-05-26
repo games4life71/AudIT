@@ -4,6 +4,7 @@ using AudIT.Applicationa.Models.AuthDTO;
 using AudIT.Applicationa.Models.Misc;
 using AudiT.Domain.Entities;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -19,10 +20,11 @@ public class AuthentificationController : ControllerBase
     private readonly IAuthorization _authorizationService;
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
-
+    private readonly IHttpContextAccessor _httpContextAccessor;
     public AuthentificationController(IAuthService authService, IEmailService emailService,
-        IAuthorization authorizationService, UserManager<User> userManager, SignInManager<User> signInManager)
+        IAuthorization authorizationService, UserManager<User> userManager, SignInManager<User> signInManager,IHttpContextAccessor httpContextAccessor)
     {
+        _httpContextAccessor = httpContextAccessor;
         _authService = authService;
         _emailService = emailService;
         _authorizationService = authorizationService;
@@ -30,7 +32,20 @@ public class AuthentificationController : ControllerBase
         _signInManager = signInManager;
     }
 
+    [HttpGet]
+    [Route("get-user-claims")]
+    public async Task<IActionResult> GetUserClaims()
+    {
+        //get the user claims
+        var user = _httpContextAccessor.HttpContext?.User;
 
+        if (user == null || !user.Claims.Any())
+        {
+            return BadRequest("No user is currently authenticated or there are no claims.");
+        }
+        var claims = user.Claims.Select(c => new { c.Type, c.Value }).ToList();
+            return Ok(claims);
+    }
     [HttpPost]
     [Route("register")]
     public async Task<IActionResult> Register(RegistrationModel model)
@@ -65,6 +80,12 @@ public class AuthentificationController : ControllerBase
     [Route("login")]
     public async Task<IActionResult> Login(LoginModel model)
     {
+        //print the request
+        Console.WriteLine("Logging in user");
+        Console.WriteLine(model.Email);
+        Console.WriteLine(model.Password);
+
+
         try
         {
             if (!ModelState.IsValid)
@@ -72,6 +93,7 @@ public class AuthentificationController : ControllerBase
                 return BadRequest("Invalid payload");
             }
 
+            Console.WriteLine("Logging in user");
             var (status, message) = await _authService.Login(model);
             var newUser = await _userManager.FindByEmailAsync(model.Email);
             if (newUser != null) await _signInManager.SignInAsync(newUser, false);
@@ -83,14 +105,15 @@ public class AuthentificationController : ControllerBase
 
             var cookieOptions = new CookieOptions
             {
-                HttpOnly = true,
+                HttpOnly = false,
                 Secure = true,
                 Expires = DateTime.UtcNow.AddHours(2),
-                SameSite = SameSiteMode.Strict
+                SameSite = SameSiteMode.None
             };
 
             Response.Cookies.Append("jwt", message, cookieOptions);
-            return Ok(message);
+
+            return Ok();
         }
         catch (Exception ex)
         {

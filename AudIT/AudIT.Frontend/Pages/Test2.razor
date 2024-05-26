@@ -1,0 +1,45 @@
+﻿@page "/page"
+
+
+@using System.Net
+@using System.Text
+@using Newtonsoft.Json
+
+
+<RadzenTemplateForm TItem="TestModel" Data="@_valueModel" Submit="@OnSubmit">
+
+    <RadzenFormField  Text="First Name" Variant="Variant.Text">
+        <RadzenRow>
+        <RadzenEmailValidator Style="position: absolute" Component="FirstName" Text="Email has to be valid !"></RadzenEmailValidator>
+        <RadzenTextBox style="display: block"  Name="FirstName" @bind-Value="_valueModel.FirstName"></RadzenTextBox>
+        </RadzenRow>
+    </RadzenFormField>
+
+
+</RadzenTemplateForm>
+
+
+@code
+{
+
+
+    class TestModel
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+
+    bool popup;
+
+    TestModel _valueModel = new TestModel();
+
+    void OnSubmit(TestModel _valueModel)
+    {
+        Console.WriteLine("Model: " + _valueModel.FirstName);
+    }
+
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        // console.Log($"InvalidSubmit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() {  WriteIndented = true })}");
+    }
+}

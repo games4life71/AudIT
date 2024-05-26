@@ -1,28 +1,49 @@
 ﻿@page "/Login"
-
+@using System.ComponentModel.DataAnnotations
+@using System.Net
+@using System.Text
+@using Frontend.Models
+@using Newtonsoft.Json
+@inject  HttpClient _Client
+@inject NavigationManager NavigationManager
 
 <RadzenStack Gap="0" Class="rz-my-12 rz-mx-auto rz-border-radius-6 rz-shadow-10" Style="width: 100%; max-width: 600px; overflow: hidden;">
     <RadzenCard Class="rz-shadow-0 rz-border-radius-0 rz-background-color-info rz-p-12" style="text-align: center;">
         <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.H5" Class="rz-color-white rz-mb-0">Login</RadzenText>
     </RadzenCard>
     <RadzenCard Class="rz-shadow-0 rz-p-12" Style="width: 100%; max-width: 1000px; overflow: hidden;">
-        <RadzenTemplateForm Data=@("SimpleLogin") Action="http://www.google.com">
+        <RadzenTemplateForm TItem="LoginModel" Data="@_loginModel" Submit="@OnLogin" InvalidSubmit="@OnInvalid">
             @* <RadzenLogin AllowRegister="false" AllowResetPassword="true" /> *@
-            <RadzenFormField Text="Email" Variant="Variant.Text" Style="width: 100%">
 
-                <RadzenTextBox ></RadzenTextBox>
+            <RadzenFormField Text="Email" Style="width: 100%; margin-bottom: 20px;">
+                <RadzenColumn Gap="10px">
+                    <RadzenTextBox style="display: block; width: 100%;" Name="email" @bind-Value="@_loginModel.email"></RadzenTextBox>
+                    <RadzenRequiredValidator Component="email" Popup="@popup" Style="position: absolute" class="w-100" Text="Email is required"></RadzenRequiredValidator>
+                    <RadzenEmailValidator Component="email" Text="Provide a valid email address" Popup="@popup" Style="position: absolute" class="w-100"/>
+                </RadzenColumn>
             </RadzenFormField>
-            <RadzenFormField Text="Password" Variant="Variant.Text">
 
-                <RadzenPassword></RadzenPassword>
+            <RadzenFormField class="w-100" Text="Password">
+                <RadzenColumn Gap="10px" class="rz.mx-10">
+                    <RadzenPassword style="display: block; width: 100%;" Name="password" @bind-Value="@_loginModel.password"> </RadzenPassword>
+                    <RadzenRequiredValidator Component="password" Style="position: absolute" class="w-100" Popup=@popup Text="Password is required !"></RadzenRequiredValidator>
+                    @* <RadzenCustomValidator  Popup="@popup" @Validator="@(() => ValidatePassword(@_loginModel.password))" Component="password" Text="Password is not strong"></RadzenCustomValidator> *@
+                   
+                </RadzenColumn>
             </RadzenFormField>
+            @if (!succesLogin)
+            {
+                <RadzenAlert Close="@OnAlertClose" AlertStyle="AlertStyle.Danger" ShowIcon="false" Variant="Variant.Flat" Shade="Shade.Lighter">
+                    Incorrect email or password !
+                </RadzenAlert>
+            }
             <RadzenSplitter></RadzenSplitter>
-            <RadzenButton IsBusy=@buttonBusy Icon="" Style="width: 50%;" Text="Login" Click=@OnLogin></RadzenButton>
+            <RadzenButton IsBusy=@buttonBusy ButtonType="ButtonType.Submit" Icon="" Style="width: 50%;" Text="Login"></RadzenButton>
         </RadzenTemplateForm>
         <RadzenCard Class=" rz-mt-10">
             <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
                 <RadzenText Text="Don't have an account ?"></RadzenText>
-                <RadzenButton ButtonStyle="ButtonStyle.Info" Style="opacity:0.7; " Text="Register" Click=@(() => OnRegister("Register"))></RadzenButton>
+                <RadzenButton ButtonStyle="ButtonStyle.Info" Style="opacity:0.7; " Text="Register" Click=@NavigateRegister></RadzenButton>
             </RadzenRow>
         </RadzenCard>
 
@@ -31,17 +52,52 @@
 
 
 @code {
-    string userName = "admin";
-    string password = "admin";
+    bool popup;
     bool rememberMe = true;
     bool buttonBusy = false;
+    public LoginModel _loginModel = new LoginModel();
+    private bool succesLogin = true;
+
+    private string msg;
+    // protected override void OnInitialized()
+    // {
+    //     _loginModel = new LoginModel();
+
+    // }
+    void OnAlertClose()
+    {
+        succesLogin = true; // Hide the alert box
+        StateHasChanged(); // Force the component to re-render
+    }
 
     async Task OnLogin()
     {
-// console.Log($"{name} -> Username: {args.Username}, password: {args.Password}, remember me: {args.RememberMe}");
-        buttonBusy = true;
-        await Task.Delay(2000);
-        buttonBusy = false;
+        try
+        {
+            // Console.WriteLine("the message is " + _loginModel.email);
+            // Console.WriteLine(_loginModel.password);
+            var response = await _Client.PostAsJsonAsync("https://localhost:7248/api/v1/Authentification/login", _loginModel);
+            msg = response.Content.ReadAsStringAsync().Result;
+            if (!response.IsSuccessStatusCode)
+            {
+                succesLogin = false;
+                StateHasChanged();
+            }
+
+            else
+            {
+                succesLogin = true;
+                NavigationManager.NavigateTo("/");
+            }
+
+            // Console.WriteLine("the message is " + _loginModel.email);
+        }
+        catch (Exception e)
+        {
+            // Console.WriteLine(e);
+            succesLogin = false; // Login failed, show the alert box
+            StateHasChanged(); //
+        }
     }
 
     void OnRegister(string name)
@@ -52,6 +108,40 @@
     void OnResetPassword(string value, string name)
     {
 // console.Log($"{name} -> ResetPassword for user: {value}");
+    }
+
+    private void OnInvalid(FormInvalidSubmitEventArgs obj)
+    {
+    }
+
+    private bool ValidatePassword(string password)
+    {
+        //if the password is empty or null
+        if (string.IsNullOrEmpty(password))
+        {
+            return false;
+        }
+
+        //if the password is less than 8 characters
+        if (password.Length < 8)
+        {
+            return false;
+        }
+
+        //if the password does not contain a number
+        if (!password.Any(char.IsDigit))
+        {
+            return false;
+        }
+
+        //if the password does not contain a special character
+        return !password.All(char.IsLetterOrDigit);
+
+    }
+
+    private void NavigateRegister(MouseEventArgs obj)
+    {
+        NavigationManager.NavigateTo("/register");
     }
 
 }
