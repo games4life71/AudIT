@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using AudIT.Applicationa;
 using AudIT.Applicationa.MapperProfiles;
 using AudIT.Infrastructure;
@@ -41,6 +42,11 @@ builder.Services.ConfigureApplicationCookie(config =>
         return Task.CompletedTask;
     };
 });
+
+// builder.Services.AddControllers().AddJsonOptions(options =>
+// {
+//     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+// });
 // builder.Logging.AddConsole();
 // builder.Logging.AddDebug();
 

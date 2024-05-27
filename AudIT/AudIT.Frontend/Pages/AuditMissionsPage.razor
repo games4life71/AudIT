@@ -1,0 +1,69 @@
+﻿@page "/AuditMissions"
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+<h3>AuditMissions</h3>
+
+@inject NavigationManager NavigationManager
+@inject IAuditMissionService auditMissionService
+@* <RadzenDataGrid Data="@orders"> *@
+@* *@
+@*     <Columns> *@
+@* *@
+@*         <RadzenDataGridColumn Property="OrderID" Title="Order Id"></RadzenDataGridColumn> *@
+@*         <RadzenDataGridColumn Property="OrderName" Title="Order Name"></RadzenDataGridColumn> *@
+@* *@
+@*         <RadzenDataGridColumn TItem="Order" Title="Action"> *@
+@*             <Template Context="order"> *@
+@*                 <RadzenButton Text="Click me" Click="@(() => ButtonClicked(order))"></RadzenButton> *@
+@*             </Template> *@
+@*         </RadzenDataGridColumn> *@
+@*     </Columns> *@
+@* *@
+@* *@
+@* </RadzenDataGrid> *@
+
+<RadzenText Text="@Message"></RadzenText>
+
+@code {
+    string Message { get; set; }
+
+    public class Order
+    {
+        public int OrderID { get; set; }
+        public string OrderName { get; set; }
+    }
+
+    List<Order> orders = new List<Order>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        orders.Add(new Order() { OrderID = 1, OrderName = "Order 1" });
+        orders.Add(new Order() { OrderID = 2, OrderName = "Order 2" });
+        orders.Add(new Order() { OrderID = 3, OrderName = "Order 3" });
+        orders.Add(new Order() { OrderID = 4, OrderName = "Order 4" });
+
+        var result = await auditMissionService.GetAuditMissionById(Guid.Parse("A9ABBACF-E226-496B-85E7-E3270CF7CE16"));
+
+        if (!result.Success)
+        {
+            Message = "Failed to load audit missions";
+        }
+
+        else
+        {
+            Message = result.DtoResponse.Name;
+        }
+    }
+
+    private Task GoHome()
+    {
+        NavigationManager.NavigateTo("/");
+        return Task.CompletedTask;
+    }
+
+    private Task ButtonClicked(Order order)
+    {
+        Console.WriteLine($"Button clicked for order {order.OrderID}");
+        return Task.CompletedTask;
+    }
+
+}
