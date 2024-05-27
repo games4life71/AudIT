@@ -1,0 +1,114 @@
+﻿@page "/AuditMissions"
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.DepartmentService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityDtos.Department
+@* <h3>AuditMissions</h3> *@
+
+@inject NavigationManager NavigationManager
+@inject IAuditMissionService auditMissionService
+@inject IDepartmentService departmentService
+
+
+<RadzenDataGrid Data="@_auditMissionsDto" AllowSorting="true" AllowFiltering="true">
+
+    <Columns>
+
+        <RadzenDataGridColumn Property="Id" Title="Id"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="Name" Title="Name"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="DepartmentName" Title="Department Name"></RadzenDataGridColumn>
+
+        <RadzenDataGridColumn Frozen="true" Sortable="false" Filterable="false" TItem="AuditMissionWithDepartmentName" Title="">
+            <Template  Context="order">
+                <RadzenButton Style="display: flex; justify-content: center ;" Variant="Variant.Outlined" Text="See info" Click="@(() => ButtonClicked())"></RadzenButton>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+
+@code {
+
+    // RadzenDataGrid<AuditMissionWithDepartmentName> grid;
+    string? Message { get; set; }
+    string? Name { get; set; }
+    private BaseDepartmentDto _departmentDto;
+    private List<AuditMissionWithDepartmentName> _auditMissionsDto = [];
+
+    public class Order
+    {
+        public int OrderID { get; set; }
+        public string? OrderName { get; set; }
+    }
+
+    List<Order> Orders = new List<Order>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Orders.Add(new Order() { OrderID = 1, OrderName = "Order 1" });
+        // Orders.Add(new Order() { OrderID = 1, OrderName = "Order 1" });
+        // Orders.Add(new Order() { OrderID = 1, OrderName = "Order 1" });
+        // Orders.Add(new Order() { OrderID = 1, OrderName = "Order 1" });
+        // _auditMissionsDto.Add(new AuditMissionWithDepartmentName(new Guid(), "Test", "adasd", new Guid(), "Test"));
+        // _auditMissionsDto.Add(new AuditMissionWithDepartmentName(new Guid(), "Test", "adasd", new Guid(), "Test"));
+        // _auditMissionsDto.Add(new AuditMissionWithDepartmentName(new Guid(), "Test", "adasd", new Guid(), "Test"));
+        // _auditMissionsDto.Add(new AuditMissionWithDepartmentName(new Guid(), "Test", "adasd", new Guid(), "Test"));
+
+
+        var result = await auditMissionService.GetAuditMissionByOwnerId(Guid.Parse("e389ae7c-86bd-4763-8f08-c98ec2948803"));
+
+        if (!result.Success)
+        {
+            // Message = "Failed to load audit missions";
+            Message = result.Message;
+            // _auditMissionsDto = result.DtoResponses;
+        }
+
+        else
+        {
+            Message = result.DtoResponses[0].Name;
+
+            var tempAuditMissionsDto = new List<AuditMissionWithDepartmentName>();
+            _auditMissionsDto = [];
+            foreach (var auditMissionDto in result.DtoResponses)
+            {
+                var departmentResult = await departmentService.GetDepartmentByIdAsync(auditMissionDto.DepartmentId);
+                string? departmentName = "";
+                if (!departmentResult.Success)
+                {
+                    departmentName = "Department not found";
+                }
+                else
+                {
+                    if (departmentResult.DtoResponse?.Name != null) departmentName = departmentResult.DtoResponse?.Name;
+                }
+
+                var newAuditMission = new AuditMissionWithDepartmentName(
+                    auditMissionDto.Id,
+                    auditMissionDto.Name,
+                    auditMissionDto.UserId,
+                    auditMissionDto.DepartmentId,
+                    departmentName
+                );
+
+                _auditMissionsDto.Add(newAuditMission);
+            }
+
+            // _auditMissionsDto = tempAuditMissionsDto;
+        }
+    }
+
+    private Task GoHome()
+    {
+        NavigationManager.NavigateTo("/");
+        return Task.CompletedTask;
+    }
+
+    private Task ButtonClicked()
+    {
+        // Console.WriteLine($"Button clicked for order {order.OrderID}");
+        return Task.CompletedTask;
+    }
+
+}

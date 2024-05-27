@@ -63,7 +63,7 @@ public class AuditMissionController(
 
     [HttpGet]
     [Route("get-audit-mission-by-owner/{id}")]
-    [Authorize(Roles = "Admin")] // only admin can access this route
+    // [Authorize(Roles = "Admin")] // only admin can access this route
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAuditMissionByOwner(Guid id)
     {

@@ -1,7 +1,9 @@
 ﻿using System.Net.Http.Headers;
 using Frontend.Contracts.Abstract_Services.AuditMissionService;
+using Frontend.Contracts.Abstract_Services.DepartmentService;
 using Frontend.Services.AuditMission;
 using Frontend.Services.AuthentificationServices;
+using Frontend.Services.Department;
 using Frontend.Services.Misc;
 using Havit.Blazor.Components.Web;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -17,9 +19,14 @@ public static class ServiceRegistration
         services.AddTransient<CookieHandler>();
         services.AddHxServices();
         services.AddRadzenComponents();
+
+
         services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
         services.AddScoped<IAuditMissionService, AuditMissionService>();
         services.AddScoped<CustomAuthStateProvider>();
+        services.AddScoped<IDepartmentService, DepartmentService>();
+
+
         services.AddScoped(sp =>
         {
             var httpClient = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
@@ -32,4 +39,3 @@ public static class ServiceRegistration
         });
     }
 }
-

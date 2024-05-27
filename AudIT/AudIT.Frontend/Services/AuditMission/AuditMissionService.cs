@@ -5,11 +5,8 @@ using Newtonsoft.Json;
 
 namespace Frontend.Services.AuditMission;
 
-public class AuditMissionService(HttpClient httpClient): IAuditMissionService
+public class AuditMissionService(HttpClient httpClient) : IAuditMissionService
 {
-
-
-
     public async Task<BaseDTOResponse<BaseAuditMissionDto>> GetAuditMissionById(Guid id)
     {
         try
@@ -19,6 +16,7 @@ public class AuditMissionService(HttpClient httpClient): IAuditMissionService
             {
                 return new BaseDTOResponse<BaseAuditMissionDto>();
             }
+
             var content = await response.Content.ReadAsStringAsync();
             var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseAuditMissionDto>>(content);
 
@@ -30,7 +28,6 @@ public class AuditMissionService(HttpClient httpClient): IAuditMissionService
             {
                 return new BaseDTOResponse<BaseAuditMissionDto>();
             }
-
         }
         catch (Exception e)
         {
@@ -44,7 +41,35 @@ public class AuditMissionService(HttpClient httpClient): IAuditMissionService
 
     public async Task<BaseDTOResponse<BaseAuditMissionDto>> GetAuditMissionByOwnerId(Guid ownerId)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var response =
+                await httpClient.GetAsync($"{IAuditMissionService.ApiPath}/get-audit-mission-by-owner/{ownerId}");
+            if (!response.IsSuccessStatusCode)
+            {
+                return new BaseDTOResponse<BaseAuditMissionDto>();
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseAuditMissionDto>>(content);
+
+            if (result != null && result.Success && result.DtoResponses.Count>0 )
+            {
+                return result;
+            }
+            else
+            {
+                return new BaseDTOResponse<BaseAuditMissionDto>("An error occurred "+ result.Message, false);
+            }
+        }
+        catch (Exception e)
+        {
+            return new BaseDTOResponse<BaseAuditMissionDto>
+            {
+                Success = false,
+                Message = e.Message
+            };
+        }
     }
 
     public async Task<BaseDTOResponse<BaseAuditMissionDto>> GetAuditMissionByDepartmentId(Guid departmentId)
