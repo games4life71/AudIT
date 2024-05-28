@@ -1,4 +1,6 @@
-﻿namespace AudIT.Applicationa.Requests.AuditMission.DTO;
+﻿using AudiT.Domain.Entities;
+
+namespace AudIT.Applicationa.Requests.AuditMission.DTO;
 
 public class BaseAuditMissionDto
 {
@@ -9,6 +11,8 @@ public class BaseAuditMissionDto
     public string UserId { get; set; }
 
     public Guid DepartmentId { get; set; }
+
+    public AuditMissionStatus Status { get; set; } = AuditMissionStatus.Creata;
 
     public BaseAuditMissionDto(Guid id, string name, string userId, Guid departmentId)
     {

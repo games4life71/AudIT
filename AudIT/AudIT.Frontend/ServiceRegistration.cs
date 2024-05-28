@@ -1,4 +1,6 @@
 ﻿using System.Net.Http.Headers;
+using System.Security.Claims;
+using Blazored.LocalStorage;
 using Frontend.Contracts.Abstract_Services.AuditMissionService;
 using Frontend.Contracts.Abstract_Services.DepartmentService;
 using Frontend.Services.AuditMission;
@@ -25,7 +27,8 @@ public static class ServiceRegistration
         services.AddScoped<IAuditMissionService, AuditMissionService>();
         services.AddScoped<CustomAuthStateProvider>();
         services.AddScoped<IDepartmentService, DepartmentService>();
-
+        services.AddBlazoredLocalStorage();
+        // services.AddScoped<ClaimsPrincipal>();
 
         services.AddScoped(sp =>
         {

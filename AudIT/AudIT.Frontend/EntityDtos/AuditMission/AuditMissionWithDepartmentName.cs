@@ -16,4 +16,6 @@ public class AuditMissionWithDepartmentName(
     public Guid DepartmentId { get; set; } = departmentId;
 
     public string? DepartmentName { get; set; } = departmentName;
+
+    public AuditMissionStatus Status { get; set; } = AuditMissionStatus.Creata;
 }

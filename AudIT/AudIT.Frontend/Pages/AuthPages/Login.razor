@@ -3,8 +3,11 @@
 @using System.Net
 @using System.Text
 @using Frontend.Models
+@using Frontend.Services.AuthentificationServices
+@using Microsoft.AspNetCore.Components.Authorization
 @using Newtonsoft.Json
 @inject  HttpClient _Client
+@inject CustomAuthStateProvider customAuthState
 @inject NavigationManager NavigationManager
 
 <RadzenStack Gap="0" Class="rz-my-12 rz-mx-auto rz-border-radius-6 rz-shadow-10" Style="width: 100%; max-width: 600px; overflow: hidden;">
@@ -50,7 +53,8 @@
     </RadzenCard>
 </RadzenStack>
 
-
+@* <RadzenText Text="@succesLogin.ToString()"></RadzenText> *@
+@* <RadzenText Text="@msg"></RadzenText> *@
 @code {
     bool popup;
     bool rememberMe = true;
@@ -81,14 +85,15 @@
            buttonBusy = false;
             msg = response.Content.ReadAsStringAsync().Result;
             if (!response.IsSuccessStatusCode)
-            {
+            {   buttonBusy = false;
                 succesLogin = false;
                 StateHasChanged();
             }
 
             else
-            {
+            {   buttonBusy = false;
                 succesLogin = true;
+                await customAuthState.GetAuthenticationStateAsync();
                 NavigationManager.NavigateTo("/");
             }
 
@@ -96,8 +101,10 @@
         }
         catch (Exception e)
         {
+            buttonBusy = false;
+            msg = e.Message;
             // Console.WriteLine(e);
-            succesLogin = false; // Login failed, show the alert box
+            // succesLogin = false; // Login failed, show the alert box
             StateHasChanged(); //
         }
     }

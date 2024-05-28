@@ -120,6 +120,33 @@ public class AuthentificationController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
+    [HttpGet]
+    [Route("logout")]
+public async Task<IActionResult> Logout()
+    {
+        Console.WriteLine("Logging out user");
+        try
+        {
+         //set the expiration time to 1 second ago
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = true,
+                Expires = DateTime.UtcNow.AddSeconds(-1),
+                SameSite = SameSiteMode.None
+            };
+
+            Response.Cookies.Append("jwt", "", cookieOptions);
+            await _signInManager.SignOutAsync();
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
+
 
     [HttpGet]
     [Route("verify-email/{token}")]
