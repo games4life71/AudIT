@@ -25,12 +25,12 @@ public class DepartmentController : BaseController
 
 
     [HttpGet]
-    [Route("get-department-by-institution-id/{id}")]
+    [Route("get-departments-by-institution-id/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetDepartmentByInstitutionId(Guid id)
     {
-        var result = await Mediator.Send(new GetDepartmentByInstitutionIdQuery { InstitutionId = id });
+        var result = await Mediator.Send(new GetDepartmentsByInstitutionIdQuery { InstitutionId = id });
 
         if (!result.Success)
         {

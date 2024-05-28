@@ -21,6 +21,8 @@ using AudiT.Domain.Entities;
 using AudIT.Infrastructure.Repositories;
 using AudIT.Infrastructure.Security.AuthorizationHandlers;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +35,27 @@ public static class InfrastructureRegistration
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+
+        services.ConfigureExternalCookie(options =>
+        {
+            options.Cookie.SameSite = SameSiteMode.None;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        });
+
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.Cookie.SameSite = SameSiteMode.None;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.Name="MyCookie";
+        });
+
+        services.Configure<CookiePolicyOptions>(options =>
+        {
+            options.MinimumSameSitePolicy = SameSiteMode.None;
+            options.CheckConsentNeeded = context => false;
+            options.Secure = CookieSecurePolicy.Always;
+        });
+
         services.AddDbContext<AudITContext>(options =>
             options.UseSqlite(configuration.GetConnectionString("AudITContext")));
         // services.AddAuthentication(

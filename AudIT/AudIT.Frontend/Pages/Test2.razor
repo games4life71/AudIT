@@ -5,20 +5,27 @@
 @using System.Text
 @using Newtonsoft.Json
 
+@* *@
+@* <RadzenTemplateForm TItem="TestModel" Data="@_valueModel" Submit="@OnSubmit"> *@
+@* *@
+@*     <RadzenFormField  Text="First Name" Variant="Variant.Text"> *@
+@*         <RadzenRow> *@
+@*         $1$ <RadzenEmailValidator Style="position: absolute" Component="FirstName" Text="emailAddress has to be valid !"></RadzenEmailValidator> #1# *@
+@*         <RadzenTextBox style="display: block"  Name="FirstName" @bind-Value="_valueModel.FirstName"></RadzenTextBox> *@
+@*             <RadzenCustomValidator  Value="@_valueModel.FirstName" Style="position: absolute" class="w-100"  Validator="@(() => CheckLength(_valueModel.FirstName))" Component="FirstName" Text="Password is not strong"></RadzenCustomValidator> *@
+@*         </RadzenRow> *@
+@*     </RadzenFormField> *@
+@* *@
+@* *@
+@* </RadzenTemplateForm>
+ *@
 
-<RadzenTemplateForm TItem="TestModel" Data="@_valueModel" Submit="@OnSubmit">
-
-    <RadzenFormField  Text="First Name" Variant="Variant.Text">
-        <RadzenRow>
-        @* <RadzenEmailValidator Style="position: absolute" Component="FirstName" Text="emailAddress has to be valid !"></RadzenEmailValidator> *@
-        <RadzenTextBox style="display: block"  Name="FirstName" @bind-Value="_valueModel.FirstName"></RadzenTextBox>
-            <RadzenCustomValidator  Value="@_valueModel.FirstName" Style="position: absolute" class="w-100"  Validator="@(() => CheckLength(_valueModel.FirstName))" Component="FirstName" Text="Password is not strong"></RadzenCustomValidator>
-        </RadzenRow>
-    </RadzenFormField>
+<RadzenDropDown @bind-Value="selectedTest" AllowFiltering="true" TValue="string"
+                Placeholder="choose:" Data="@(test_models)"
+                TextProperty="FirstName" ValueProperty="LastName"/>
 
 
-</RadzenTemplateForm>
-
+<RadzenText Text="@selectedTest"></RadzenText>
 
 @code
 {
@@ -28,11 +35,31 @@
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
+
+        public TestModel(string firstName, string lastName)
+        {
+            FirstName = firstName;
+            LastName = lastName;
+        }
     }
 
+    List<TestModel> test_models = new List<TestModel>();
+
+    string selectedTest;
     bool popup;
 
-    TestModel _valueModel = new TestModel();
+    protected override Task OnInitializedAsync()
+    {
+        test_models.Add(new TestModel("asdasdasadass", "bbbb1"));
+        test_models.Add(new TestModel("asdasdasadass", "bbbb2"));
+        test_models.Add(new TestModel("asdasdasadass", "bbbb3"));
+        test_models.Add(new TestModel("asdasdasadass", "bbbb4"));
+
+        return base.OnInitializedAsync();
+
+    }
+
+
 
     void OnSubmit(TestModel _valueModel)
     {

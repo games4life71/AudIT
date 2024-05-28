@@ -45,6 +45,36 @@ public class DepartmentService(HttpClient httpClient) : IDepartmentService
 
     public async Task<BaseDTOResponse<BaseDepartmentDto>> GetDepartmentsByInstitutionIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var response = await httpClient.GetAsync($"{IDepartmentService.ApiPath}/get-departments-by-institution-id/{id}");
+            if (!response.IsSuccessStatusCode)
+                return new BaseDTOResponse<BaseDepartmentDto>
+                {
+                    Success = false,
+                    Message = "Failed to get departments by institution id."
+                };
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseDepartmentDto>>(content);
+
+            if (result is { Success: true, DtoResponses: not null })
+            {
+                return result;
+            }
+            else
+            {
+                return new BaseDTOResponse<BaseDepartmentDto>();
+            }
+        }
+        catch (Exception e)
+        {
+            return new BaseDTOResponse<BaseDepartmentDto>
+            {
+                Success = false,
+                Message = e.Message
+            };
+        }
     }
 }

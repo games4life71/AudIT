@@ -1,0 +1,170 @@
+﻿@page "/create-mission"
+@using Frontend.Contracts.Abstract_Services.DepartmentService
+@using Frontend.Contracts.Abstract_Services.InstitutionsService
+@using Frontend.EntityDtos.Department
+@using Frontend.EntityDtos.Institution
+@using Frontend.Services.InstitutionServices
+@inject IInstitutionService institutionService
+@inject IDepartmentService departmentService
+@if (institutions == null)
+{
+    //show loading spinner
+    <RadzenLoadingText Text="Loading institutions..."></RadzenLoadingText>
+}
+else
+{
+    <RadzenCard>
+        <RadzenSteps CanChange="@CanChange" Style="display: flex; justify-content: space-between;">
+            <Steps>
+                <RadzenStepsItem Text="Name">
+                    <RadzenText class="rz-my-10" Text="Choose a name for the audit mission "></RadzenText>
+                    <RadzenFieldset Text="Name">
+                        <RadzenTextBox Value="@_selectedInstitutionName" ValueChanged="s => GetName(s)" Name="Name"></RadzenTextBox>
+                        <RadzenText TextStyle="TextStyle.Subtitle1" Visible="@(!validName)" Text="Audit Mission Name must only contain letter and digits"></RadzenText>
+                    </RadzenFieldset>
+                </RadzenStepsItem>
+                <RadzenStepsItem Text="Institution">
+                    <RadzenText Text="Choose an institution: "></RadzenText>
+                    <RadzenFieldset>
+                        <RadzenDropDown AllowFiltering="true"
+                                        TValue="Guid" Placeholder="Institution:" ValueChanged="@OnInstitutionChange"
+                                        Data="@(institutions)" TextProperty="Name" ValueProperty="Id"/>
+
+
+                    </RadzenFieldset>
+
+
+                </RadzenStepsItem>
+                <RadzenStepsItem Text="Department ">
+                    @{
+                        bool foundDepart = !(_departments != null && _departments.Count() > 0);
+                        bool foundNeg = !foundDepart;
+                    }
+
+                    <RadzenText Text="Choose the Department"></RadzenText>
+                    <RadzenFieldset>
+                        <RadzenDropDown Disabled="@foundDepart" @bind-Value="_selectedDepartmentId" AllowFiltering="true"
+                                        TValue="Guid" Placeholder="Department:"
+                                        Data="@(_departments)" TextProperty="Name" ValueProperty="Id"/>
+
+
+                        <RadzenText Text="No departments found for the selected institution" Visible="@foundDepart"></RadzenText>
+                    </RadzenFieldset>
+                </RadzenStepsItem>
+
+            </Steps>
+
+
+        </RadzenSteps>
+    </RadzenCard>
+
+
+}
+
+
+@code {
+
+    public class Test(string name, string value)
+    {
+        public string Name { get; set; } = name;
+        public string Value { get; set; } = value;
+    }
+
+    List<BaseInstitutionDto> institutions;
+    List<BaseDepartmentDto> _departments;
+
+    private string _selectedInstitutionName;
+    private Guid _selectedInstitutionId = Guid.Empty;
+    private Guid _selectedDepartmentId = Guid.Empty;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+
+        var result = await institutionService.GetAllInstitutionsAsync();
+
+        if (!result.Success)
+        {
+            //show error message
+        }
+        else
+        {
+            institutions = [];
+            foreach (var institution in result.DtoResponses)
+            {
+                institutions.Add(new BaseInstitutionDto(
+                    institution.Id,
+                    institution.Name,
+                    institution.Address
+                ));
+            }
+        }
+    }
+
+    string Name { get; set; }
+    bool validName;
+
+    private Task GetName(string s)
+    {
+        //check if the name is valid
+        var isValid = !string.IsNullOrEmpty(s);
+        //if it contains only letters and numbers
+        if (isValid)
+        {
+            isValid = s.All(char.IsLetterOrDigit);
+        }
+
+        if (!isValid)
+        {
+            //show an error message
+            validName = false;
+        }
+        else
+        {
+            validName = true;
+        }
+
+        _selectedInstitutionName = s;
+        return Task.CompletedTask;
+    }
+
+    private void CanChange(StepsCanChangeEventArgs obj)
+    {
+        obj.SelectedIndex = 0;
+    }
+
+    private async void OnInstitutionChange(Guid InstitutionId)
+    {
+        _selectedInstitutionId = InstitutionId;
+        //get the departments of the selected institution
+
+
+        var result = await departmentService.GetDepartmentsByInstitutionIdAsync(InstitutionId);
+
+
+        if (!result.Success)
+        {
+            //show error message
+          
+        }
+        else
+        {
+
+            _departments = [];
+
+            foreach (var department in result.DtoResponses)
+            {
+                _departments.Add(new BaseDepartmentDto(
+                    department.Id,
+                    department.Name,
+                    department.Address,
+                    department.HomePhoneNumber,
+                    institutions.FirstOrDefault(x => x.Id == department.Id)
+                ));
+            }
+        }
+    }
+
+}

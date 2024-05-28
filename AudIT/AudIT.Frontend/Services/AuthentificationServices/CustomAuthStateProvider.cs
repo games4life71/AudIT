@@ -24,15 +24,15 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
     /// <returns></returns>
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-         int MaxRetries = 10;
+         int MaxRetries = 2;
         ClaimsPrincipal claimsPrincipal;
         var response = await _httpClient.GetAsync("http://localhost:5071/api/v1/Authentification/get-user-claims");
-        while (!response.IsSuccessStatusCode && MaxRetries > 0)
-        {
-            await Task.Delay(1000); // Wait for 1 second
-            response = await _httpClient.GetAsync("http://localhost:5071/api/v1/Authentification/get-user-claims");
-            MaxRetries--;
-        }
+        // while (!response.IsSuccessStatusCode && MaxRetries > 0)
+        // {
+        //      // Wait for 1 second
+        //     response = await _httpClient.GetAsync("http://localhost:5071/api/v1/Authentification/get-user-claims");
+        //     MaxRetries--;
+        // }
         if (response.IsSuccessStatusCode)
         {
             var claims = await response.Content.ReadFromJsonAsync<List<ClaimResponse>>();

@@ -1,4 +1,4 @@
-﻿@page "/AuditMissions"
+﻿@page "/audit-missions"
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.DepartmentService
 @using Frontend.EntityDtos.AuditMission
@@ -11,31 +11,47 @@
 @inject IDepartmentService departmentService
 @inject CustomAuthStateProvider customAuthState
 
-<RadzenDataGrid Data="@_auditMissionsDto" AllowSorting="true" AllowFiltering="true">
+@if (isAuthenticated)
+{
 
-    <Columns>
+    <RadzenDataGrid Data="@_auditMissionsDto" AllowSorting="true" AllowFiltering="true">
 
-        @* <RadzenDataGridColumn Property="Id" Title="Id"></RadzenDataGridColumn> *@
-        <RadzenDataGridColumn Property="Name" Title="Name"></RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="DepartmentName" Title="Department Name">
+        <Columns>
 
-            <Template Context="data">
-                <div @onclick="() => DepartmentCellClicked(data)">
-                    @data.DepartmentName
-                </div>
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="Status" Title="Status"></RadzenDataGridColumn>
+            @* <RadzenDataGridColumn Property="Id" Title="Id"></RadzenDataGridColumn> *@
+            <RadzenDataGridColumn Property="Name" Title="Name"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="DepartmentName" Title="Department Name">
 
-        <RadzenDataGridColumn Frozen="true" Sortable="false" Filterable="false" TItem="AuditMissionWithDepartmentName" Title="">
-            <Template Context="order">
-                <RadzenButton Style="display: flex; justify-content: center ;" Variant="Variant.Outlined" Text="See info" Click="@(() => ButtonClicked())"></RadzenButton>
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+                <Template Context="data">
+                    <div @onclick="() => DepartmentCellClicked(data)">
+                        @data.DepartmentName
+                    </div>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="Status" Title="Status"></RadzenDataGridColumn>
 
-<RadzenText Text="@isAuthenticated.ToString()" ></RadzenText>
+            <RadzenDataGridColumn Frozen="true" Sortable="false" Filterable="false" TItem="AuditMissionWithDepartmentName" Title="">
+                <Template Context="order">
+                    <RadzenButton Style="display: flex; justify-content: center ;" Variant="Variant.Outlined" Text="See info" Click="@(() => ButtonClicked())"></RadzenButton>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+
+}
+@* else if(!isAuthenticated) *@
+@* { *@
+@*  //display a loading spinner *@
+@*     <h1>Not authenticated</h1> *@
+@* } *@
+else
+{
+    <RadzenPanel Style="justify-content: center; align-content: center;">
+        <RadzenLabel Text="Loading..." />
+        <RadzenProgressBar  Height="10px" />
+    </RadzenPanel>
+}
+
 
 @code {
 
@@ -44,7 +60,7 @@
     string? Name { get; set; }
     private BaseDepartmentDto _departmentDto;
     private List<AuditMissionWithDepartmentName> _auditMissionsDto = [];
-    bool isAuthenticated = false;
+    bool isAuthenticated ;
 
 
 

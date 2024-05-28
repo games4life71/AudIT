@@ -21,27 +21,27 @@ builder.Services.AddSwaggerGen(c => c.SwaggerDoc(
         Title = "AudIT API",
     }
 ));
-builder.Services.ConfigureApplicationCookie(config =>
-{
-    config.Cookie.Name = "Identity.Cookie";
-    config.LoginPath = "/User/Login";
-    config.LogoutPath = "/User/Logout";
-    config.AccessDeniedPath = "/User/Login";
-    config.Cookie.SameSite = SameSiteMode.None;
-    config.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-
-    config.Events.OnRedirectToAccessDenied = context =>
-    {
-        context.Response.StatusCode = (int)403;
-        return Task.CompletedTask;
-    };
-
-    config.Events.OnRedirectToLogin = context =>
-    {
-        context.Response.StatusCode = (int)401;
-        return Task.CompletedTask;
-    };
-});
+// builder.Services.ConfigureApplicationCookie(config =>
+// {
+//     config.Cookie.Name = "Identity.Cookie";
+//     config.LoginPath = "/User/Login";
+//     config.LogoutPath = "/User/Logout";
+//     config.AccessDeniedPath = "/User/Login";
+//     config.Cookie.SameSite = SameSiteMode.None;
+//     config.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+//
+//     config.Events.OnRedirectToAccessDenied = context =>
+//     {
+//         context.Response.StatusCode = (int)403;
+//         return Task.CompletedTask;
+//     };
+//
+//     config.Events.OnRedirectToLogin = context =>
+//     {
+//         context.Response.StatusCode = (int)401;
+//         return Task.CompletedTask;
+//     };
+// });
 
 // builder.Services.AddControllers().AddJsonOptions(options =>
 // {

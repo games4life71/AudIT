@@ -6,22 +6,22 @@ using MediatR;
 
 namespace AudIT.Applicationa.Requests.Department.Queries.GetByInstitutionId;
 
-public class GetDepartmentByInstIDHandler(
+public class GetDepartmentsByInstIDHandler(
     IDepartmentRepository departmentRepository,
     IMapper mapper
-) : IRequestHandler<GetDepartmentByInstitutionIdQuery, BaseDTOResponse<BaseDepartmentDto>>
+) : IRequestHandler<GetDepartmentsByInstitutionIdQuery, BaseDTOResponse<BaseDepartmentDto>>
 {
-    public async Task<BaseDTOResponse<BaseDepartmentDto>> Handle(GetDepartmentByInstitutionIdQuery request,
+    public async Task<BaseDTOResponse<BaseDepartmentDto>> Handle(GetDepartmentsByInstitutionIdQuery request,
         CancellationToken cancellationToken)
     {
         try
         {
-            var result = await departmentRepository.FindByInstitutionIdAsync(
+            var result = await departmentRepository.FindAllByInstitutionIdAsync(
                 request.InstitutionId);
             if (!result.IsSuccess)
                 return new BaseDTOResponse<BaseDepartmentDto>(
                     $"Department with institution id {request.InstitutionId} not found", false);
-            return new BaseDTOResponse<BaseDepartmentDto>(mapper.Map<BaseDepartmentDto>(result.Value),
+            return new BaseDTOResponse<BaseDepartmentDto>(mapper.Map<List<BaseDepartmentDto>>(result.Value),
                 "Succesfully retrieved department", true);
         }
         catch (Exception e)

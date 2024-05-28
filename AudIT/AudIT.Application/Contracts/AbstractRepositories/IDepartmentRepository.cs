@@ -5,5 +5,5 @@ namespace AudIT.Applicationa.Contracts.AbstractRepositories;
 
 public interface IDepartmentRepository : IRepository<Department>
 {
-    public Task<Result<Department>> FindByInstitutionIdAsync(Guid institutionId);
+    public Task<Result<List<Department>>> FindAllByInstitutionIdAsync(Guid institutionId);
 }

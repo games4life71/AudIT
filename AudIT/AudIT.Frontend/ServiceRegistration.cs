@@ -3,9 +3,11 @@ using System.Security.Claims;
 using Blazored.LocalStorage;
 using Frontend.Contracts.Abstract_Services.AuditMissionService;
 using Frontend.Contracts.Abstract_Services.DepartmentService;
+using Frontend.Contracts.Abstract_Services.InstitutionsService;
 using Frontend.Services.AuditMission;
 using Frontend.Services.AuthentificationServices;
 using Frontend.Services.Department;
+using Frontend.Services.InstitutionServices;
 using Frontend.Services.Misc;
 using Havit.Blazor.Components.Web;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -26,10 +28,12 @@ public static class ServiceRegistration
         services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
         services.AddScoped<IAuditMissionService, AuditMissionService>();
         services.AddScoped<CustomAuthStateProvider>();
+        services.AddScoped<IInstitutionService, InstitutionService>();
         services.AddScoped<IDepartmentService, DepartmentService>();
         services.AddBlazoredLocalStorage();
-        // services.AddScoped<ClaimsPrincipal>();
 
+        // services.AddScoped<ClaimsPrincipal>();
+        services.AddScoped<DialogService>();
         services.AddScoped(sp =>
         {
             var httpClient = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };

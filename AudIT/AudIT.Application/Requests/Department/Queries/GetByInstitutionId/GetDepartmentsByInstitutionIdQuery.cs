@@ -4,7 +4,7 @@ using MediatR;
 
 namespace AudIT.Applicationa.Requests.Department.Queries.GetByInstitutionId;
 
-public class GetDepartmentByInstitutionIdQuery : IRequest<BaseDTOResponse<BaseDepartmentDto>>
+public class GetDepartmentsByInstitutionIdQuery : IRequest<BaseDTOResponse<BaseDepartmentDto>>
 {
     public Guid InstitutionId { get; set; }
 }

@@ -111,7 +111,7 @@ public class AuthentificationController : ControllerBase
                 SameSite = SameSiteMode.None
             };
 
-            Response.Cookies.Append("jwt", message, cookieOptions);
+            // Response.Cookies.Append("jwt", message, cookieOptions);
 
             return Ok();
         }

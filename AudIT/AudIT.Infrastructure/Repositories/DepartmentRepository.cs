@@ -22,16 +22,16 @@ public class DepartmentRepository(AudITContext context) : BaseRepository<Departm
         return Result<Department>.Success(department);
     }
 
-    public async Task<Result<Department>> FindByInstitutionIdAsync(Guid institutionId)
+    public async Task<Result<List<Department>>> FindAllByInstitutionIdAsync(Guid institutionId)
     {
         var department = await context.Departments
             .Where(x => x.Institution.Id == institutionId)
             .Include(x => x.Institution)
-            .FirstOrDefaultAsync();
+            .ToListAsync();
 
         if (department == null)
-            return Result<Department>.Failure("Department not found");
+            return Result<List<Department>>.Failure("Department not found");
 
-        return Result<Department>.Success(department);
+        return Result<List<Department>>.Success(department);
     }
 }

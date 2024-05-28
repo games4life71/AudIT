@@ -3,6 +3,7 @@
 @inherits LayoutComponentBase
 @inject CustomAuthStateProvider customAuthState
 @inject NavigationManager NavigationManager
+@inject DialogService DialogService
 
 <RadzenLayout Style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body'">
     <RadzenHeader>
@@ -25,8 +26,8 @@
             {
                 <RadzenPanelMenuItem Text="Home" Path="/" Icon="home"/>
                 <RadzenPanelMenuItem Text="Audit Missions">
-                    <RadzenPanelMenuItem Text="Create Mission" Icon="add"/>
-                    <RadzenPanelMenuItem Text="List Missions" Path="/auditMissions" Icon="list"/>
+                    <RadzenPanelMenuItem Text="Create Mission" Path="/create-mission" Icon="add"/>
+                    <RadzenPanelMenuItem Text="List Missions" Path="/audit-missions" Icon="list"/>
                 </RadzenPanelMenuItem>
 
             }
@@ -34,7 +35,7 @@
         <RadzenPanelMenu>
             @if (isAuthenticated)
             {
-                <RadzenButton Text="Logout" Click="@SignOut" Icon="logout"></RadzenButton>
+                <RadzenButton Text="Logout"  Click="@SignOut"  Icon="logout"></RadzenButton>
             }
 
         </RadzenPanelMenu>
@@ -50,7 +51,7 @@
         </main>
     </RadzenBody>
 </RadzenLayout>
-
+<RadzenDialog/>
 @code
 {
 
@@ -66,14 +67,27 @@
 
     private async void RefreshNavbar(Task<AuthenticationState> task)
     {
-        await OnInitializedAsync();
+        // await OnInitializedAsync();
         StateHasChanged();
     }
 
-    private void SignOut()
+    private async void SignOut()
     {
-        isAuthenticated = false;
-        customAuthState.SignOut();
-        NavigationManager.NavigateTo("/login");
+
+        var confirm = await DialogService.Confirm("Are you sure you want to Log out ?", "Confirm Logout", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+        if (confirm.Value == true)
+        {
+            isAuthenticated = false;
+            customAuthState.SignOut();
+            NavigationManager.NavigateTo("/login");
+        }
+        else
+        {
+            return;
+        }
+
     }
+
+
 }

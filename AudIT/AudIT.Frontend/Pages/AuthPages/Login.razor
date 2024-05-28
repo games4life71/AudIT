@@ -93,8 +93,9 @@
             else
             {   buttonBusy = false;
                 succesLogin = true;
+
                 await customAuthState.GetAuthenticationStateAsync();
-                NavigationManager.NavigateTo("/");
+                NavigationManager.NavigateTo("/",forceLoad:true);
             }
 
             // Console.WriteLine("the message is " + _loginModel.email);
