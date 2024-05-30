@@ -59,6 +59,24 @@ public class CustomAuthStateProvider : AuthenticationStateProvider
         return authState.User.Claims.Select(c => new ClaimResponse(c.Type, c.Value)).ToList();
     }
 
+    public async Task<(Guid,bool)> GetUserIdFromTokenAsync()
+    {
+       //read the token from local storage
+        var auth = await _localStorage.GetItemAsync<ClaimsPrincipalDto>("auth");
+        if(auth == null)
+        {
+            return (Guid.Empty, false);
+        }
+        var userId = auth.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+        if(userId == null)
+        {
+            return (Guid.Empty, false);
+        }
+
+        return (Guid.Parse(userId), true);
+    }
+
     public async void SignOut()
     {
 

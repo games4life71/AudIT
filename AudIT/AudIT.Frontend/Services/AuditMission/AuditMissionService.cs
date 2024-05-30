@@ -1,4 +1,5 @@
-﻿using Frontend.Contracts.Abstract_Services.AuditMissionService;
+﻿using System.Net.Http.Json;
+using Frontend.Contracts.Abstract_Services.AuditMissionService;
 using Frontend.EntityDtos.AuditMission;
 using Frontend.EntityDtos.Misc;
 using Newtonsoft.Json;
@@ -75,5 +76,18 @@ public class AuditMissionService(HttpClient httpClient) : IAuditMissionService
     public async Task<BaseDTOResponse<BaseAuditMissionDto>> GetAuditMissionByDepartmentId(Guid departmentId)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<BaseDTOResponse<BaseAuditMissionDto>> CreateAuditMissionAsync(CreateAuditMissionDto createAuditMissionDto)
+    {
+        var response = await httpClient.PostAsJsonAsync($"{IAuditMissionService.ApiPath}/add-audit-mission", createAuditMissionDto);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return new BaseDTOResponse<BaseAuditMissionDto>("Faile to create audit mission", false);
+
+        }
+
+        return new BaseDTOResponse<BaseAuditMissionDto>("Audit mission created successfully", true);
     }
 }
