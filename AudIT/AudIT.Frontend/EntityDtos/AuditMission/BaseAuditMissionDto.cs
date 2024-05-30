@@ -1,4 +1,6 @@
-﻿namespace Frontend.EntityDtos.AuditMission;
+﻿using System.Runtime.InteropServices.JavaScript;
+
+namespace Frontend.EntityDtos.AuditMission;
 
 public class BaseAuditMissionDto
 {
@@ -12,13 +14,17 @@ public class BaseAuditMissionDto
 
     public AuditMissionStatus Status { get; set; } = AuditMissionStatus.Creata;
 
-    public BaseAuditMissionDto(Guid id, string? name, string userId, Guid departmentId)
+    public DateTime LastModifiedDate { get; set; }
+    public BaseAuditMissionDto(Guid id, string? name, string userId, Guid departmentId, AuditMissionStatus status, DateTime lastModifiedDate)
     {
         Id = id;
         Name = name;
         UserId = userId;
         DepartmentId = departmentId;
+        Status = status;
+        LastModifiedDate = lastModifiedDate;
     }
+
 }
 
 public enum AuditMissionStatus

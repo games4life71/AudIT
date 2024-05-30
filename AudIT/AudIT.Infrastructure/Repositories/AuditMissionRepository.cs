@@ -15,7 +15,10 @@ public class AuditMissionRepository(AudITContext context)
     {
         try
         {
-            var result = await _context.AuditMissions.Where(x => x.UserId == id).ToListAsync();
+            var result = await _context.AuditMissions
+                .Where(x => x.UserId == id)
+                // .Include(x=>x.LastModifiedBy)
+                .ToListAsync();
 
             if (result.Count == 0)
             {

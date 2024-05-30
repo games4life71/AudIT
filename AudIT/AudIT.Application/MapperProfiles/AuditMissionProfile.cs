@@ -10,6 +10,7 @@ public class AuditMissionProfile:MyCustomProfile
     {
         CreateMap<AuditMission, BaseAuditMissionDto>();
         CreateMap<AuditMission,IReadOnlyList<AuditMission>>();
+        CreateMap<AuditMission, AuditMissionWithDateDto>();
     }
 
 }

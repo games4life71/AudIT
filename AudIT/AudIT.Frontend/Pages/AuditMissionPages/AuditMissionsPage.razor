@@ -13,7 +13,6 @@
 
 @if (isAuthenticated)
 {
-
     <RadzenDataGrid Data="@_auditMissionsDto" AllowSorting="true" AllowFiltering="true">
 
         <Columns>
@@ -29,15 +28,15 @@
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn Property="Status" Title="Status"></RadzenDataGridColumn>
-
+            <RadzenDataGridColumn Property="LastModifiedDate" Title="Last Modified"></RadzenDataGridColumn>
             <RadzenDataGridColumn Frozen="true" Sortable="false" Filterable="false" TItem="AuditMissionWithDepartmentName" Title="">
                 <Template Context="order">
                     <RadzenButton Style="display: flex; justify-content: center ;" Variant="Variant.Outlined" Text="See info" Click="@(() => ButtonClicked())"></RadzenButton>
                 </Template>
             </RadzenDataGridColumn>
+
         </Columns>
     </RadzenDataGrid>
-
 }
 @* else if(!isAuthenticated) *@
 @* { *@
@@ -47,8 +46,8 @@
 else
 {
     <RadzenPanel Style="justify-content: center; align-content: center;">
-        <RadzenLabel Text="Loading..." />
-        <RadzenProgressBar  Height="10px" />
+        <RadzenLabel Text="Loading..."/>
+        <RadzenProgressBar Height="10px"/>
     </RadzenPanel>
 }
 
@@ -60,13 +59,11 @@ else
     string? Name { get; set; }
     private BaseDepartmentDto _departmentDto;
     private List<AuditMissionWithDepartmentName> _auditMissionsDto = [];
-    bool isAuthenticated ;
-
+    bool isAuthenticated;
 
 
     protected override async Task OnInitializedAsync()
     {
-
         var authState = await customAuthState.GetAuthenticationStateAsync();
         if (authState.User.Identity is { IsAuthenticated: true })
         {
@@ -78,6 +75,7 @@ else
             NavigationManager.NavigateTo("/login");
             return;
         }
+
         var result = await auditMissionService.GetAuditMissionByOwnerId(Guid.Parse("e389ae7c-86bd-4763-8f08-c98ec2948803"));
 
         if (!result.Success)
@@ -111,7 +109,8 @@ else
                     auditMissionDto.Name,
                     auditMissionDto.UserId,
                     auditMissionDto.DepartmentId,
-                    departmentName
+                    departmentName,
+                    auditMissionDto.LastModifiedDate
                 );
 
                 _auditMissionsDto.Add(newAuditMission);
