@@ -10,16 +10,18 @@ namespace AudIT.Applicationa.Requests.Export.Fiap;
 
 public class ExportFiapHandler(
     IObjectiveActionFiapRepository fiapRepository,
+    IInstitutionRepository institutionRepository,
     IExporterService<FiapDocModel> exporterService,
     IHttpContextAccessor httpContextAccessor
 ) : IRequestHandler<ExportFiapCommand, BaseDTOResponse<BaseExportDto>>
 {
+
     public async Task<BaseDTOResponse<BaseExportDto>> Handle(ExportFiapCommand request,
         CancellationToken cancellationToken)
     {
         // Get the data from the repository
         var resultFiap = await fiapRepository.FindByIdAsync(request.Id);
-
+        var resultInstitution = await institutionRepository.FindByIdAsync(Guid.Empty);
         if (!resultFiap.IsSuccess)
         {
             return new BaseDTOResponse<BaseExportDto>($"Cannot find Fiap with id {request.Id}", false);

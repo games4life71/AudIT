@@ -11,7 +11,10 @@ public class ObjectiveRepository(AudITContext context) : BaseRepository<Objectiv
 
     public async Task<Result<List<Objective>>> FindAllByAuditMissionIdAsync(Guid auditMissionId)
     {
-        var objectives = await _context.Objective.Where(o => o.AuditMissionId == auditMissionId).ToListAsync();
+        var objectives = await _context.Objective
+            .Where(o => o.AuditMissionId == auditMissionId)
+
+            .ToListAsync();
 
 
         if (objectives.Count == 0)

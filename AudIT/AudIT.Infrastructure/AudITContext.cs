@@ -84,8 +84,8 @@ public class AudITContext : IdentityDbContext<User>
     {
         var now = DateTime.Now;
         var user = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-        // if (user == null)
-        //     throw new AuthenticationException("User not authenticated.");
+        if (user == null)
+            user =Guid.Empty.ToString();
 
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
         {

@@ -5,13 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AudIT.Infrastructure.Repositories;
 
-public class ObjectiveActionFiapRepository : BaseRepository<ObjectiveActionFiap>, IObjectiveActionFiapRepository
+public class ObjectiveActionFiapRepository(AudITContext context)
+    : BaseRepository<ObjectiveActionFiap>(context), IObjectiveActionFiapRepository
 {
-    public ObjectiveActionFiapRepository(AudITContext context) : base(context)
-    {
-    }
-
-
     public override async Task<Result<ObjectiveActionFiap>> FindByIdAsync(Guid id)
     {
         var result = await _dbcContext.ObjectiveActionFiap

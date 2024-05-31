@@ -1,0 +1,130 @@
+﻿@page "/audit-mission/{AuditMissionId}"
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.DepartmentService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityDtos.Department
+@using Frontend.Pages.Components
+@inject TooltipService tooltipService
+@inject IAuditMissionService _auditMissionService
+@inject IDepartmentService _departmentService
+@inject NavigationManager _navigationManager
+@if (_notFound == true)
+{
+    <NotFound/>
+}
+else if (_notFound == false && _auditMissionDto != null)
+{
+    <RadzenRow>
+        <RadzenColumn>
+            <RadzenCard Variant="Variant.Flat" class="rz-mb-6">
+                <RadzenText Text=@($"Audit Mission Summary for: {_auditMissionDto.Name}") TextStyle="TextStyle.DisplayH5"></RadzenText>
+            </RadzenCard>
+        </RadzenColumn>
+
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn>
+            <RadzenCard Style="height: 100%; width: 75%; display: flex;" Variant="Variant.Filled" class="rz-mb-12">
+                <RadzenStack Style="align-items: center" Gap="10px" Orientation="Orientation.Vertical">
+                    @* <RadzenStack Orientation="Orientation.Horizontal"> *@
+                        <RadzenLabel Component="Name" Text="Name:" Style="font-size: large;"></RadzenLabel>
+                        <RadzenTextBox Disabled="@editDetailsDisabled" Placeholder="@_auditMissionDto.Name"></RadzenTextBox>
+                    @* </RadzenStack> *@
+                    @* <RadzenStack Orientation="Orientation.Horizontal"> *@
+                        <RadzenLabel Component="Department" Text="Department:" Style="font-size: large;"></RadzenLabel>
+                        <RadzenTextBox Disabled="@editDetailsDisabled" Placeholder="@_departmentDto.Name"></RadzenTextBox>
+                    @* </RadzenStack> *@
+                    @* <RadzenStack Orientation="Orientation.Horizontal"> *@
+                        <RadzenLabel Text="Last Modified:" Style="font-size: large;" Component="LastModified"></RadzenLabel>
+                        <RadzenDatePicker Disabled="@editDetailsDisabled" TValue="DateTime" Change="@(args => _auditMissionDto.LastModifiedDate = args.Value)" @bind-Value="@lastModifiedDate"></RadzenDatePicker>
+                    @* </RadzenStack> *@
+
+                    @* <RadzenStack Orientation="Orientation.Horizontal"> *@
+                        <RadzenLabel Text="Status" Component="StatusBind" Style="font-size: large;"></RadzenLabel>
+                        <RadzenDropDown Disabled="@editDetailsDisabled" Style="width: 75%;" Name="StatusBind" @bind-Value="@_auditMissionDto.Status" Data="@_auditMissionStatuses"></RadzenDropDown>
+                    @* </RadzenStack> *@
+                    <RadzenRow Style="justify-content: space-between">
+                        <RadzenToggleButton Click="@(() => editDetailsDisabled=!editDetailsDisabled)" ToggleButtonStyle="ButtonStyle.Warning" class="rz-mt-12" Text="Edit details"></RadzenToggleButton>
+                        <RadzenButton ButtonStyle="ButtonStyle.Info" class="rz-mt-12" Text="Save changes"></RadzenButton>
+                    </RadzenRow>
+
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn>
+            <RadzenCard Style="line-height: 100%; height: 200%; "Variant="Variant.Outlined" class="rz-mb-12">
+                <RadzenText Text="Audit Mission Summary" TextStyle="TextStyle.DisplayH5"></RadzenText>
+                <RadzenText Text="Audit Mission Summary" TextStyle="TextStyle.DisplayH5"></RadzenText>
+                <RadzenText Text="Audit Mission Summary" TextStyle="TextStyle.DisplayH5"></RadzenText>
+                <RadzenText Text="Audit Mission Summary" TextStyle="TextStyle.DisplayH5"></RadzenText>
+                <RadzenText Text="Audit Mission Summary" TextStyle="TextStyle.DisplayH5"></RadzenText>
+                <RadzenText Text="Audit Mission Summary" TextStyle="TextStyle.DisplayH5"></RadzenText>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+}
+
+@code {
+
+    [Parameter] public required string AuditMissionId { get; set; }
+    private List<string> _auditMissionStatuses = Enum.GetNames(typeof(AuditMissionStatus)).ToList();
+    private BaseAuditMissionDto _auditMissionDto = null;
+    private BaseDepartmentDto _departmentDto = null;
+    private bool _notFound;
+    private bool _navigateHome;
+    private bool editDetailsDisabled = true;
+    DateTime lastModifiedDate;
+}
+
+
+@functions
+{
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await _auditMissionService.GetAuditMissionById(Guid.Parse(AuditMissionId));
+
+        if (result.Success && result.DtoResponse != null)
+        {
+            _auditMissionDto = result.DtoResponse;
+            lastModifiedDate = _auditMissionDto.LastModifiedDate.ToLocalTime();
+
+            var department = await _departmentService.GetDepartmentByIdAsync(_auditMissionDto.DepartmentId);
+
+            if (department.Success && department.DtoResponse != null)
+            {
+                _departmentDto = department.DtoResponse;
+            }
+            else
+            {
+                _notFound = true;
+                // await NavigateHome();
+                // StateHasChanged();
+            }
+        }
+        else
+        {
+            _notFound = true;
+            // await NavigateHome();
+            // StateHasChanged();
+        }
+    }
+
+
+    private Task HandleClick()
+    {
+        _navigationManager.NavigateTo("/new-page");
+        return Task.CompletedTask;
+    }
+
+    void ShowTooltip(ElementReference elementReference, TooltipOptions options = null)
+    {
+        tooltipService.Open(elementReference, "Click to follow link ", new TooltipOptions()
+        {
+            Position = TooltipPosition.Top,
+            Duration = 500,
+            Delay = 0,
+            Style = "background-color: #000; color: #fff;"
+        });
+    }
+}

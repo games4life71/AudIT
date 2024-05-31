@@ -38,7 +38,7 @@ public class ObjectiveActionFiap : AuditableEntity
 
 
     private ObjectiveActionFiap(string name, Guid auditMissionId, Guid objectiveActionId,
-        DateTime auditedPeriodStart, DateTime auditedPeriodEnd, string problem, string recommendation,
+        DateTime auditedPeriodStart, DateTime auditedPeriodEnd, string problem, string recommendation,AuditMission auditMission,ObjectiveAction objectiveAction,
         string aditionalFindings = "empty", string cause = "empty", string consequence = "empty")
     {
         Id = Guid.NewGuid();
@@ -52,6 +52,8 @@ public class ObjectiveActionFiap : AuditableEntity
         Cause = cause;
         Consequence = consequence;
         Recommendation = recommendation;
+        AuditMission = auditMission;
+        ObjectiveAction = objectiveAction;
     }
 
 
@@ -62,7 +64,7 @@ public class ObjectiveActionFiap : AuditableEntity
 
     public static Result<ObjectiveActionFiap> Create(string name, Guid auditMissionId,
         Guid objectiveActionId, DateTime auditedPeriodStart, DateTime auditedPeriodEnd,
-        string problem, string recommendation, string aditionalFindings = "empty", string cause = "empty",
+        string problem, string recommendation,AuditMission auditMission,ObjectiveAction objectiveAction, string aditionalFindings = "empty", string cause = "empty",
         string consequence = "empty")
     {
         //TODO : Add validation logic here
@@ -75,6 +77,8 @@ public class ObjectiveActionFiap : AuditableEntity
             auditedPeriodEnd,
             problem,
             recommendation,
+            auditMission,
+            objectiveAction,
             aditionalFindings,
             cause,
             consequence

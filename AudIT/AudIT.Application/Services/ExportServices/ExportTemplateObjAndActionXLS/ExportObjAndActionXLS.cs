@@ -54,23 +54,90 @@ public class ExportObjAndActionXLS : IExporterService<ObjectiveAndActionsExportM
                     Console.WriteLine("Objective is null");
                 }
 
-
-                //for each ObjectiveAction in the Objective
-                for (var j = 0; j < objectives.ElementAt(i).ObjectiveActions.Count; j++)
+                if (objectives.ElementAt(i).ObjectiveActions != null)
                 {
-                    int totalActionRisksForCurrentObjectiveAction =
-                        objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks.Count > 0
-                            ? objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks.Count
-                            : 1;
+                    // Console.WriteLine("ObjectiveActions is null");
+                    // continue;
 
-                    mergeCellMedium.Add(CURRENT_ROW_MEDIUM,
-                        totalActionRisksForCurrentObjectiveAction); //number of risks for the action
-                    CURRENT_ROW_MEDIUM += totalActionRisksForCurrentObjectiveAction;
+                    //for each ObjectiveAction in the Objective
+                    for (var j = 0; j < objectives.ElementAt(i).ObjectiveActions.Count; j++)
+                    {
+                        int totalActionRisksForCurrentObjectiveAction =
+                            objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks.Count > 0
+                                ? objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks.Count
+                                : 1;
+
+                        mergeCellMedium.Add(CURRENT_ROW_MEDIUM,
+                            totalActionRisksForCurrentObjectiveAction); //number of risks for the action
+                        CURRENT_ROW_MEDIUM += totalActionRisksForCurrentObjectiveAction;
 
 
-                    //if the action is the first action in the objective
-                    if (j == 0)
-                        if (objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks.Count > 0)
+                        //if the action is the first action in the objective
+                        if (j == 0)
+                            if (objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks.Count > 0)
+                            {
+                                var controlinternExist = CollectStringFromList(objectives.ElementAt(i).ObjectiveActions
+                                    .ElementAt(j).ControaleInterneExistente);
+                                var controlinternAsteptate = CollectStringFromList(objectives.ElementAt(i)
+                                    .ObjectiveActions
+                                    .ElementAt(j).ControaleInterneAsteptate);
+
+                                dataTable.Rows.Add(
+                                    i+1,
+                                    objectives.ElementAt(i).Name, //Objective Name
+                                    objectives.ElementAt(i).ObjectiveActions.ElementAt(j).Name, //Action Name
+                                    objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks[0].Name,
+                                    objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks[0].Risk,
+                                    controlinternExist,
+                                    controlinternAsteptate);
+                            }
+
+
+                        //for each risk in the action
+                        for (var k = 0;
+                             k < objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks.Count;
+                             k++)
+                        {
+                            //if the risk is the first risk and the action is not the first action
+                            if (k == 0 && j != 0)
+                            {
+                                var controlinternExist = CollectStringFromList(objectives.ElementAt(i).ObjectiveActions
+                                    .ElementAt(j).ControaleInterneExistente);
+                                var controlinternAsteptate = CollectStringFromList(objectives.ElementAt(i)
+                                    .ObjectiveActions
+                                    .ElementAt(j).ControaleInterneAsteptate);
+                                dataTable.Rows.Add(
+                                    null,
+                                    "", //Objective Name is empty
+                                    objectives.ElementAt(i).ObjectiveActions.ElementAt(j).Name, //Action Name
+                                    objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks[k].Name, //
+                                    objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks[k].Risk,
+                                    controlinternExist,
+                                    controlinternAsteptate);
+                            }
+                            //if the risk is not the first then put empty lines for the crt objectiveName and ActionName columns
+                            else if (k != 0)
+                            {
+                                var controlinternExist = CollectStringFromList(objectives.ElementAt(i).ObjectiveActions
+                                    .ElementAt(j).ControaleInterneExistente);
+                                var controlinternAsteptate = CollectStringFromList(objectives.ElementAt(i)
+                                    .ObjectiveActions
+                                    .ElementAt(j).ControaleInterneAsteptate);
+                                dataTable.Rows.Add(
+                                    null,
+                                    "", //Objective Name is empty
+                                    // objectives.ElementAt(i).ObjectiveActions.ElementAt(j).Name, //Action Name is empty
+                                    "", //Action Name is empty
+                                    objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks[k].Name, //
+                                    objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks[k].Risk,
+                                    controlinternExist,
+                                    controlinternAsteptate);
+                            }
+                            // If the ActionRisk is not the first one or the ObjectiveAction is not the first one
+                        }
+
+                        //If the ObjectiveAction has no ActionRisks
+                        if (objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks.Count == 0)
                         {
                             var controlinternExist = CollectStringFromList(objectives.ElementAt(i).ObjectiveActions
                                 .ElementAt(j).ControaleInterneExistente);
@@ -79,92 +146,51 @@ public class ExportObjAndActionXLS : IExporterService<ObjectiveAndActionsExportM
 
                             dataTable.Rows.Add(
                                 i,
-                                objectives.ElementAt(i).Name, //Objective Name
+                                j == 0 ? objectives.ElementAt(i).Name : "", //Objective Name
                                 objectives.ElementAt(i).ObjectiveActions.ElementAt(j).Name, //Action Name
-                                objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks[0].Name,
-                                objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks[0].Risk,
+                                "", //Risk Name
+                                "", //Risk
                                 controlinternExist,
                                 controlinternAsteptate);
                         }
-
-
-                    //for each risk in the action
-                    for (var k = 0;
-                         k < objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks.Count;
-                         k++)
-                    {
-                        //if the risk is the first risk and the action is not the first action
-                        if (k == 0 && j != 0)
-                        {
-                            var controlinternExist = CollectStringFromList(objectives.ElementAt(i).ObjectiveActions
-                                .ElementAt(j).ControaleInterneExistente);
-                            var controlinternAsteptate = CollectStringFromList(objectives.ElementAt(i).ObjectiveActions
-                                .ElementAt(j).ControaleInterneAsteptate);
-                            dataTable.Rows.Add(
-                                null,
-                                "", //Objective Name is empty
-                                objectives.ElementAt(i).ObjectiveActions.ElementAt(j).Name, //Action Name
-                                objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks[k].Name, //
-                                objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks[k].Risk,
-                                controlinternExist,
-                                controlinternAsteptate);
-                        }
-                        //if the risk is not the first then put empty lines for the crt objectiveName and ActionName columns
-                        else if (k != 0)
-                        {
-                            var controlinternExist = CollectStringFromList(objectives.ElementAt(i).ObjectiveActions
-                                .ElementAt(j).ControaleInterneExistente);
-                            var controlinternAsteptate = CollectStringFromList(objectives.ElementAt(i).ObjectiveActions
-                                .ElementAt(j).ControaleInterneAsteptate);
-                            dataTable.Rows.Add(
-                                null,
-                                "", //Objective Name is empty
-                                // objectives.ElementAt(i).ObjectiveActions.ElementAt(j).Name, //Action Name is empty
-                                "", //Action Name is empty
-                                objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks[k].Name, //
-                                objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks[k].Risk,
-                                controlinternExist,
-                                controlinternAsteptate);
-                        }
-                        // If the ActionRisk is not the first one or the ObjectiveAction is not the first one
                     }
 
-                    //If the ObjectiveAction has no ActionRisks
-                    if (objectives.ElementAt(i).ObjectiveActions.ElementAt(j).ActionRisks.Count == 0)
-                    {
-                        var controlinternExist = CollectStringFromList(objectives.ElementAt(i).ObjectiveActions
-                            .ElementAt(j).ControaleInterneExistente);
-                        var controlinternAsteptate = CollectStringFromList(objectives.ElementAt(i).ObjectiveActions
-                            .ElementAt(j).ControaleInterneAsteptate);
+                    // int longCount = objectives.ElementAt(i).ObjectiveActions.Sum(obj => obj.ActionRisks.Count);
 
-                        dataTable.Rows.Add(
-                            i,
-                            j == 0 ? objectives.ElementAt(i).Name : "", //Objective Name
-                            objectives.ElementAt(i).ObjectiveActions.ElementAt(j).Name, //Action Name
-                            "", //Risk Name
-                            "", //Risk
-                            controlinternExist,
-                            controlinternAsteptate);
+                    int count = 0;
+                    foreach (var objectiveAction in objectives.ElementAt(i).ObjectiveActions)
+                    {
+                        if (objectiveAction.ActionRisks.Count == 0)
+                        {
+                            count++;
+                        }
+                        else
+                        {
+                            count += objectiveAction.ActionRisks.Count;
+                        }
                     }
+                    mergeCellLarge.Add(CURRENT_ROW_LARGE, count);
+                    CURRENT_ROW_LARGE += count;
                 }
-
-                int longCount = objectives.ElementAt(i).ObjectiveActions.Sum(obj => obj.ActionRisks.Count);
-
-                int count = 0;
-                foreach (var objectiveAction in objectives.ElementAt(i).ObjectiveActions)
+                else
                 {
-                    if (objectiveAction.ActionRisks.Count == 0)
-                    {
-                        count++;
-                    }
-                    else
-                    {
-                        count += objectiveAction.ActionRisks.Count;
-                    }
+
+                    // if the Objective has no ObjectiveActions, add a row with the Objective's information and empty values for the ObjectiveAction's columns
+                    dataTable.Rows.Add(
+                        i+1,
+                        objectives.ElementAt(i).Name, //Objective Name
+                        "", //Action Name is empty
+                        "", //Risk Name is empty
+                        "", //Risk is empty
+                        "", //Controlare Interne Existente is empty
+                        ""  //Controlare Interne Asteptate is empty
+                    );
+
+                    mergeCellLarge.Add(CURRENT_ROW_LARGE, 1);
+                    CURRENT_ROW_LARGE += 1;
                 }
 
-                mergeCellLarge.Add(CURRENT_ROW_LARGE, count);
-                CURRENT_ROW_LARGE += count;
+
             }
 
             ExcelWorksheet worksheet = package.Workbook.Worksheets.Add("export");

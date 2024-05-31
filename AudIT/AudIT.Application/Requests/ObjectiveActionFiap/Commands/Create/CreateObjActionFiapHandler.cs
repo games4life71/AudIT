@@ -44,6 +44,8 @@ public class CreateObjActionFiapHandler(
                 request.AuditedPeriodEnd,
                 request.Problem,
                 request.Recommendation,
+                auditMission.Value,
+                objectiveAction.Value,
                 request.AditionalFindings,
                 request.Cause,
                 request.Consequence
