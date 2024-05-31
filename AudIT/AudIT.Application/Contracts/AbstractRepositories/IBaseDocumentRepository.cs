@@ -7,4 +7,5 @@ public interface IBaseDocumentRepository : IRepository<BaseDocument>
 {
     Task<Result<List<StandaloneDocument>>> GetDocumentsByDepartmentId(Guid requestDepartmentId);
     Task<Result<List<BaseDocument>>> GetDocumentsByUserId(Guid requestUserId);
+    Task<Result<List<BaseDocument>>> GetRecentDocumentsByUserIdAsync(Guid  userId);
 }

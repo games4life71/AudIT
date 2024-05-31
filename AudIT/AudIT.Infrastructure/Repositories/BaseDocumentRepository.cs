@@ -32,11 +32,24 @@ public class BaseDocumentRepository : BaseRepository<BaseDocument>, IBaseDocumen
                 .Where(x => x.OwnerId == requestUserId.ToString()).ToListAsync();
 
             return Result<List<BaseDocument>>.Success(result);
-
         }
         catch (Exception e)
         {
             return Result<List<BaseDocument>>.Failure(e.Message);
         }
+    }
+
+    public async Task<Result<List<BaseDocument>>> GetRecentDocumentsByUserIdAsync(Guid userId)
+    {
+        var result = await _dbcContext.BaseDocuments
+            .Where(x => x.OwnerId == userId.ToString())
+            .OrderByDescending(x => x.LastModifiedDate)
+            .Take(3)
+            .ToListAsync();
+
+        if (result.Count == 0)
+            return Result<List<BaseDocument>>.Failure("No documents found for the given user id");
+
+        return Result<List<BaseDocument>>.Success(result);
     }
 }

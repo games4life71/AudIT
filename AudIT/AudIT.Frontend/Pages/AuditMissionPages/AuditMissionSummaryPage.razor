@@ -1,9 +1,18 @@
 ﻿@page "/audit-mission/{AuditMissionId}"
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.DepartmentService
+@using Frontend.Contracts.Abstract_Services.DocumentService
+@using Frontend.Contracts.Abstract_Services.ObjectiveService
 @using Frontend.EntityDtos.AuditMission
 @using Frontend.EntityDtos.Department
+@using Frontend.EntityViewModels.Document
+@using Frontend.EntityViewModels.Objective
 @using Frontend.Pages.Components
+@using Frontend.Services.AuthentificationServices
+
+@inject CustomAuthStateProvider _customAuthState
+@inject  IDocumentService _documentService
+@inject IObjectiveService _objectiveService
 @inject TooltipService tooltipService
 @inject IAuditMissionService _auditMissionService
 @inject IDepartmentService _departmentService
@@ -16,49 +25,112 @@ else if (_notFound == false && _auditMissionDto != null)
 {
     <RadzenRow>
         <RadzenColumn>
-            <RadzenCard Variant="Variant.Flat" class="rz-mb-6">
-                <RadzenText Text=@($"Audit Mission Summary for: {_auditMissionDto.Name}") TextStyle="TextStyle.DisplayH5"></RadzenText>
+            <RadzenCard Variant="Variant.Text" class="rz-mb-6">
+                <RadzenText Text=@($"Audit Mission Summary") TextStyle="TextStyle.DisplayH3"></RadzenText>
             </RadzenCard>
         </RadzenColumn>
 
     </RadzenRow>
     <RadzenRow>
         <RadzenColumn>
-            <RadzenCard Style="height: 100%; width: 75%; display: flex;" Variant="Variant.Filled" class="rz-mb-12">
+            <RadzenCard Style="height: 100%; width: 75%; display: flex;" Variant="Variant.Outlined" class="rz-mb-12">
                 <RadzenStack Style="align-items: center" Gap="10px" Orientation="Orientation.Vertical">
                     @* <RadzenStack Orientation="Orientation.Horizontal"> *@
-                        <RadzenLabel Component="Name" Text="Name:" Style="font-size: large;"></RadzenLabel>
-                        <RadzenTextBox Disabled="@editDetailsDisabled" Placeholder="@_auditMissionDto.Name"></RadzenTextBox>
+                    <RadzenLabel Component="Name" Text="Name:" Style="font-size: large;"></RadzenLabel>
+                    <RadzenTextBox Disabled="@editDetailsDisabled" Placeholder="@_auditMissionDto.Name"></RadzenTextBox>
                     @* </RadzenStack> *@
                     @* <RadzenStack Orientation="Orientation.Horizontal"> *@
-                        <RadzenLabel Component="Department" Text="Department:" Style="font-size: large;"></RadzenLabel>
-                        <RadzenTextBox Disabled="@editDetailsDisabled" Placeholder="@_departmentDto.Name"></RadzenTextBox>
+                    <RadzenLabel Component="Department" Text="Department:" Style="font-size: large;"></RadzenLabel>
+                    <RadzenTextBox Disabled="@editDetailsDisabled" Placeholder="@_departmentDto.Name"></RadzenTextBox>
                     @* </RadzenStack> *@
                     @* <RadzenStack Orientation="Orientation.Horizontal"> *@
-                        <RadzenLabel Text="Last Modified:" Style="font-size: large;" Component="LastModified"></RadzenLabel>
-                        <RadzenDatePicker Disabled="@editDetailsDisabled" TValue="DateTime" Change="@(args => _auditMissionDto.LastModifiedDate = args.Value)" @bind-Value="@lastModifiedDate"></RadzenDatePicker>
+                    <RadzenLabel Text="Last Modified:" Style="font-size: large;" Component="LastModified"></RadzenLabel>
+                    <RadzenDatePicker Disabled="@editDetailsDisabled" TValue="DateTime" Change="@(args => _auditMissionDto.LastModifiedDate = args.Value)" @bind-Value="@lastModifiedDate"></RadzenDatePicker>
                     @* </RadzenStack> *@
 
                     @* <RadzenStack Orientation="Orientation.Horizontal"> *@
-                        <RadzenLabel Text="Status" Component="StatusBind" Style="font-size: large;"></RadzenLabel>
-                        <RadzenDropDown Disabled="@editDetailsDisabled" Style="width: 75%;" Name="StatusBind" @bind-Value="@_auditMissionDto.Status" Data="@_auditMissionStatuses"></RadzenDropDown>
+                    <RadzenLabel Text="Status" Component="StatusBind" Style="font-size: large;"></RadzenLabel>
+                    <RadzenDropDown Disabled="@editDetailsDisabled" Style="width: 75%;" Name="StatusBind" @bind-Value="@_auditMissionDto.Status" Data="@_auditMissionStatuses"></RadzenDropDown>
                     @* </RadzenStack> *@
                     <RadzenRow Style="justify-content: space-between">
-                        <RadzenToggleButton Click="@(() => editDetailsDisabled=!editDetailsDisabled)" ToggleButtonStyle="ButtonStyle.Warning" class="rz-mt-12" Text="Edit details"></RadzenToggleButton>
+                        <RadzenToggleButton Click="@(() => editDetailsDisabled = !editDetailsDisabled)" ToggleButtonStyle="ButtonStyle.Warning" class="rz-mt-12" Text="Edit details"></RadzenToggleButton>
                         <RadzenButton ButtonStyle="ButtonStyle.Info" class="rz-mt-12" Text="Save changes"></RadzenButton>
                     </RadzenRow>
 
                 </RadzenStack>
             </RadzenCard>
         </RadzenColumn>
-        <RadzenColumn>
-            <RadzenCard Style="line-height: 100%; height: 200%; "Variant="Variant.Outlined" class="rz-mb-12">
-                <RadzenText Text="Audit Mission Summary" TextStyle="TextStyle.DisplayH5"></RadzenText>
-                <RadzenText Text="Audit Mission Summary" TextStyle="TextStyle.DisplayH5"></RadzenText>
-                <RadzenText Text="Audit Mission Summary" TextStyle="TextStyle.DisplayH5"></RadzenText>
-                <RadzenText Text="Audit Mission Summary" TextStyle="TextStyle.DisplayH5"></RadzenText>
-                <RadzenText Text="Audit Mission Summary" TextStyle="TextStyle.DisplayH5"></RadzenText>
-                <RadzenText Text="Audit Mission Summary" TextStyle="TextStyle.DisplayH5"></RadzenText>
+        <RadzenColumn Size="8">
+            <RadzenCard Variant="Variant.Outlined" class="rz-mb-12">
+                <RadzenText Text="Recent activities:" TextStyle="TextStyle.DisplayH4" class="rz-mb-6 rz-mx-2"></RadzenText>
+                <RadzenRow>
+                    <RadzenColumn >
+                        <RadzenCard Style="min-height: 200px;">
+                            <RadzenRow class="rz-mt-2">
+                                <RadzenText TextStyle="TextStyle.Overline" Style="font-size: 15px;" Text="Recent Objectives: "></RadzenText>
+                                <RadzenIcon Icon="label"></RadzenIcon>
+                            </RadzenRow>
+                            @foreach (var objective in _objectiveViewModel)
+                            {
+                                <RadzenLink Path="@($"/objective/{objective.Id}")">
+                                    <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{objective.Name}")"></RadzenText>
+                                </RadzenLink>
+                            }
+                            <RadzenRow >
+                                <RadzenColumn Style="display: flex; justify-content: end; align-content: flex-end ">
+                                    <RadzenButton  ButtonStyle="ButtonStyle.Secondary" Text="See more..."></RadzenButton>
+                                </RadzenColumn>
+
+                            </RadzenRow>
+                        </RadzenCard>
+                    </RadzenColumn>
+
+                    <RadzenColumn>
+                        <RadzenCard Style="min-height: 200px;">
+
+                            <RadzenRow class="rz-mt-2">
+                                <RadzenText TextStyle="TextStyle.Overline" Style="font-size: 15px;" Text="Recent Documents:"></RadzenText>
+                                <RadzenIcon Icon="description"></RadzenIcon>
+                            </RadzenRow>
+                            @foreach (var document in _baseDocumentViewmodels)
+                            {
+                            <RadzenLink Path="@($"/document-preview/{document.Id}")">
+                                <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{document.Name}")"></RadzenText>
+                            </RadzenLink>
+                            }
+                        </RadzenCard>
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow class="rz-my-12">
+                    <RadzenColumn>
+                        <RadzenCard Style="min-height: 200px;">
+                            <RadzenRow class="rz-mt-2">
+                                <RadzenText TextStyle="TextStyle.Overline" Style="font-size: 15px;" Text="Recent Documents:"></RadzenText>
+                                <RadzenIcon Icon="description"></RadzenIcon>
+                            </RadzenRow>
+                            @foreach (var document in _baseDocumentViewmodels)
+                            {
+                            <RadzenLink Path="@($"/document-preview/{document.Id}")">
+                                <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{document.Name}")"></RadzenText>
+                            </RadzenLink>
+                            }
+                        </RadzenCard>
+                    </RadzenColumn>
+                    <RadzenColumn>
+                        <RadzenCard Style="min-height: 200px;">
+                            <RadzenRow class="rz-mt-2">
+                                <RadzenText TextStyle="TextStyle.Overline" Style="font-size: 15px;" Text="Recent Documents:"></RadzenText>
+                                <RadzenIcon Icon="description"></RadzenIcon>
+                            </RadzenRow>
+                            @foreach (var document in _baseDocumentViewmodels)
+                            {
+                            <RadzenLink Path="@($"/document-preview/{document.Id}")">
+                                <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{document.Name}")"></RadzenText>
+                            </RadzenLink>
+                            }
+                        </RadzenCard>
+                    </RadzenColumn>
+                </RadzenRow>
             </RadzenCard>
         </RadzenColumn>
     </RadzenRow>
@@ -66,13 +138,31 @@ else if (_notFound == false && _auditMissionDto != null)
 
 @code {
 
+    public class Product
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+
+        public Product(string name, string description)
+        {
+            Name = name;
+            Description = description;
+        }
+    }
+
+    List<Product> _products = new List<Product>();
+
     [Parameter] public required string AuditMissionId { get; set; }
     private List<string> _auditMissionStatuses = Enum.GetNames(typeof(AuditMissionStatus)).ToList();
+
     private BaseAuditMissionDto _auditMissionDto = null;
     private BaseDepartmentDto _departmentDto = null;
+    private List<BaseDocumentViewmodel> _baseDocumentViewmodels = [];
+    private List<BaseObjectiveViewModel> _objectiveViewModel = [];
     private bool _notFound;
     private bool _navigateHome;
     private bool editDetailsDisabled = true;
+
     DateTime lastModifiedDate;
 }
 
@@ -82,6 +172,12 @@ else if (_notFound == false && _auditMissionDto != null)
 
     protected override async Task OnInitializedAsync()
     {
+        _products.Add(new Product("adasdsad", "adsasdsad1"));
+        _products.Add(new Product("adasdsad1", "adsasdsad2"));
+        _products.Add(new Product("adasdsad2", "adsasdsad3"));
+        _products.Add(new Product("adasdsad3", "adsasdsad1"));
+        await FetchObjectives();
+        await FetchDocuments();
         var result = await _auditMissionService.GetAuditMissionById(Guid.Parse(AuditMissionId));
 
         if (result.Success && result.DtoResponse != null)
@@ -110,11 +206,49 @@ else if (_notFound == false && _auditMissionDto != null)
         }
     }
 
+    private async Task<Guid> GetUserIdAsync()
+    {
+        var authState = await _customAuthState.GetUserIdFromTokenAsync();
+
+        if (authState.Item2)
+        {
+            return authState.Item1;
+        }
+
+        return Guid.Empty;
+
+    }
 
     private Task HandleClick()
     {
         _navigationManager.NavigateTo("/new-page");
         return Task.CompletedTask;
+    }
+
+    private async Task FetchObjectives()
+    {
+        var result = await _objectiveService.GetMostRecentObjectiveByAuditMissionIdAsync(Guid.Parse(AuditMissionId));
+
+        if (result.Success && result.DtoResponses.Count > 0)
+        {
+            // _objectiveViewModel = [];
+            _objectiveViewModel = result.DtoResponses;
+        }
+    }
+
+    private async Task FetchDocuments()
+    {
+        var userId = await GetUserIdAsync();
+
+
+        var result = await _documentService.GetRecentDocumentsAsync(userId);
+
+        if (result.Success && result.DtoResponses.Count > 0)
+        {
+            _baseDocumentViewmodels = result.DtoResponses;
+        }
+
+
     }
 
     void ShowTooltip(ElementReference elementReference, TooltipOptions options = null)

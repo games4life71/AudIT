@@ -13,7 +13,6 @@ public class ObjectiveRepository(AudITContext context) : BaseRepository<Objectiv
     {
         var objectives = await _context.Objective
             .Where(o => o.AuditMissionId == auditMissionId)
-
             .ToListAsync();
 
 
@@ -24,6 +23,27 @@ public class ObjectiveRepository(AudITContext context) : BaseRepository<Objectiv
 
 
         return Result<List<Objective>>.Success(objectives);
+    }
+
+    /// <summary>
+    /// Get the most recent 3  objectives by audit mission id
+    /// </summary>
+    /// <param name="auditMissionId"></param>
+    /// <returns></returns>
+    public async Task<Result<List<Objective>>> FindMostRecentsByAuditMissionIdAsync(Guid auditMissionId)
+    {
+        var result = await context.Objective
+            .Where(o => o.AuditMissionId == auditMissionId)
+            .OrderByDescending(o => o.LastModifiedDate)
+            .Take(3)
+            .ToListAsync();
+
+        if (result.Count == 0)
+        {
+            return Result<List<Objective>>.Failure($"Objectives for AuditMission with id {auditMissionId} not found.");
+        }
+
+        return Result<List<Objective>>.Success(result);
     }
 
     public override async Task<Result<Objective>> FindByIdAsync(Guid id)

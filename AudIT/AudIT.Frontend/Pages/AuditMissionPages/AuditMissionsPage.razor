@@ -29,9 +29,9 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn Property="Status" Title="Status"></RadzenDataGridColumn>
             <RadzenDataGridColumn Property="LastModifiedDate" Title="Last Modified"></RadzenDataGridColumn>
-            <RadzenDataGridColumn Frozen="true" Sortable="false" Filterable="false" TItem="AuditMissionWithDepartmentName" Title="">
-                <Template Context="order">
-                    <RadzenButton Style="display: flex; justify-content: center ;" Variant="Variant.Outlined" Text="See info" Click="@(() => ButtonClicked())"></RadzenButton>
+            <RadzenDataGridColumn Width="15%" Frozen="true" Sortable="false" Filterable="false" TItem="AuditMissionWithDepartmentName" Title="">
+                <Template Context="auditMission">
+                    <RadzenButton Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Text" Text="More details " Click="@(() => ButtonClicked(auditMission))"></RadzenButton>
                 </Template>
             </RadzenDataGridColumn>
 
@@ -75,8 +75,9 @@ else
             NavigationManager.NavigateTo("/login");
             return;
         }
+        var userId = await GetUserIdAsync();
 
-        var result = await auditMissionService.GetAuditMissionByOwnerId(Guid.Parse("e389ae7c-86bd-4763-8f08-c98ec2948803"));
+        var result = await auditMissionService.GetAuditMissionByOwnerId(userId);
 
         if (!result.Success)
         {
@@ -126,10 +127,25 @@ else
         return Task.CompletedTask;
     }
 
-    private Task ButtonClicked()
+    private Task ButtonClicked(AuditMissionWithDepartmentName auditMission)
     {
         // Console.WriteLine($"Button clicked for order {order.OrderID}");
+        NavigationManager.NavigateTo($"/audit-mission/{auditMission.Id}");
         return Task.CompletedTask;
+
+    }
+
+    private async Task<Guid> GetUserIdAsync()
+    {
+        var authState = await customAuthState.GetUserIdFromTokenAsync();
+
+        if (authState.Item2)
+        {
+            return authState.Item1;
+        }
+
+        return Guid.Empty;
+
     }
 
     private Task DepartmentCellClicked(AuditMissionWithDepartmentName data)
