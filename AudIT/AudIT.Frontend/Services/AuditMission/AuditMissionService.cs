@@ -40,12 +40,12 @@ public class AuditMissionService(HttpClient httpClient) : IAuditMissionService
         }
     }
 
-    public async Task<BaseDTOResponse<BaseAuditMissionDto>> GetAuditMissionByOwnerId(Guid ownerId)
+    public async Task<BaseDTOResponse<BaseAuditMissionDto>> GetAuditMissionByOwnerId()
     {
         try
         {
             var response =
-                await httpClient.GetAsync($"{IAuditMissionService.ApiPath}/get-audit-mission-by-owner/{ownerId}");
+                await httpClient.GetAsync($"{IAuditMissionService.ApiPath}/get-audit-mission-by-owner");
             if (!response.IsSuccessStatusCode)
             {
                 return new BaseDTOResponse<BaseAuditMissionDto>();

@@ -1,15 +1,19 @@
 ﻿using System.Net.Http.Headers;
 using System.Security.Claims;
 using Blazored.LocalStorage;
+using Frontend.Contracts.Abstract_Services.ActivityService;
 using Frontend.Contracts.Abstract_Services.AuditMissionService;
 using Frontend.Contracts.Abstract_Services.DepartmentService;
 using Frontend.Contracts.Abstract_Services.DocumentService;
+using Frontend.Contracts.Abstract_Services.FiapService;
 using Frontend.Contracts.Abstract_Services.InstitutionsService;
 using Frontend.Contracts.Abstract_Services.ObjectiveService;
+using Frontend.Services.Activity;
 using Frontend.Services.AuditMission;
 using Frontend.Services.AuthentificationServices;
 using Frontend.Services.Department;
 using Frontend.Services.Document;
+using Frontend.Services.FiapService;
 using Frontend.Services.InstitutionServices;
 using Frontend.Services.Misc;
 using Frontend.Services.ObjectiveServices;
@@ -36,6 +40,8 @@ public static class ServiceRegistration
         services.AddScoped<IDepartmentService, DepartmentService>();
         services.AddScoped<IObjectiveService, ObjectiveService>();
         services.AddScoped<IDocumentService, DocumentService>();
+        services.AddScoped<IActivityService, ActivityService>();
+        services.AddScoped<IFiapService, FiapService>();
         services.AddBlazoredLocalStorage();
 
         // services.AddScoped<ClaimsPrincipal>();

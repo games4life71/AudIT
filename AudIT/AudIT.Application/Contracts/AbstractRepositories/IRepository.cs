@@ -14,4 +14,5 @@ public interface IRepository<T> where T : class
     Task<Result<IReadOnlyList<T>>> GetPagedResponseAsync(int page, int size);
     Task<Result<IReadOnlyList<T>>> GetByFilterAsync(Expression<Func<T, bool>> filter);
 
+    Task<Result<IReadOnlyList<T>>>  GetMostRecentAsyncById(Func<T, object> orderBy,Expression<Func<T,bool>> filter, Guid id, int take = 3);
 }

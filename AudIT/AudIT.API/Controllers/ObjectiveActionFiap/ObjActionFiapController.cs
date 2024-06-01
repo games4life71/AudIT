@@ -1,6 +1,7 @@
 ﻿using AudIT.Applicationa.Requests.ObjectiveActionFiap.Commands.Create;
 using AudIT.Applicationa.Requests.ObjectiveActionFiap.Commands.Queries.GetById;
 using AudIT.Applicationa.Requests.ObjectiveActionFiap.Commands.Update;
+using AudIT.Applicationa.Requests.ObjectiveActionFiap.Queries.GetByAuditMissionId;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AudIT.API.Controllers.ObjectiveActionFiap;
@@ -15,6 +16,22 @@ public class ObjActionFiapController : BaseController
     public async Task<IActionResult> CreateObjActionFiap([FromBody] CreateObjActionFiapCommand command)
     {
         var result = await Mediator.Send(command);
+
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
+
+
+    [HttpGet]
+    [Route("get-obj-action-fiap-by-audit-mission-id/{auditMissionId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetObjActionFiapByAuditMissionId(Guid auditMissionId, bool mostRecent = false)
+    {
+        var result = await Mediator.Send(new GetFiapByAuditMissionIdQuery(auditMissionId, mostRecent));
 
         if (!result.Success)
         {

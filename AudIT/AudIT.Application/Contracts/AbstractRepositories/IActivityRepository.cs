@@ -18,4 +18,6 @@ public interface IActivityRepository : IRepository<Activity>
 
     public Task<Result<ActivityExportModel>> FindByIdForExportAsync(Guid id);
 
+    public Task<Result<List<Activity>>> FindMostRecentByAuditMissionId(Guid requestAuditMissionId);
+    public Task<Result<List<Activity>>> FindByAuditMissionId(Guid requestAuditMissionId);
 }

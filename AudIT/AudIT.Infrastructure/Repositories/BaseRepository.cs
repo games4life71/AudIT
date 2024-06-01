@@ -17,17 +17,38 @@ public class BaseRepository<T> : IRepository<T> where T : class
 
     public async Task<Result<IReadOnlyList<T>>> GetByFilterAsync(Expression<Func<T, bool>> filter)
     {
-        var result = await _dbcContext.Set<T>().Where(filter).ToListAsync();
-
-        if (result == null)
+        try
         {
-            return Result<IReadOnlyList<T>>.Failure("No entities found.");
-        }
+            // var result = await _dbcContext.Set<T>().Where(filter).ToListAsync();
+            var result = _dbcContext.Set<T>().ToListAsync();
+            var filteredResult = result.Result.Where(filter.Compile()).ToList();
 
-        return Result<IReadOnlyList<T>>.Success(result);
+            if (result == null)
+            {
+                return Result<IReadOnlyList<T>>.Failure("No entities found.");
+            }
+
+            return Result<IReadOnlyList<T>>.Success(filteredResult);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
+    public async Task<Result<IReadOnlyList<T>>> GetMostRecentAsyncById(Func<T, object> orderBy,Expression<Func<T,bool>> filter, Guid id, int take = 3)
+    {
+        var result = _dbcContext.Set<T>().ToListAsync();
 
+            var filteredResult = result.Result.Where(filter.Compile()).OrderByDescending(orderBy).Take(take).ToList();
+
+
+        if (result == null)
+            return Result<IReadOnlyList<T>>.Failure("No entities found.");
+
+        return Result<IReadOnlyList<T>>.Success(filteredResult);
+    }
 
 
     public virtual async Task<Result<T>> AddAsync(T entity)

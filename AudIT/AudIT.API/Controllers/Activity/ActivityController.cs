@@ -3,6 +3,7 @@ using AudIT.Applicationa.Requests.Activity.Commands.AttachDocument;
 using AudIT.Applicationa.Requests.Activity.Commands.RemoveDocument;
 using AudIT.Applicationa.Requests.Activity.Commands.Update;
 using AudIT.Applicationa.Requests.Activity.Queries;
+using AudIT.Applicationa.Requests.Activity.Queries.GetByAuditMissionId;
 using AudIT.Applicationa.Requests.Activity.Queries.GetByDate;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,6 +23,19 @@ public class ActivityController : BaseController
         if (!result.Success)
             return BadRequest(result.Message);
 
+
+        return Ok(result);
+    }
+
+    [HttpGet]
+    [Route("get-activities-by-audit-mission/{auditMissionId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetActivities(Guid auditMissionId, bool mostRecent = false)
+    {
+        var result = await Mediator.Send(new GetActivitiesByAuditMissionIdQuery(auditMissionId, mostRecent));
+
+        if (!result.Success)
+            return BadRequest(result.Message);
 
         return Ok(result);
     }

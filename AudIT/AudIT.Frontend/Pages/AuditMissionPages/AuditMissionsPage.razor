@@ -75,9 +75,9 @@ else
             NavigationManager.NavigateTo("/login");
             return;
         }
-        var userId = await GetUserIdAsync();
 
-        var result = await auditMissionService.GetAuditMissionByOwnerId(userId);
+
+        var result = await auditMissionService.GetAuditMissionByOwnerId();
 
         if (!result.Success)
         {
@@ -135,18 +135,7 @@ else
 
     }
 
-    private async Task<Guid> GetUserIdAsync()
-    {
-        var authState = await customAuthState.GetUserIdFromTokenAsync();
 
-        if (authState.Item2)
-        {
-            return authState.Item1;
-        }
-
-        return Guid.Empty;
-
-    }
 
     private Task DepartmentCellClicked(AuditMissionWithDepartmentName data)
     {

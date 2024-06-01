@@ -90,6 +90,28 @@ public class ActivityRepository(AudITContext context) : BaseRepository<Activity>
             activity.AuditMission?.Name ?? string.Empty,
             activity.AttachedDocuments?.Select(d => d.Name).ToList() ?? new List<string>()
         ), null);
+    }
 
+    public async Task<Result<List<Activity>>> FindMostRecentByAuditMissionId(Guid requestAuditMissionId)
+    {
+        var activities = await _dbcContext.Activities
+            .Where(a => a.AuditMissionId == requestAuditMissionId)
+            .OrderByDescending(a => a.LastModifiedDate)
+            .Take(3)
+            .ToListAsync();
+
+        if (activities.Count == 0)
+            return Result<List<Activity>>.Failure("Cannot find any activities with the given audit mission id");
+
+        return Result<List<Activity>>.Success(activities);
+    }
+
+    public async Task<Result<List<Activity>>> FindByAuditMissionId(Guid requestAuditMissionId)
+    {
+        var activities = await _dbcContext.Activities
+            .Where(a => a.AuditMissionId == requestAuditMissionId)
+            .ToListAsync();
+
+        return Result<List<Activity>>.Success(activities);
     }
 }

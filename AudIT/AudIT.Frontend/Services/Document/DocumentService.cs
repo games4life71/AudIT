@@ -8,11 +8,11 @@ namespace Frontend.Services.Document;
 
 public class DocumentService(HttpClient httpClient) : IDocumentService
 {
-    public async Task<BaseDTOResponse<BaseDocumentViewmodel>> GetRecentDocumentsAsync(Guid userId)
+    public async Task<BaseDTOResponse<BaseDocumentViewmodel>> GetRecentDocumentsAsync()
     {
         var response =
             await httpClient.GetAsync(
-                $"{IDocumentService.ApiPathBaseDocument}/get-recent-documents-by-user-id/{userId}");
+                $"{IDocumentService.ApiPathBaseDocument}/get-recent-documents-by-user-id");
 
         if (response.IsSuccessStatusCode)
         {

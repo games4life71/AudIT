@@ -1,9 +1,8 @@
-﻿using AudIT.Applicationa.Requests.AuditMission.DTO;
-using AudiT.Domain.Entities;
+﻿using Frontend.EntityDtos.AuditMission;
 
-namespace AudIT.Applicationa.Requests.ObjectiveActionFiap.DTO;
+namespace Frontend.EntityViewModels.Fiap;
 
-public class BaseObjActionFiapDto
+public class BaseObjActionFiapViewmodel
 {
     public Guid Id { get; set; }
 
@@ -14,8 +13,6 @@ public class BaseObjActionFiapDto
     public BaseAuditMissionDto AuditMission { get; set; }
 
     public Guid ObjectiveActionId { get; set; }
-
-    // public ObjectiveAction ObjectiveAction { get; set; }
 
     public DateTime AuditedPeriodStart { get; set; }
 

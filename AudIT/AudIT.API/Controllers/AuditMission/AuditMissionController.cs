@@ -1,4 +1,5 @@
-﻿using AudIT.Applicationa.Contracts.AbstractRepositories;
+﻿using System.Security.Claims;
+using AudIT.Applicationa.Contracts.AbstractRepositories;
 using AudIT.Applicationa.Requests.AuditMission.Commands.Create;
 using AudIT.Applicationa.Requests.AuditMission.Commands.Update;
 using AudIT.Applicationa.Requests.AuditMission.Queries.GetBy.GetByDepartmentId;
@@ -62,12 +63,21 @@ public class AuditMissionController(
 
 
     [HttpGet]
-    [Route("get-audit-mission-by-owner/{id}")]
+    [Route("get-audit-mission-by-owner")]
     // [Authorize(Roles = "Admin")] // only admin can access this route
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetAuditMissionByOwner(Guid id)
+    public async Task<IActionResult> GetAuditMissionByOwner()
     {
-        var result = await Mediator.Send(new GetAudMissByOwnerId(id.ToString()));
+        //get the id of the user from the http context
+        var id = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        if (id == null)
+        {
+            return BadRequest("User not found");
+        }
+
+
+
+        var result = await Mediator.Send(new GetAudMissByOwnerId(id.Value.ToString()));
         if (!result.Success)
         {
             return BadRequest(result.Message);

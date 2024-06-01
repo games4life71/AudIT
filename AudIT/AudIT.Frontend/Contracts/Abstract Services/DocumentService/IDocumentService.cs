@@ -7,5 +7,5 @@ public interface IDocumentService
 {
     public const String ApiPathBaseDocument = "https://localhost:7248/api/v1/BaseDocument";
 
-    public Task<BaseDTOResponse<BaseDocumentViewmodel>> GetRecentDocumentsAsync(Guid userId);
+    public Task<BaseDTOResponse<BaseDocumentViewmodel>> GetRecentDocumentsAsync();
 }
