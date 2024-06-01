@@ -113,17 +113,16 @@ else if (_notFound == false && _auditMissionDto != null)
 
                             @foreach (var objective in _objectiveViewModel)
                             {
-                                <RadzenRow>
+
                                     <RadzenLink Path="@($"/objective/{objective.Id}")">
                                         <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{objective.Name}")"></RadzenText>
                                     </RadzenLink>
-                                </RadzenRow>
+
                             }
                             @if (_objectiveViewModel.Count == 0)
                             {
                                 <RadzenText TextAlign="TextAlign.Center" class="rz-mt-4" Text="No objectives found"></RadzenText>
                             }
-
 
                             <RadzenRow Style="display: flex; justify-content: flex-end; align-content: flex-end ">
                                 <RadzenColumn Style="display: flex; justify-content: flex-end; align-content: flex-end ">
@@ -248,6 +247,12 @@ else if (_notFound == false && _auditMissionDto != null)
         await FetchActivities();
         await FetchFiaps();
 
+        _baseDocumentViewmodels.Add(new BaseDocumentViewmodel(
+            new Guid(),
+            "Document 1",
+            "Document 1 description",
+            "Document 1 type"
+        ));
     }
 
     private async Task FetchAuditMission()
