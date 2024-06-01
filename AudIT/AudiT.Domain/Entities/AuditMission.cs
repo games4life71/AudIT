@@ -65,11 +65,12 @@ public class AuditMission : AuditableEntity
     public void Update(
         string name,
         Department department,
-        Guid departmentId
+        Guid departmentId,
+        AuditMissionStatus status
     )
     {
         //TODO : Add validation logic here
-
+        Status = status;
         Name = name;
         Department = department;
         DepartmentId = departmentId;

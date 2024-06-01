@@ -29,7 +29,8 @@ public class UpdateAuditMissionHandler(
             auditMission.Value.Update(
                 name: request.Name,
                 departmentId: request.DepartmentId,
-                department: auditMission.Value.Department
+                department: auditMission.Value.Department,
+                status:request.Status
             );
             var updateResult = await auditMissionRepository.UpdateAsync(auditMission.Value);
 

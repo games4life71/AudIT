@@ -90,4 +90,20 @@ public class AuditMissionService(HttpClient httpClient) : IAuditMissionService
 
         return new BaseDTOResponse<BaseAuditMissionDto>("Audit mission created successfully", true);
     }
+
+    public async  Task<BaseDTOResponse<BaseAuditMissionDto>> UpdateAuditMissionAsync(UpdateAuditMissionDto updateAuditMissionDto)
+    {
+        var response = await  httpClient.PutAsJsonAsync($"{IAuditMissionService.ApiPath}/update-audit-mission", updateAuditMissionDto);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return new BaseDTOResponse<BaseAuditMissionDto>("Failed to update audit mission", false);
+        }
+
+        return new BaseDTOResponse<BaseAuditMissionDto>("Audit mission updated successfully", true);
+
+
+    }
+
+
 }

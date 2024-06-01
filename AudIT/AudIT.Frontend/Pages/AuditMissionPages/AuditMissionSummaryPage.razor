@@ -15,6 +15,8 @@
 @using Frontend.Services.AuthentificationServices
 
 
+@inject NotificationService NotificationService
+@inject DialogService DialogService
 @inject IFiapService _fiapService
 @inject IActivityService _activityService
 @inject CustomAuthStateProvider _customAuthState
@@ -74,26 +76,22 @@ else if (_notFound == false && _auditMissionDto != null)
         <RadzenColumn>
             <RadzenCard Style="height: 100%; width: 75%; display: flex;" Variant="Variant.Outlined" class="rz-mb-12">
                 <RadzenStack Style="align-items: center" Gap="10px" Orientation="Orientation.Vertical">
-                    @* <RadzenStack Orientation="Orientation.Horizontal"> *@
-                    <RadzenLabel Component="Name" Text="Name:" Style="font-size: large;"></RadzenLabel>
-                    <RadzenTextBox Disabled="@editDetailsDisabled" Placeholder="@_auditMissionDto.Name"></RadzenTextBox>
-                    @* </RadzenStack> *@
-                    @* <RadzenStack Orientation="Orientation.Horizontal"> *@
-                    <RadzenLabel Component="Department" Text="Department:" Style="font-size: large;"></RadzenLabel>
-                    <RadzenTextBox Disabled="@editDetailsDisabled" Placeholder="@_departmentDto.Name"></RadzenTextBox>
-                    @* </RadzenStack> *@
-                    @* <RadzenStack Orientation="Orientation.Horizontal"> *@
-                    <RadzenLabel Text="Last Modified:" Style="font-size: large;" Component="LastModified"></RadzenLabel>
-                    <RadzenDatePicker Disabled="@editDetailsDisabled" TValue="DateTime" Change="@(args => _auditMissionDto.LastModifiedDate = args.Value)" @bind-Value="@_lastModifiedDate"></RadzenDatePicker>
-                    @* </RadzenStack> *@
 
-                    @* <RadzenStack Orientation="Orientation.Horizontal"> *@
+                    <RadzenLabel Component="Name" Text="Name:" Style="font-size: large;"></RadzenLabel>
+                    <RadzenTextBox Disabled="@editDetailsDisabled" @bind-Value="@_updateAuditMissionDto.Name" Placeholder="@_updateAuditMissionDto.Name"></RadzenTextBox>
+
+                    <RadzenLabel Component="Department" Text="Department:" Style="font-size: large;"></RadzenLabel>
+                    <RadzenTextBox Disabled="true" Placeholder="@_departmentDto.Name"></RadzenTextBox>
+
+                    <RadzenLabel Text="Last Modified:" Style="font-size: large;" Component="LastModified"></RadzenLabel>
+                    <RadzenDatePicker Disabled="true" TValue="DateTime" Min="DateTime.Now.AddMonths(-2)" Max="DateTime.Today" Change="@(args => selectedDate= args.Value)" @bind-Value="@_lastModifiedDate"></RadzenDatePicker>
+
                     <RadzenLabel Text="Status" Component="StatusBind" Style="font-size: large;"></RadzenLabel>
-                    <RadzenDropDown Disabled="@editDetailsDisabled" Style="width: 75%;" Name="StatusBind" @bind-Value="@_auditMissionDto.Status" Data="@_auditMissionStatuses"></RadzenDropDown>
-                    @* </RadzenStack> *@
+                    <RadzenDropDown Disabled="@editDetailsDisabled" Style="width: 75%;" Name="StatusBind" @bind-Value="@selectedStatus" Data="@_auditMissionStatuses"></RadzenDropDown>
+
                     <RadzenRow Style="justify-content: space-between">
                         <RadzenToggleButton Click="@(() => editDetailsDisabled = !editDetailsDisabled)" ToggleButtonStyle="ButtonStyle.Warning" class="rz-mt-12" Text="Edit details"></RadzenToggleButton>
-                        <RadzenButton ButtonStyle="ButtonStyle.Info" class="rz-mt-12" Text="Save changes"></RadzenButton>
+                        <RadzenButton Click="@ShowConfirmDialog"  ButtonStyle="ButtonStyle.Info" class="rz-mt-12" Text="Save changes"></RadzenButton>
                     </RadzenRow>
 
                 </RadzenStack>
@@ -215,12 +213,15 @@ else if (_notFound == false && _auditMissionDto != null)
 
 
     [Parameter] public required string AuditMissionId { get; set; }
+    private UpdateAuditMissionDto _updateAuditMissionDto;
 
     private List<string> _auditMissionStatuses = Enum.GetNames(typeof(AuditMissionStatus)).ToList();
 
     private BaseAuditMissionDto _auditMissionDto = null;
     private BaseDepartmentDto _departmentDto = null;
 
+    private string selectedStatus="";
+    private DateTime selectedDate;
     private List<BaseDocumentViewmodel> _baseDocumentViewmodels = [];
     private List<BaseActivityViewmodel> _activityViewModels = [];
     private List<BaseObjectiveViewModel> _objectiveViewModel = [];
@@ -246,6 +247,16 @@ else if (_notFound == false && _auditMissionDto != null)
         await FetchDocuments();
         await FetchActivities();
         await FetchFiaps();
+
+        _updateAuditMissionDto = new UpdateAuditMissionDto()
+        {
+            Id = _auditMissionDto.Id,
+            Name = _auditMissionDto.Name,
+            DepartmentId = _auditMissionDto.DepartmentId,
+            Status = _auditMissionDto.Status,
+        };
+
+        selectedStatus = _auditMissionDto.Status.ToString();
 
         _baseDocumentViewmodels.Add(new BaseDocumentViewmodel(
             new Guid(),
@@ -345,5 +356,49 @@ else if (_notFound == false && _auditMissionDto != null)
             Delay = 0,
             Style = "background-color: #000; color: #fff;"
         });
+    }
+
+    private async  Task ShowConfirmDialog(MouseEventArgs obj)
+    {
+        var confirm = await DialogService.OpenAsync("Confirmation", ds =>
+            @<div>
+                <p>Are you sure you want to update the audit mission with the following parameters?</p>
+                <p>Name: "@_updateAuditMissionDto.Name"</p>
+                <p>Department: "@_departmentDto.Name"</p>
+                <p>Status: "@selectedStatus"</p>
+                <p>Last Modified at: "@selectedDate."</p>
+                <RadzenButton Text="Yes" Click="@(() => { ds.Close(true); UpdateAuditMission(); })"/>
+                <RadzenButton Text="No" Click="@(() => ds.Close(false))"/>
+        </div>, new DialogOptions() { });
+    }
+
+    private async  Task UpdateAuditMission()
+    {
+
+        // _updateAuditMissionDto.Name = _auditMissionDto.Name;
+        _updateAuditMissionDto.DepartmentId = _auditMissionDto.DepartmentId;
+        _updateAuditMissionDto.Status = (AuditMissionStatus)Enum.Parse(typeof(AuditMissionStatus), selectedStatus);
+
+
+        var result = await _auditMissionService.UpdateAuditMissionAsync(_updateAuditMissionDto);
+
+        if (result.Success)
+        {
+            //display an alert
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Success", Detail = "Audit Mission updated successfully", Duration = 4000 });
+            Console.WriteLine("Audit mission updated successfully");
+
+            Console.WriteLine(result.DtoResponse.Name);
+        }
+        else
+        {
+            //display an alert
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "Failed to update audit mission", Duration = 4000 });
+            Console.WriteLine("Failed to update audit mission");
+        }
+
+
+        return;
+
     }
 }

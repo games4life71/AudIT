@@ -6,7 +6,8 @@ public class AuditMissionWithDepartmentName(
     string userId,
     Guid departmentId,
     string? departmentName,
-    DateTime lastModifiedDate
+    DateTime lastModifiedDate,
+    AuditMissionStatus status
     )
 {
     public Guid Id { get; set; } = id;
@@ -19,7 +20,7 @@ public class AuditMissionWithDepartmentName(
 
     public string? DepartmentName { get; set; } = departmentName;
 
-    public AuditMissionStatus Status { get; set; } = AuditMissionStatus.Creata;
+    public AuditMissionStatus Status { get; set; } = status;
 
     public DateTime LastModifiedDate { get; set; } = lastModifiedDate;
 }
