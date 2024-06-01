@@ -11,4 +11,9 @@ public interface IObjectiveService
         Guid auditMissionId);
 
     public Task<BaseDTOResponse<BaseObjectiveViewModel>> GetObjectivesByAuditMissionIdAsync(Guid auditMissionId);
+
+    public Task<BaseDTOResponse<ObjectiveFullViewModel>> GetObjectiveWithActionsByIdAsync(Guid objectiveId);
+
+    public Task<BaseDTOResponse<ObjectiveFullViewModel>> GetObjectiveFullByAuditMissionIdAsync(
+        Guid auditMissionId);
 }

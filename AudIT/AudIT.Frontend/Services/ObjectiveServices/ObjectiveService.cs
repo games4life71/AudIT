@@ -10,7 +10,6 @@ public class ObjectiveService(HttpClient httpClient) : IObjectiveService
     public async Task<BaseDTOResponse<BaseObjectiveViewModel>> GetMostRecentObjectiveByAuditMissionIdAsync(
         Guid auditMissionId)
     {
-
         var response =
             await httpClient.GetAsync(
                 $"{IObjectiveService.ApiPath}/get-most-recent-objective-by-audit-mission-id/?auditMissionId={auditMissionId}");
@@ -37,6 +36,80 @@ public class ObjectiveService(HttpClient httpClient) : IObjectiveService
 
     public async Task<BaseDTOResponse<BaseObjectiveViewModel>> GetObjectivesByAuditMissionIdAsync(Guid auditMissionId)
     {
-        throw new NotImplementedException();
+        var response = await
+            httpClient.GetAsync(
+                $"{IObjectiveService.ApiPath}/get-objective-by-audit-mission-id?auditMissionId={auditMissionId}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return new BaseDTOResponse<BaseObjectiveViewModel>
+            {
+                Success = false,
+                Message = response.ReasonPhrase
+            };
+        }
+
+        var result = await response.Content.ReadFromJsonAsync<BaseDTOResponse<BaseObjectiveViewModel>>();
+
+        if (result != null) return result;
+
+        return new BaseDTOResponse<BaseObjectiveViewModel>
+        {
+            Success = false,
+            Message = "An error occurred while fetching the data."
+        };
+    }
+
+    public async Task<BaseDTOResponse<ObjectiveFullViewModel>> GetObjectiveWithActionsByIdAsync(Guid objectiveId)
+    {
+        var response = await httpClient.GetAsync($"{IObjectiveService.ApiPath}/get-objective-by-id/?id={objectiveId}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return new BaseDTOResponse<ObjectiveFullViewModel>
+            {
+                Success = false,
+                Message = response.ReasonPhrase
+            };
+        }
+
+        var result = await response.Content.ReadFromJsonAsync<BaseDTOResponse<ObjectiveFullViewModel>>();
+
+        if (result != null) return result;
+
+        return new BaseDTOResponse<ObjectiveFullViewModel>
+        {
+            Success = false,
+            Message = "An error occurred while fetching the data."
+        };
+    }
+
+    public async Task<BaseDTOResponse<ObjectiveFullViewModel>> GetObjectiveFullByAuditMissionIdAsync(
+        Guid auditMissionId)
+    {
+        //first get all basic objectives
+
+        var objectives = await GetObjectivesByAuditMissionIdAsync(auditMissionId);
+        List<ObjectiveFullViewModel> objectivesFull = [];
+        if (objectives.Success)
+        {
+            foreach (var objective in objectives.DtoResponses)
+            {
+                var objectiveFull = await GetObjectiveWithActionsByIdAsync(objective.Id);
+
+                if (objectiveFull is { Success: true, DtoResponse: not null })
+                {
+                    objectivesFull.Add(objectiveFull.DtoResponse);
+                }
+            }
+
+            return new BaseDTOResponse<ObjectiveFullViewModel>(objectivesFull, "", true);
+        }
+
+        return new BaseDTOResponse<ObjectiveFullViewModel>
+        {
+            Success = false,
+            Message = "An error occurred while fetching the data."
+        };
     }
 }

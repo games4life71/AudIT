@@ -1,4 +1,5 @@
 ﻿using AudIT.Applicationa.Contracts.AbstractRepositories;
+using AudIT.Applicationa.Requests.Objective.DTO;
 using AudIT.Applicationa.Requests.Objectives.DTO;
 using AudIT.Applicationa.Responses;
 using AutoMapper;
@@ -9,9 +10,9 @@ namespace AudIT.Applicationa.Requests.Objectives.Queries.GeyBy.GetByAuditMission
 public class GetObjByAuditMissionIdHandler(
     IObjectiveRepository objectiveRepository,
     IMapper mapper
-) : IRequestHandler<GetObjectiveByAuditMissionIdQuery, BaseDTOResponse<ObjectiveCompleteDto>>
+) : IRequestHandler<GetObjectiveByAuditMissionIdQuery, BaseDTOResponse<BaseObjectiveDto>>
 {
-    public async Task<BaseDTOResponse<ObjectiveCompleteDto>> Handle(GetObjectiveByAuditMissionIdQuery request,
+    public async Task<BaseDTOResponse<BaseObjectiveDto>> Handle(GetObjectiveByAuditMissionIdQuery request,
         CancellationToken cancellationToken)
     {
         try
@@ -21,20 +22,20 @@ public class GetObjByAuditMissionIdHandler(
 
             if (!result.IsSuccess)
             {
-                return new BaseDTOResponse<ObjectiveCompleteDto>($"Cannot find objective for audit mission with id" +
-                                                                 $"{request.AuditMissionId}", false);
+                return new BaseDTOResponse<BaseObjectiveDto>($"Cannot find objective for audit mission with id" +
+                                                             $"{request.AuditMissionId}", false);
             }
 
 
             var objectives = result.Value;
 
-            var mappedObjectives = mapper.Map<List<ObjectiveCompleteDto>>(objectives);
+            var mappedObjectives = mapper.Map<List<BaseObjectiveDto>>(objectives);
 
-            return new BaseDTOResponse<ObjectiveCompleteDto>(mappedObjectives, "Succes", true);
+            return new BaseDTOResponse<BaseObjectiveDto>(mappedObjectives, "Succes", true);
         }
         catch (Exception e)
         {
-            return new BaseDTOResponse<ObjectiveCompleteDto>($"An error occured: {e.Message}", false);
+            return new BaseDTOResponse<BaseObjectiveDto>($"An error occured: {e.Message}", false);
         }
     }
 }
