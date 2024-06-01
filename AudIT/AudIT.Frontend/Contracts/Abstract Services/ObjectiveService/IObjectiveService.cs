@@ -1,4 +1,5 @@
 ﻿using Frontend.EntityDtos.Misc;
+using Frontend.EntityDtos.Objective;
 using Frontend.EntityViewModels.Objective;
 
 namespace Frontend.Contracts.Abstract_Services.ObjectiveService;
@@ -16,4 +17,7 @@ public interface IObjectiveService
 
     public Task<BaseDTOResponse<ObjectiveFullViewModel>> GetObjectiveFullByAuditMissionIdAsync(
         Guid auditMissionId);
+
+    Task<BaseResponse> DeleteObjectiveAsync(Guid  objectiveId);
+    Task<BaseDTOResponse<BaseObjectiveViewModel>> UpdateObjectiveAsync(UpdateObjectiveNameDto updateObjectiveNameDto);
 }

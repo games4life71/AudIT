@@ -6,16 +6,16 @@
 @using Frontend.EntityViewModels.ObjectiveAction
 @using Frontend.Pages.Components
 @using Radzen
+@inject NotificationService _notificationService
 @inject IAuditMissionService _auditMissionService
 @inject IObjectiveService _objectiveService
 @inject NavigationManager _navigationManager
 @inject DialogService _dialogService
 <RadzenStack class="rz-mb-10" Gap="10px">
     <RadzenRow>
-        <RadzenLabel Component="SelectAuditMission" Text="Select Audit Mission"></RadzenLabel>
-        <RadzenDropDownDataGrid  TValue="Guid" TextProperty="Name" AllowSorting="true" ValueChanged="@(args=>SelectedAuditMission(args))" ValueProperty="Id" Data="@_auditMissions" Name="SelectAuditMission"/>
+        <RadzenLabel Component="SelectAuditMission" Text="Select Audit Mission:"></RadzenLabel>
+        <RadzenDropDownDataGrid PageSize="5" Placeholder="Select..." TValue="Guid" TextProperty="Name" AllowSorting="true" ValueChanged="@(args => SelectedAuditMission(args))" ValueProperty="Id" Data="@_auditMissions" Name="SelectAuditMission"/>
     </RadzenRow>
-    <RadzenText Text="@_selectedAuditMissionId.ToString()"></RadzenText>
 </RadzenStack>
 
 <RadzenRow>
@@ -27,19 +27,20 @@
                     <RadzenTabsItem Text="Objective Actions">
                         <RadzenDataGrid AllowSorting="true" Data="@objective.objectiveActions">
                             <Columns>
-                                <RadzenDataGridColumn Title="Objective Action Name" Property="name"    />
-                                <RadzenDataGridColumn Sortable="true" Title="Last Modified Date" Property="lastModifiedDate"    />
+                                <RadzenDataGridColumn Title="Objective Action Name" Property="name"/>
+                                <RadzenDataGridColumn Sortable="true" Title="Last Modified Date" Property="lastModifiedDate"/>
                                 <RadzenDataGridColumn Title="Action Risks Details" Sortable="false" Filterable="false">
                                     <Template Context="objectiveAction">
                                         <RadzenButton Style="display: flex; align-self: center; justify-content: center ;"
-                                                      ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Text"
-                                                      Text="More details " Click="@(()=>OpenActionRiskDialog(objectiveAction))"></RadzenButton>
+                                                      ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="info"
+                                                      Text="More details " Click="@(() => OpenActionRiskDialog(objectiveAction))">
+                                        </RadzenButton>
                                     </Template>
                                 </RadzenDataGridColumn>
-                                <RadzenDataGridColumn Frozen="true" Title="Selected in auditing" Property="selected"  ></RadzenDataGridColumn>
+                                <RadzenDataGridColumn Frozen="true" Title="Selected in auditing" Property="selected"></RadzenDataGridColumn>
                                 <RadzenDataGridColumn Width="15%" Frozen="true" Sortable="false" Filterable="false" Title="">
                                     <Template Context="objectiveAction">
-                                        <RadzenButton Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Text" Text="More details " Click="@(() => NavigateObjAction(objectiveAction))"></RadzenButton>
+                                        <RadzenButton Shade="Shade.Lighter" Icon="info" Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Text="More details " Click="@(() => NavigateObjAction(objectiveAction))"></RadzenButton>
                                     </Template>
                                 </RadzenDataGridColumn>
                             </Columns>
@@ -49,8 +50,9 @@
                     <RadzenTabsItem Text="Options" Icon="build">
 
                         <RadzenRow>
-                            <RadzenButton Text="Configure Risks"></RadzenButton>
-                            <RadzenButton  Text="Configure Risks"></RadzenButton>
+                            <RadzenButton Icon="bookmark" Click="@(()=>_navigationManager.NavigateTo($"risks/{objective.id}"))" Text="Configure Risks"></RadzenButton>
+                            <RadzenButton  ButtonStyle="ButtonStyle.Info" Icon="assignment" Click="@(() => OpenEditNameForm(objective))" Text="Edit Name"></RadzenButton>
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="@(() => DeleteObjective(objective))" Text="Delete Objective"></RadzenButton>
                         </RadzenRow>
                     </RadzenTabsItem>
                 </Tabs>
@@ -66,50 +68,21 @@
 
 @code {
 
-    public class Order
-    {
-        public string Name { get; set; }
-
-        public string Description { get; set; }
-
-        public Order(string name, string description)
-        {
-            Name = name;
-            Description = description;
-        }
-    }
-
-    public string selectedOrder { get; set; }
-
-    private List<Order> _orders = new List<Order>();
-
-
-
-    private void RowRender(RowRenderEventArgs<Order> args)
-    {
-        args.Expandable = true;
-    }
-
 }
 
 @code
 {
     private List<BaseAuditMissionDto> _auditMissions = [];
-    private Guid _selectedAuditMissionId=Guid.Empty;
+    private Guid _selectedAuditMissionId = Guid.Empty;
     private List<ObjectiveFullViewModel> _objectiveFullViewModels = [];
 }
 
 @functions
 {
-    protected  override async  Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        _orders.Add(new Order("name", "some description"));
-        _orders.Add(new Order("name", "some description"));
-        _orders.Add(new Order("name", "some description"));
-        _orders.Add(new Order("name", "some description"));
 
         await FetchAuditMissions();
-
     }
 
     private async Task FetchAuditMissions()
@@ -123,10 +96,9 @@
 
     private async Task FetchObjectives()
     {
-
         var result = await _objectiveService.GetObjectiveFullByAuditMissionIdAsync(_selectedAuditMissionId);
 
-        if(result.Success)
+        if (result.Success)
         {
             // Create a new list and assign it to _objectiveFullViewModels
             _objectiveFullViewModels = [..result.DtoResponses];
@@ -136,22 +108,18 @@
         {
             _objectiveFullViewModels = [];
         }
-
-
-
     }
-    private async  void SelectedAuditMission(Guid id)
+
+    private async void SelectedAuditMission(Guid id)
     {
         _selectedAuditMissionId = id;
         //TODO get the objectives of the selected audit mission and display them in the datagrid
-      await FetchObjectives();
+        await FetchObjectives();
         StateHasChanged();
         //refresh the datagrid
-
-
     }
 
-    private  Task NavigateObjAction(ObjectiveActionViewModel objectiveAction)
+    private Task NavigateObjAction(ObjectiveActionViewModel objectiveAction)
     {
         _navigationManager.NavigateTo($"/objectiveAction/{objectiveAction.id}");
         return Task.CompletedTask;
@@ -163,10 +131,60 @@
         var actionRisks = objectiveAction.actionRisks;
 
         await _dialogService.OpenAsync<ObjActionDialog>
-            ("Objective Action Risks", new Dictionary<string, object>() { { "ActionRisks", actionRisks } },
-                new DialogOptions() { Width = "700px", Height = "512px", Resizable = true, Draggable = true });
-
-
+        ("Objective Action Risks", new Dictionary<string, object>() { { "ActionRisks", actionRisks } },
+            new DialogOptions() { Width = "700px", Height = "512px", Resizable = true, Draggable = true });
     }
 
+    private async Task DeleteObjective(ObjectiveFullViewModel objective)
+    {
+        //open a dialog to confirm the deletion
+        var resultConfirm = await _dialogService.Confirm(
+            "Are you sure you want to delete the objective along with all dependencies ?", "Delete Objective", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+        if (resultConfirm == null || resultConfirm.Value == false)
+        {
+            return;
+        }
+
+        else
+        {
+            var result = await _objectiveService.DeleteObjectiveAsync(Guid.Parse(objective.id));
+
+            if (result.Success)
+            {
+                _objectiveFullViewModels.Remove(objective);
+                _notificationService.Notify(NotificationSeverity.Success, "Success", "Objective deleted successfully", 3000);
+                StateHasChanged();
+            }
+            else
+            {
+                _notificationService.Notify(NotificationSeverity.Error, "Error", "Failed to delete the objective", 3000);
+            }
+        }
+    }
+
+    private async Task OpenEditNameForm(ObjectiveFullViewModel objective)
+    {
+        await _dialogService.OpenAsync<EditObjectiveNameDialog>
+        ("Edit Name", new Dictionary<string, object>()
+            {
+                { "Objective", objective },
+                { "OnNameEdited", new EventCallback<string>(this, HandleNameEdited) },
+                { "OnNameEditFailed", new EventCallback<string>(this, HandleNameEditFailed) }
+            },
+            new DialogOptions() { Width = "400px", Height = "200px", Resizable = false, Draggable = false });
+    }
+
+    private void HandleNameEdited(string message)
+    {
+        _notificationService.Notify(NotificationSeverity.Success, "Success", message, 3000);
+        StateHasChanged();
+    }
+
+    private void HandleNameEditFailed(string message)
+    {
+        // Show a notification with the error message
+        _notificationService.Notify(NotificationSeverity.Error, "Error", message, 3000);
+        StateHasChanged();
+    }
 }

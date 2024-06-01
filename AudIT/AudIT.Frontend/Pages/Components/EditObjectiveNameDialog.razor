@@ -1,0 +1,62 @@
+﻿@using Frontend.Contracts.Abstract_Services.ObjectiveService
+@using Frontend.EntityDtos.Objective
+@using Frontend.EntityViewModels.Objective
+@inject IObjectiveService _objectiveService
+@inject DialogService dialogService
+<RadzenCard>
+
+    <RadzenLabel Text="Edit Objective Name" Component="objName"></RadzenLabel>
+    <RadzenTextBox Placeholder="Objective Name" @bind-Value="@Objective.name" Component="objName"></RadzenTextBox>
+    <RadzenButton ButtonStyle="ButtonStyle.Info" Text="Save" Click="@(() => SaveObjectiveName())"></RadzenButton>
+</RadzenCard>
+
+
+@code {
+
+
+
+    [Parameter] public ObjectiveFullViewModel Objective { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnNameEdited { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnNameEditFailed { get; set; }
+}
+
+@functions
+{
+
+    private async Task SaveObjectiveName()
+    {
+
+        try
+        {
+            var updateDto = new UpdateObjectiveNameDto()
+            {
+                Name = Objective.name,
+                Id = Guid.Parse(Objective.id)
+            };
+            var response = await _objectiveService.UpdateObjectiveAsync(updateDto);
+
+            if (response.Success)
+            {
+                await OnNameEdited.InvokeAsync("Name edited successfully");
+                dialogService.Close(true);
+            }
+
+            else
+            {
+                await OnNameEditFailed.InvokeAsync("Failed to edit name");
+                dialogService.Close(false);
+            }
+        }
+        catch (Exception e)
+        {
+            await OnNameEditFailed.InvokeAsync("Failed to edit name");
+            dialogService.Close(false);
+        }
+    }
+
+
+}

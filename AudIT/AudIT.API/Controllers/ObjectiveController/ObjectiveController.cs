@@ -1,4 +1,5 @@
 ﻿using AudIT.Applicationa.Requests.Objective.Commands.Create;
+using AudIT.Applicationa.Requests.Objectives.Commands.Delete;
 using AudIT.Applicationa.Requests.Objectives.Commands.Patch.RemoveObjectiveAction;
 using AudIT.Applicationa.Requests.Objectives.Commands.Patch.UpdateObjName;
 using AudIT.Applicationa.Requests.Objectives.Queries.GeyBy.GetByAuditMissionId;
@@ -89,6 +90,31 @@ public class ObjectiveController : BaseController
             return BadRequest(e.Message);
         }
     }
+
+    [HttpDelete]
+    [Route("delete-objective/{objectiveId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> DeleteObjective(Guid objectiveId)
+    {
+        try
+        {
+            var response = await Mediator.Send(new DeleteObjectiveCommand(objectiveId));
+            if (!response.Success)
+            {
+                return BadRequest(response.Message);
+            }
+
+            return Ok(response);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
 
     [HttpGet]
     [Route("get-objective-by-audit-mission-id")]
