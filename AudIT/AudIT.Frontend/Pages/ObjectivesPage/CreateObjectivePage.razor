@@ -1,0 +1,180 @@
+﻿@page "/create-objective"
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityDtos.ObjectiveAction
+@inject IAuditMissionService _auditMissionService
+
+<RadzenCard>
+    <RadzenSteps>
+
+        <Steps>
+            <RadzenStepsItem Text="Name and Audit Mission">
+                <RadzenCard>
+                    <RadzenStack Orientation="Orientation.Vertical">
+
+
+                        <RadzenLabel Component="forName" Text="Choose a name for new objective:"/>
+                        <RadzenTextBox ValueChanged="@((value) => CheckValidName(value))" Name="forName" Placeholder="Objective name..."></RadzenTextBox>
+                        <RadzenText TextStyle="TextStyle.Subtitle1" Visible="@(!validObjName)" Text="Audit Mission Name must only contain letter and digits"></RadzenText>
+                        <RadzenLabel Component="SelectAuditMission" Text="Select Audit Mission:"></RadzenLabel>
+                        <RadzenDropDownDataGrid PageSize="5" Placeholder="Select..." TValue="Guid" TextProperty="Name" AllowSorting="true" ValueChanged="@(args => SelectedAuditMission(args))" ValueProperty="Id" Data="@_auditMissions" Name="SelectAuditMission"/>
+
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenStepsItem>
+
+            <RadzenStepsItem Text="Add Objective Actions (optional)">
+                <RadzenRow>
+
+                    @*Add new objective action form*@
+                    <RadzenColumn>
+                        <RadzenStack Orientation="Orientation.Vertical">
+                            <RadzenTemplateForm Data="@_newObjAction">
+                                <RadzenCard Variant="Variant.Outlined">
+                                    <RadzenStack class="rz-my-6" Orientation="Orientation.Vertical">
+                                        <RadzenLabel Text="Objective Action Name:" Component="forName"></RadzenLabel>
+                                        <RadzenTextBox Name="forName" Placeholder="Objective action name..."></RadzenTextBox>
+                                    </RadzenStack>
+
+                                    <RadzenStack class="rz-my-6" Orientation="Orientation.Vertical">
+                                        <RadzenLabel Text="Internal Expected Controls:" Component="forControaleInterne1"></RadzenLabel>
+                                        <RadzenTextArea  Rows="3" Placeholder="Internal expected controls..." Name="forControaleInterne1"></RadzenTextArea>
+                                    </RadzenStack>
+
+                                    <RadzenStack class="rz-my-6" Orientation="Orientation.Vertical">
+                                        <RadzenLabel Text="Internal Existing Controls:" Component="forControaleInterne2"></RadzenLabel>
+                                        <RadzenTextArea Rows="3" Placeholder="Internal existing controls..." Name="forControaleInterne2"></RadzenTextArea>
+                                    </RadzenStack>
+                                    <RadzenStack class="rz-my-6" Orientation="Orientation.Horizontal">
+                                        <RadzenLabel Component="forSelected" Text="Selected in auditing: "></RadzenLabel>
+                                        <RadzenSwitch @bind-Valiue="@isSelectedSwitch">
+
+                                        </RadzenSwitch>
+                                    </RadzenStack>
+
+                                    <RadzenStack Orientation="Orientation.Horizontal">
+                                        <RadzenButton ButtonType="ButtonType.Submit" Size="ButtonSize.Small" Icon="save" Text="Save"/>
+                                        <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Small" Icon="cancel" Text="Cancel" Click="@CancelObjActions"/>
+                                    </RadzenStack>
+                                </RadzenCard>
+                            </RadzenTemplateForm>
+                        </RadzenStack>
+
+
+                    </RadzenColumn>
+
+                    @* Display added objective actions into a DataList*@
+                    <RadzenColumn>
+                        <RadzenCard Variant="Variant.Outlined">
+                            <RadzenText class="rz-my-4" TextStyle="TextStyle.DisplayH6" Text="Added Objective Actions:"></RadzenText>
+
+                            <RadzenDataList Data="@_addedObjActions" TItem="CreateObjectiveActionDto">
+                                <Template Context="newObjAction">
+                                    <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
+                                        <RadzenColumn >
+                                            <RadzenText Text="Objective Action name: "></RadzenText>
+                                            <RadzenText Text="@newObjAction.Name"></RadzenText>
+                                        </RadzenColumn>
+
+                                        <RadzenColumn Style="display: flex; justify-content: flex-end;">
+                                            <RadzenButton Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Danger" Text="Remove" Icon="delete"></RadzenButton>
+                                        </RadzenColumn>
+                                    </RadzenRow>
+                                    </Template>
+                            </RadzenDataList>
+                        </RadzenCard>
+
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+            </RadzenStepsItem>
+            <RadzenStepsItem Text="Attach Documents (optional)">
+
+            </RadzenStepsItem>
+
+
+        </Steps>
+    </RadzenSteps>
+
+
+</RadzenCard>
+
+
+@code {
+
+    private List<BaseAuditMissionDto> _auditMissions = [];
+
+    private string _selectedObjectiveName = "";
+    private Guid _selectedAuditMissionId = Guid.Empty;
+    private bool isSelectedSwitch = true;
+
+    private CreateObjectiveActionDto _newObjAction = new CreateObjectiveActionDto();
+    private List<CreateObjectiveActionDto> _addedObjActions = [];
+
+    private bool validObjName;
+}
+
+@functions
+{
+    protected async override Task OnInitializedAsync()
+    {
+        await FetchAuditMissions();
+        _addedObjActions.Add(new CreateObjectiveActionDto());
+        _addedObjActions.Add(new CreateObjectiveActionDto());
+        _addedObjActions.Add(new CreateObjectiveActionDto());
+        _addedObjActions.Add(new CreateObjectiveActionDto());
+        _addedObjActions.Add(new CreateObjectiveActionDto());
+        _addedObjActions.Add(new CreateObjectiveActionDto());
+    }
+
+    private async Task FetchAuditMissions()
+    {
+        var auditMissions = await _auditMissionService.GetAuditMissionByOwnerId();
+        if (auditMissions.Success)
+        {
+            _auditMissions = auditMissions.DtoResponses;
+        }
+    }
+
+    private async void SelectedAuditMission(Guid id)
+    {
+        _selectedAuditMissionId = id;
+        //TODO get the objectives of the selected audit mission and display them in the datagrid
+        StateHasChanged();
+        //refresh the datagrid
+    }
+
+    private Task CheckValidName(string s)
+    {
+        var isValid = !string.IsNullOrEmpty(s);
+        //if it contains only letters and numbers
+        if (isValid)
+        {
+            isValid = s.All(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c));
+        }
+
+
+        if (!isValid)
+        {
+            //show an error message
+            validObjName = false;
+        }
+        else
+        {
+            validObjName = true;
+        }
+
+        _selectedObjectiveName = s;
+        return Task.CompletedTask;
+
+
+        return Task.CompletedTask;
+    }
+
+    private void CancelObjActions(MouseEventArgs obj)
+    {
+        _newObjAction = new CreateObjectiveActionDto();
+        StateHasChanged();
+    }
+}
