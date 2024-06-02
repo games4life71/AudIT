@@ -136,10 +136,34 @@ public class ObjectiveService(HttpClient httpClient) : IObjectiveService
 
     public async Task<BaseDTOResponse<BaseObjectiveViewModel>> UpdateObjectiveAsync(UpdateObjectiveNameDto updateDto)
     {
+        var response =
+            await httpClient.PatchAsJsonAsync($"{IObjectiveService.ApiPath}/update-objective-name", updateDto);
 
+        if (!response.IsSuccessStatusCode)
+        {
+            return new BaseDTOResponse<BaseObjectiveViewModel>
+            {
+                Success = false,
+                Message = response.ReasonPhrase
+            };
+        }
 
+        var result = await response.Content.ReadFromJsonAsync<BaseDTOResponse<BaseObjectiveViewModel>>();
 
-        var response = await httpClient.PatchAsJsonAsync($"{IObjectiveService.ApiPath}/update-objective-name", updateDto);
+        if (result != null) return result;
+
+        return new BaseDTOResponse<BaseObjectiveViewModel>
+        {
+            Success = false,
+            Message = "An error occurred while fetching the data."
+        };
+    }
+
+    public async Task<BaseDTOResponse<BaseObjectiveViewModel>> CreateObjectiveAsync(
+        CreateObjectiveDto createObjectiveDto)
+    {
+        var response =
+            await httpClient.PostAsJsonAsync($"{IObjectiveService.ApiPath}/add-new-objective", createObjectiveDto);
 
         if (!response.IsSuccessStatusCode)
         {

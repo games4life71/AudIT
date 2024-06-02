@@ -2,6 +2,9 @@
 
 namespace Frontend.EntityViewModels.ObjectiveAction;
 
+/// <summary>
+/// This ViewModel is used to model the data in the full Objective response.
+/// </summary>
 public class ObjectiveActionViewModel
 {
     public string id { get; set; }

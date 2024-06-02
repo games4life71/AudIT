@@ -20,4 +20,5 @@ public interface IObjectiveService
 
     Task<BaseResponse> DeleteObjectiveAsync(Guid  objectiveId);
     Task<BaseDTOResponse<BaseObjectiveViewModel>> UpdateObjectiveAsync(UpdateObjectiveNameDto updateObjectiveNameDto);
+    Task<BaseDTOResponse<BaseObjectiveViewModel>> CreateObjectiveAsync(CreateObjectiveDto createObjectiveDto);
 }

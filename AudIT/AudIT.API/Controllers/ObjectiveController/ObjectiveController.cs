@@ -13,7 +13,11 @@ public class ObjectiveController : BaseController
 {
     [HttpPost]
     [Route("add-new-objective")]
-    public async Task<IActionResult> AddNewObjective([FromBody] CreateObjectiveCommand command)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AddNewObjective( CreateObjectiveCommand command)
     {
         try
         {
@@ -23,10 +27,12 @@ public class ObjectiveController : BaseController
                 return BadRequest(response.Message);
             }
 
+            Console.WriteLine("RETURNING TRUE");
             return Ok(response);
         }
         catch (Exception e)
         {
+            Console.WriteLine("RETURNING FALSE");
             return BadRequest(e.Message);
         }
     }

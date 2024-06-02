@@ -7,6 +7,7 @@ using Frontend.Contracts.Abstract_Services.DepartmentService;
 using Frontend.Contracts.Abstract_Services.DocumentService;
 using Frontend.Contracts.Abstract_Services.FiapService;
 using Frontend.Contracts.Abstract_Services.InstitutionsService;
+using Frontend.Contracts.Abstract_Services.ObjectiveActionService;
 using Frontend.Contracts.Abstract_Services.ObjectiveService;
 using Frontend.Services.Activity;
 using Frontend.Services.AuditMission;
@@ -16,6 +17,7 @@ using Frontend.Services.Document;
 using Frontend.Services.FiapService;
 using Frontend.Services.InstitutionServices;
 using Frontend.Services.Misc;
+using Frontend.Services.ObjectiveActionServices;
 using Frontend.Services.ObjectiveServices;
 using Havit.Blazor.Components.Web;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -42,6 +44,7 @@ public static class ServiceRegistration
         services.AddScoped<IDocumentService, DocumentService>();
         services.AddScoped<IActivityService, ActivityService>();
         services.AddScoped<IFiapService, FiapService>();
+        services.AddScoped<IObjectiveActionService, ObjectiveActionService>();
         services.AddBlazoredLocalStorage();
 
         // services.AddScoped<ClaimsPrincipal>();

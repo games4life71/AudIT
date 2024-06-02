@@ -6,10 +6,11 @@ public class CreateObjectiveActionDto
 
     public Guid ObjectiveId { get; set; }
 
+
     public CreateObjectiveActionDto()
     {
         // Name = string.Empty;
-        Name = "name 124";
+        Name = "";
             ObjectiveId = Guid.Empty;
     }
 }
