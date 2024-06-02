@@ -3,6 +3,7 @@ using System;
 using AudIT.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AudIT.Infrastructure.Migrations
 {
     [DbContext(typeof(AudITContext))]
-    partial class AudITContextModelSnapshot : ModelSnapshot
+    [Migration("20240602133509_addUserInstitution")]
+    partial class addUserInstitution
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.2");
@@ -678,7 +681,10 @@ namespace AudIT.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("InstitutionId")
+                    b.Property<int>("InstitutionId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("InstitutionId1")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
@@ -687,9 +693,7 @@ namespace AudIT.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InstitutionId");
-
-                    b.HasIndex("UserId");
+                    b.HasIndex("InstitutionId1");
 
                     b.ToTable("UserInstitution");
                 });
@@ -1069,19 +1073,11 @@ namespace AudIT.Infrastructure.Migrations
                 {
                     b.HasOne("AudiT.Domain.Entities.Institution", "Institution")
                         .WithMany()
-                        .HasForeignKey("InstitutionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AudiT.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("InstitutionId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Institution");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

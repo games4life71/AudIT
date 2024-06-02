@@ -6,10 +6,21 @@
 @inject DialogService DialogService
 
 <RadzenLayout Style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body'">
-    <RadzenHeader>
+    <RadzenHeader Style="display: flex; justify-content: space-between;">
+
+
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
             <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)"/>
             <RadzenLabel Text="AudIT App"/>
+        </RadzenStack>
+
+        <RadzenStack class="rz-mx-12" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+            <RadzenMenu>
+                <RadzenMenuItem Icon="dashboard" Text="Menu">
+                    <RadzenMenuItem  Icon="account_circle" Text="Profile"></RadzenMenuItem>
+                    <RadzenMenuItem Icon="markunread_mailbox" Text="Notifications"> </RadzenMenuItem>
+                </RadzenMenuItem>
+            </RadzenMenu>
         </RadzenStack>
     </RadzenHeader>
     <RadzenSidebar Style="display: flex;  justify-content: space-between; flex-direction: column;" @bind-Expanded="@sidebarExpanded">
@@ -24,22 +35,38 @@
             }
             else
             {
-                <RadzenPanelMenuItem Text="Home" Path="/" Icon="home"/>
-                <RadzenPanelMenuItem Text="Audit Missions">
-                    <RadzenPanelMenuItem Text="Create Mission" Path="/create-mission" Icon="add"/>
-                    <RadzenPanelMenuItem Text="List Missions" Path="/audit-missions" Icon="list"/>
+                <RadzenPanelMenuItem class="rz-my-4" Text="Home" Path="/" Icon="home"/>
+                <RadzenPanelMenuItem Icon="chrome_reader_mode" Text="Audit Missions">
+                    <RadzenPanelMenuItem class="rz-my-2" Text="Create Mission" Path="/create-mission" Icon="add"/>
+                    <RadzenPanelMenuItem  class="rz-my-2" Text="List Missions" Path="/audit-missions" Icon="list"/>
                 </RadzenPanelMenuItem>
-                <RadzenPanelMenuItem Text="Objectives">
-                    <RadzenPanelMenuItem Text="Create Objective" Path="/create-objective" Icon="add"/>
-                    <RadzenPanelMenuItem Text="List Objectives" Path="/objectives" Icon="list"/>
+                <RadzenPanelMenuItem class="rz-my-4" Icon="all_out" Text="Objectives">
+                    <RadzenPanelMenuItem  class="rz-my-2" Text="Create Objective" Path="/create-objective" Icon="add"/>
+                    <RadzenPanelMenuItem  class="rz-my-2" Text="List Objectives" Path="/objectives" Icon="list"/>
                 </RadzenPanelMenuItem>
+                <RadzenPanelMenuItem class="rz-my-4" Icon="feedback" Text="Recommendations">
 
+                </RadzenPanelMenuItem>
+                <RadzenPanelMenuItem class="rz-my-4" Icon="description" Text="Documents">
+                    <RadzenPanelMenuItem class="rz-my-2" Text="Upload Document" Path="/create-document" Icon="add"/>
+                    <RadzenPanelMenuItem class="rz-my-2" Text="List Documents" Path="/documents" Icon="list"/>
+                </RadzenPanelMenuItem>
+                <RadzenPanelMenuItem class="rz-my-4" Icon="history" Text="Activities">
+                    <RadzenPanelMenuItem Icon="add" Text="Add Activity"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Icon="list" Text="List Activities"></RadzenPanelMenuItem>
+                </RadzenPanelMenuItem>
+                <RadzenPanelMenuItem  Icon="bookmark_border" class="rz-my-4" Text="Export"></RadzenPanelMenuItem>
+                <RadzenPanelMenuItem  class="rz-my-4" Icon="card_membership" Text="Acces control"></RadzenPanelMenuItem>
+                <RadzenPanelMenuItem class="rz-my-4" Icon="build" Text="Configure">
+                    <RadzenPanelMenuItem Icon="book" Text="Configure Departments" class="rz-my-2" ></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Icon="account_balance" class="rz-my-2" Text="Configure Institutions" ></RadzenPanelMenuItem>
+                </RadzenPanelMenuItem>
             }
         </RadzenPanelMenu>
         <RadzenPanelMenu>
             @if (isAuthenticated)
             {
-                <RadzenButton Text="Logout"  Click="@SignOut"  Icon="logout"></RadzenButton>
+                <RadzenButton Text="Logout" Click="@SignOut" Icon="logout"></RadzenButton>
             }
 
         </RadzenPanelMenu>
@@ -58,6 +85,7 @@
 <RadzenDialog/>
 <RadzenNotification></RadzenNotification>
 <RadzenTooltip></RadzenTooltip>
+
 @code
 {
 
@@ -79,7 +107,6 @@
 
     private async void SignOut()
     {
-
         var confirm = await DialogService.Confirm("Are you sure you want to Log out ?", "Confirm Logout", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
 
         if (confirm.Value == true)
@@ -92,7 +119,6 @@
         {
             return;
         }
-
     }
 
 

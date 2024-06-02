@@ -4,11 +4,13 @@ using AudIT.Applicationa.Models.AuthDTO;
 using AudIT.Applicationa.Services.EmailServices;
 using AudIT.Applicationa.Services.UtilsServices;
 using AudiT.Domain.Entities;
+using AudIT.Domain.Misc;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
@@ -23,13 +25,16 @@ public class AuthService(
     IInstitutionRepository institutionRepository,
     EmailService emailService,
     UtilsService utilsService,
-    SignInManager<User> signInManager)
+    SignInManager<User> signInManager,
+    IUserInstitutionRepository userInstitutionRepository
+)
     : IAuthService // This is the implementation of the IAuthService interface
 {
     private readonly IConfiguration _configuration = configuration;
     private readonly IInstitutionRepository _institutionRepository = institutionRepository;
     private readonly EmailService _emailService = emailService;
     private readonly UtilsService _utilsService = utilsService;
+    private readonly IUserInstitutionRepository _userInstitutionRepository = userInstitutionRepository;
 
     public async Task<(int, string)> Registration(RegistrationModel model, string role)
     {
@@ -76,6 +81,9 @@ public class AuthService(
             return (0, $"No institutioon with domain {emailDomain} found");
         }
 
+        //add the institution to the user
+
+
         // Console.WriteLine("FOUND THE INSTITURION");
         var institutionAdmin = institution.Value.InstitutionAdmin;
         if (institutionAdmin == null)
@@ -94,32 +102,47 @@ public class AuthService(
             Console.WriteLine("INSTITUTION ADMIN IS NOT NULL");
         }
 
-        var emailResult = await emailService.SendAuthorizeEmail(institutionAdmin.Id, newUserValue);
-
-        if (emailResult.Item2 == false)
-        {
-            return (0, "Email not sent");
-        }
+        // var emailResult = await emailService.SendAuthorizeEmail(institutionAdmin.Id, newUserValue);
+        //
+        // if (emailResult.Item2 == false)
+        // {
+        //     return (0, "Email not sent");
+        // }
 
         try
         {
             result = await userManager.CreateAsync(newUserValue, model.Password);
+
+
+            if (!result.Succeeded)
+            {
+                return (1, "Failed to create user");
+            }
+
+            //add the institution to the user
+            var userInstitution = UserInstitution.Create(
+                newUserValue.Id,
+                institution.Value.Id,
+                institution.Value
+            );
+
+            if (userInstitution.IsSuccess)
+            {
+                //save it to the database
+                await _userInstitutionRepository.AddAsync(userInstitution.Value);
+            }
+
+
+            await roleManager.CreateAsync(new IdentityRole(role));
+            await userManager.AddToRoleAsync(newUserValue, role);
         }
+        //get the user
         catch (Exception e)
         {
             Console.WriteLine(e);
             return (0, e.Message);
         }
 
-
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new IdentityRole(role));
-        }
-
-
-        await roleManager.CreateAsync(new IdentityRole(role));
-        await userManager.AddToRoleAsync(newUserValue, role);
 
         return (1, "User created successfully!");
     }
@@ -154,6 +177,7 @@ public class AuthService(
         {
             authClaims.Add(new Claim(ClaimTypes.Role, userRole));
         }
+
         // Add the claims to the user
         foreach (var claim in authClaims)
         {
@@ -162,15 +186,28 @@ public class AuthService(
                 await userManager.AddClaimAsync(user, claim);
             }
         }
+
         var claimsIdentity = new ClaimsIdentity(authClaims, CookieAuthenticationDefaults.AuthenticationScheme);
 
         var authProperties = new AuthenticationProperties();
 
-        await signInManager.Context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+        await signInManager.Context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(claimsIdentity), authProperties);
 
         var token = utilsService.GenerateToken(authClaims);
 
         return (1, token);
     }
 
+    public async Task<Result<List<User>>> GetAllUsersByInstitutionId(Guid institutionId)
+    {
+        var results = await userInstitutionRepository.GetAllUsersByInstitutionId(institutionId);
+
+        if (!results.IsSuccess)
+        {
+            return Result<List<User>>.Failure("No users found");
+        }
+
+        return Result<List<User>>.Success(results.Value);
+    }
 }

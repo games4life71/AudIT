@@ -21,8 +21,10 @@ public class AuthentificationController : ControllerBase
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
     private readonly IHttpContextAccessor _httpContextAccessor;
+
     public AuthentificationController(IAuthService authService, IEmailService emailService,
-        IAuthorization authorizationService, UserManager<User> userManager, SignInManager<User> signInManager,IHttpContextAccessor httpContextAccessor)
+        IAuthorization authorizationService, UserManager<User> userManager, SignInManager<User> signInManager,
+        IHttpContextAccessor httpContextAccessor)
     {
         _httpContextAccessor = httpContextAccessor;
         _authService = authService;
@@ -43,9 +45,11 @@ public class AuthentificationController : ControllerBase
         {
             return BadRequest("No user is currently authenticated or there are no claims.");
         }
+
         var claims = user.Claims.Select(c => new { c.Type, c.Value }).ToList();
-            return Ok(claims);
+        return Ok(claims);
     }
+
     [HttpPost]
     [Route("register")]
     public async Task<IActionResult> Register(RegistrationModel model)
@@ -120,14 +124,15 @@ public class AuthentificationController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
+
     [HttpGet]
     [Route("logout")]
-public async Task<IActionResult> Logout()
+    public async Task<IActionResult> Logout()
     {
         Console.WriteLine("Logging out user");
         try
         {
-         //set the expiration time to 1 second ago
+            //set the expiration time to 1 second ago
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = false,
@@ -147,7 +152,6 @@ public async Task<IActionResult> Logout()
     }
 
 
-
     [HttpGet]
     [Route("verify-email/{token}")]
     public async Task<IActionResult> VerifyEmail(string token)
@@ -163,6 +167,22 @@ public async Task<IActionResult> Logout()
             }
 
             return Ok(message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
+    [HttpGet]
+    [Route("get-all-users-by-institution-id/{institutionId}")]
+    public async Task<IActionResult> GetAllUsersByInstitutionId(Guid institutionId)
+    {
+        Console.WriteLine("Getting all users by institution id");
+        try
+        {
+            var users = await _authService.GetAllUsersByInstitutionId(institutionId);
+            return Ok(users);
         }
         catch (Exception ex)
         {

@@ -38,6 +38,7 @@ public class AudITContext : IdentityDbContext<User>
 
     public DbSet<ActionRisk> ActionRisk { get; set; }
 
+    public DbSet<UserInstitution> UserInstitution { get; set; }
     public DbSet<ObjectiveActionFiap> ObjectiveActionFiap { get; set; }
 
     //Services
@@ -61,7 +62,17 @@ public class AudITContext : IdentityDbContext<User>
     }
 
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        //
+        // modelBuilder.Entity<User>()
+        //     .HasIndex(u => u.InstitutionId)
+        //     .IsUnique(false); // This ensures that InstitutionId is not a unique key
 
+        // modelBuilder.Entity<User>()
+        //     .HasOne(u => u.Institution);
+    }
 
     public override int SaveChanges()
     {

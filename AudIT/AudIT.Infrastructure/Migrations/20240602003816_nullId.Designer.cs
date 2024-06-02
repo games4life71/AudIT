@@ -3,6 +3,7 @@ using System;
 using AudIT.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AudIT.Infrastructure.Migrations
 {
     [DbContext(typeof(AudITContext))]
-    partial class AudITContextModelSnapshot : ModelSnapshot
+    [Migration("20240602003816_nullId")]
+    partial class nullId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.2");
@@ -343,9 +346,6 @@ namespace AudIT.Infrastructure.Migrations
                     b.Property<Guid>("InstitutionAdminId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("InstitutionAdminId1")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("LastModifiedBy")
                         .HasColumnType("TEXT");
 
@@ -363,8 +363,6 @@ namespace AudIT.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("InstitutionAdminId1");
 
                     b.ToTable("Institutions");
                 });
@@ -616,6 +614,9 @@ namespace AudIT.Infrastructure.Migrations
                     b.Property<string>("Functie")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("InstitutionId")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("INTEGER");
 
@@ -662,6 +663,9 @@ namespace AudIT.Infrastructure.Migrations
 
                     b.HasIndex("DepartmentId");
 
+                    b.HasIndex("InstitutionId")
+                        .IsUnique();
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -670,28 +674,6 @@ namespace AudIT.Infrastructure.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("AudiT.Domain.Entities.UserInstitution", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("InstitutionId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InstitutionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserInstitution");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -995,15 +977,6 @@ namespace AudIT.Infrastructure.Migrations
                     b.Navigation("Institution");
                 });
 
-            modelBuilder.Entity("AudiT.Domain.Entities.Institution", b =>
-                {
-                    b.HasOne("AudiT.Domain.Entities.User", "InstitutionAdmin")
-                        .WithMany()
-                        .HasForeignKey("InstitutionAdminId1");
-
-                    b.Navigation("InstitutionAdmin");
-                });
-
             modelBuilder.Entity("AudiT.Domain.Entities.Objective", b =>
                 {
                     b.HasOne("AudiT.Domain.Entities.AuditMission", "AuditMission")
@@ -1062,26 +1035,13 @@ namespace AudIT.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("DepartmentId");
 
-                    b.Navigation("Department");
-                });
-
-            modelBuilder.Entity("AudiT.Domain.Entities.UserInstitution", b =>
-                {
                     b.HasOne("AudiT.Domain.Entities.Institution", "Institution")
-                        .WithMany()
-                        .HasForeignKey("InstitutionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithOne("InstitutionAdmin")
+                        .HasForeignKey("AudiT.Domain.Entities.User", "InstitutionId");
 
-                    b.HasOne("AudiT.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Department");
 
                     b.Navigation("Institution");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1163,6 +1123,8 @@ namespace AudIT.Infrastructure.Migrations
             modelBuilder.Entity("AudiT.Domain.Entities.Institution", b =>
                 {
                     b.Navigation("Departments");
+
+                    b.Navigation("InstitutionAdmin");
                 });
 
             modelBuilder.Entity("AudiT.Domain.Entities.Objective", b =>

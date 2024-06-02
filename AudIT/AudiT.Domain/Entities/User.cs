@@ -19,8 +19,17 @@ public class User : IdentityUser
 
     public Department? Department { get; private set; }
 
+    // public Institution? Institution { get; private set; }
+    //
+    //  public Guid? InstitutionId { get; set; }
+    //
     public bool Verified { get; private set; } = false;
 
+
+    // public void SetInstitutionId(Guid id)
+    // {
+    //     InstitutionId = id;
+    // }
     public User()
     {
     }
@@ -33,7 +42,9 @@ public class User : IdentityUser
         string phoneNumber,
         string functie,
         string officephone,
-        Department department)
+        Department department
+
+    )
     {
         // Id = Guid.NewGuid().ToString();
         UserName = username;
@@ -45,10 +56,12 @@ public class User : IdentityUser
         Functie = functie;
         OfficePhoneNumber = officephone;
         Department = department;
+
     }
 
     public static Result<User> Create(string username, string firstEmail, string adress,
-        string phoneNumber, Department department = null, string functie = "not set", string secondEmail = "not set",
+        string phoneNumber,  Department department = null, string functie = "not set",
+        string secondEmail = "not set",
         string officephone = "not set")
     {
         //TODO make all the checks then construct the entity
@@ -98,4 +111,6 @@ public class User : IdentityUser
         Verified = true;
         return Verified;
     }
+
+
 }

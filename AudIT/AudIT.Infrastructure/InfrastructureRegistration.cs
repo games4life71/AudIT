@@ -99,7 +99,7 @@ public static class InfrastructureRegistration
         services.AddScoped<IObjectiveActionService, ObjectiveActionService>();
         services.AddScoped<IBaseDocumentRepository, BaseDocumentRepository>();
         services.AddScoped<IObjectiveActionFiapRepository, ObjectiveActionFiapRepository>();
-
+        services.AddScoped<IUserInstitutionRepository, UserInstitutionRepository>();
         services.AddScoped(typeof(IRepositoryAcces<>), typeof(BaseAccesRepository<>));
         services.AddScoped<IRepositoryFactory, RepositoryFactory>();
 
