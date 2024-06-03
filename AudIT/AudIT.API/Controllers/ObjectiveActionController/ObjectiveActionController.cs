@@ -1,6 +1,7 @@
 ﻿using AudIT.Applicationa.Contracts.ObjectiveActionServices;
 using AudIT.Applicationa.Requests.ObjectiveActions.Commands.Add.AddActionRisk;
 using AudIT.Applicationa.Requests.ObjectiveActions.Commands.Create;
+using AudIT.Applicationa.Requests.ObjectiveActions.Commands.DeleteActionRisk;
 using AudIT.Applicationa.Requests.ObjectiveActions.DTO;
 using AudIT.Applicationa.Requests.ObjectiveActions.Queries.GetAllSelected;
 using AudIT.Applicationa.Requests.ObjectiveActions.Queries.GetBy.Id;
@@ -59,9 +60,8 @@ public class ObjectiveActionController : BaseController
     [Route("update-objective-action-controls")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> UpdateObjectiveActionControls( UpdateObjActionControlsCommand command)
+    public async Task<IActionResult> UpdateObjectiveActionControls(UpdateObjActionControlsCommand command)
     {
-
         Console.WriteLine("Reached here");
         Console.WriteLine($"The command is {command.Id} {command.Selected}");
 
@@ -81,6 +81,20 @@ public class ObjectiveActionController : BaseController
     public async Task<IActionResult> AddActionRisk(AddActionRiskCommand command)
     {
         var result = await Mediator.Send(command);
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
+
+    [HttpDelete]
+    [Route("delete-action-risk/{actionRiskId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteActionRisk(Guid actionRiskId)
+    {
+        var result = await Mediator.Send(new DeleteActionRiskCommand(actionRiskId));
         if (!result.Success)
         {
             return BadRequest(result.Message);

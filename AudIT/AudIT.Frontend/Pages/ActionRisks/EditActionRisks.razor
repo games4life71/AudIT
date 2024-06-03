@@ -1,4 +1,5 @@
 ﻿@page "/edit-risks/{objectiveActionId}"
+@using Frontend.Contracts.Abstract_Services.ActionRiskService
 @using Frontend.Contracts.Abstract_Services.ObjectiveActionService
 @using Frontend.EntityDtos.Misc
 @using Frontend.EntityViewModels.ActionRisk
@@ -8,32 +9,48 @@
 @inject DialogService _dialogService
 @inject NavigationManager _navigationManager
 @inject IObjectiveActionService _objectiveActionService
+@inject IActionRiskService _actionRiskService
 
 @if (_objectiveActionViewModel != null)
 {
-    <RadzenText class="rz-mb-4" TextStyle="TextStyle.H4" Text="Action Risks"></RadzenText>
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenText class="rz-mb-4" TextStyle="TextStyle.H4" Text="Action Risks of"></RadzenText>
+        <RadzenText class="rz-mb-4" TextStyle="TextStyle.H4" Text="@_objectiveActionViewModel.name"></RadzenText>
+    </RadzenStack>
+    <RadzenRow class="rz-my-4">
+        <RadzenButton Click="@CreateNewRisk" Text="Create New Risk" Icon="add"></RadzenButton>
+    </RadzenRow>
     <RadzenRow>
-        <RadzenDataGrid AllowSorting="true" AllowFiltering="true" TItem="ActionRiskViewModel" Data="@_objectiveActionViewModel.actionRisks">
+        <RadzenDataGrid @ref="_dataGrid" AllowSorting="true" AllowFiltering="true" TItem="ActionRiskViewModel" Data="@_objectiveActionViewModel.actionRisks">
             <Columns>
-                <RadzenDataGridColumn  Property="name" Title="Name"/>
+                <RadzenDataGridColumn Property="name" Title="Name"/>
                 <RadzenDataGridColumn Property="risk" Title="Risk"></RadzenDataGridColumn>
                 <RadzenDataGridColumn Property="probability" Title="Probability"></RadzenDataGridColumn>
                 <RadzenDataGridColumn Property="impact" Title="Impact"></RadzenDataGridColumn>
                 <RadzenDataGridColumn Frozen="true" Filterable="false" Sortable="false">
-                    <Template Context="actionRisk">
-                        <RadzenButton Click="@(()=>EditActionRisk(actionRisk))" Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Warning" Text="Edit Action Risk"></RadzenButton>
 
+                    <Template Context="actionRisk">
+                        <RadzenStack Orientation="Orientation.Horizontal">
+                            <RadzenButton Click="@(() => EditActionRisk(actionRisk))" Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Warning" Icon="edit" Text="Edit"></RadzenButton>
+                            <RadzenButton Click="@(() => RemoveActionRisk(actionRisk))" Icon="delete_forever" Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Danger" Text="Remove"></RadzenButton>
+                        </RadzenStack>
                     </Template>
+
                 </RadzenDataGridColumn>
             </Columns>
-
-
         </RadzenDataGrid>
+        <RadzenStack Orientation="Orientation.Horizontal">
+            <RadzenLabel Text="Total Risks: "></RadzenLabel>
+            <RadzenText Text="@_objectiveActionViewModel.actionRisks.Count.ToString()"></RadzenText>
+        </RadzenStack>
     </RadzenRow>
     <RadzenRow class="rz-my-12">
-    <RadzenButton Click="@(()=>_navigationManager.NavigateTo("/objectives"))" ButtonStyle="ButtonStyle.Secondary" Icon="arrow_back" Text="Back"></RadzenButton>
+        <RadzenButton Click="@(() => _navigationManager.NavigateTo("/objectives"))" ButtonStyle="ButtonStyle.Secondary" Icon="arrow_back" Text="Back"></RadzenButton>
     </RadzenRow>
+    @* Add a new Risk Form *@
+    <RadzenRow>
 
+    </RadzenRow>
 }
 else
 {
@@ -41,14 +58,12 @@ else
 }
 
 
-
 @code {
     RadzenDialog dialog;
-    
+
     [Parameter] public string objectiveActionId { get; set; }
 
     private ObjectiveActionViewModel _objectiveActionViewModel = null;
-
 
 
 }
@@ -88,18 +103,18 @@ else
             {
                 { "ActionRisk", actionRisk },
                 { "OnDialogClose", new EventCallback<ActionRiskViewModel>(this, OnDialogClose) }
-            },new DialogOptions()
+            }, new DialogOptions()
             {
                 Width = "700px",
                 Height = "400px",
                 Draggable = false,
                 Resizable = false
             }
-
-            );
+        );
 
         return Task.CompletedTask;
     }
+
     private void OnDialogClose(ActionRiskViewModel updatedActionRisk)
     {
         var actionRisk = _objectiveActionViewModel.actionRisks.FirstOrDefault(x => x.id == updatedActionRisk.id);
@@ -112,4 +127,59 @@ else
         }
     }
 
+    private async void CreateNewRisk(MouseEventArgs obj)
+    {
+        var newActionRisk = new ActionRiskViewModel();
+
+        //open a dialog
+        _dialogService.Open<CreateActionRiskDialog>(
+            "Create New Action Risk",
+            new Dictionary<string, object>()
+            {
+                { "ObjectiveActionId", objectiveActionId },
+                { "OnDialogClose", new EventCallback<ActionRiskViewModel>(this, OnCreateDialogClose) }
+            }, new DialogOptions()
+            {
+                Width = "700px",
+                Height = "400px",
+                Draggable = false,
+                Resizable = false
+            }
+        );
+    }
+
+    private async void OnCreateDialogClose(ActionRiskViewModel newActionRisk)
+    {
+        _objectiveActionViewModel.actionRisks.Add(newActionRisk);
+        await _dataGrid.Reload();
+        StateHasChanged();
+    }
+
+
+}
+
+@code
+{
+    RadzenDataGrid<ActionRiskViewModel> _dataGrid;
+
+
+    private async Task RemoveActionRisk(ActionRiskViewModel actionRisk)
+    {
+        //display a confirmation dialog
+        var responseConfirm = await _dialogService.Confirm("Are you sure you want to remove this action risk?", "Remove Action Risk", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+        if (responseConfirm.Value)
+        {
+            var response = await _actionRiskService.DeleteActionRiskAsync(Guid.Parse(actionRisk.id));
+
+            if (response.Success)
+            {
+                _objectiveActionViewModel.actionRisks.Remove(actionRisk);
+                await _dataGrid.Reload();
+                StateHasChanged();
+            }
+        }
+
+
+
+    }
 }

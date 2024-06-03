@@ -1,6 +1,7 @@
 ﻿using Frontend.EntityDtos.ActionRisk;
 using Frontend.EntityDtos.Misc;
 using Frontend.EntityViewModels.ActionRisk;
+using Frontend.EntityViewModels.ObjectiveAction;
 
 namespace Frontend.Contracts.Abstract_Services.ActionRiskService;
 
@@ -11,4 +12,7 @@ public interface IActionRiskService
 
     public Task<BaseDTOResponse<ActionRiskViewModel>> UpdateActionRisk(UpdateActionRiskDto updateActionRiskDto);
 
+    public Task<BaseDTOResponse<ObjActionWithRisksViewModel>> CreateActionRiskAsync(CreateActionRiskDto createActionRiskDto);
+
+    Task<BaseResponse> DeleteActionRiskAsync(Guid actionRiskId);
 }

@@ -4,6 +4,7 @@ using Frontend.Contracts.Abstract_Services.ActionRiskService;
 using Frontend.EntityDtos.ActionRisk;
 using Frontend.EntityDtos.Misc;
 using Frontend.EntityViewModels.ActionRisk;
+using Frontend.EntityViewModels.ObjectiveAction;
 
 namespace Frontend.Services.ActionRiskServices;
 
@@ -36,5 +37,51 @@ public class ActionRiskService(HttpClient httpClient) : IActionRiskService
         }
 
         return updatedActionRisk;
+    }
+
+    public async Task<BaseDTOResponse<ObjActionWithRisksViewModel>> CreateActionRiskAsync(
+        CreateActionRiskDto createActionRiskDto)
+    {
+        var createResponse = await httpClient
+            .PostAsJsonAsync($"{IActionRiskService.ApiPath}/add-action-risk",
+                createActionRiskDto);
+
+        if (!createResponse.IsSuccessStatusCode)
+            return new BaseDTOResponse<ObjActionWithRisksViewModel>()
+            {
+                Success = false,
+                Message = createResponse.ReasonPhrase
+            };
+
+        var createdActionRisk =
+            await createResponse.Content.ReadFromJsonAsync<BaseDTOResponse<ObjActionWithRisksViewModel>>();
+
+        if (createdActionRisk != null) return createdActionRisk;
+
+        return new BaseDTOResponse<ObjActionWithRisksViewModel>()
+        {
+            Success = false,
+            Message = "An error occurred while creating the action risk"
+        };
+    }
+
+    public async Task<BaseResponse> DeleteActionRiskAsync(Guid actionRiskId)
+    {
+        var response = await httpClient.DeleteAsync($"{IActionRiskService.ApiPath}/delete-action-risk/{actionRiskId}");
+
+
+        if (response.IsSuccessStatusCode)
+        {
+            return new BaseResponse()
+            {
+                Success = true
+            };
+        }
+
+        return new BaseResponse()
+        {
+            Success = false,
+            Message = response.ReasonPhrase
+        };
     }
 }
