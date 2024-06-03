@@ -105,11 +105,10 @@ public class ObjectiveActionController : BaseController
 
 
     [HttpPut]
-    [Route("update-objective-action-risk/{actionRiskId}")]
+    [Route("update-objective-action-risk")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> UpdateObjectiveActionRisk(Guid actionRiskId, UpdateActionRiskCommand command)
+    public async Task<IActionResult> UpdateObjectiveActionRisk(UpdateActionRiskCommand command)
     {
-        command.ActionRiskId = actionRiskId;
         var result = await Mediator.Send(command);
         if (!result.Success)
         {

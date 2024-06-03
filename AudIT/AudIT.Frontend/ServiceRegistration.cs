@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Security.Claims;
 using Blazored.LocalStorage;
+using Frontend.Contracts.Abstract_Services.ActionRiskService;
 using Frontend.Contracts.Abstract_Services.ActivityService;
 using Frontend.Contracts.Abstract_Services.AuditMissionService;
 using Frontend.Contracts.Abstract_Services.DepartmentService;
@@ -9,6 +10,7 @@ using Frontend.Contracts.Abstract_Services.FiapService;
 using Frontend.Contracts.Abstract_Services.InstitutionsService;
 using Frontend.Contracts.Abstract_Services.ObjectiveActionService;
 using Frontend.Contracts.Abstract_Services.ObjectiveService;
+using Frontend.Services.ActionRiskServices;
 using Frontend.Services.Activity;
 using Frontend.Services.AuditMission;
 using Frontend.Services.AuthentificationServices;
@@ -45,6 +47,7 @@ public static class ServiceRegistration
         services.AddScoped<IActivityService, ActivityService>();
         services.AddScoped<IFiapService, FiapService>();
         services.AddScoped<IObjectiveActionService, ObjectiveActionService>();
+        services.AddScoped<IActionRiskService, ActionRiskService>();
         services.AddBlazoredLocalStorage();
 
         // services.AddScoped<ClaimsPrincipal>();

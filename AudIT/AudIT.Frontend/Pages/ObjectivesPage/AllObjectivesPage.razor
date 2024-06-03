@@ -21,7 +21,7 @@
     <RadzenStack class="rz-mb-10" Gap="10px">
         <RadzenRow>
             <RadzenLabel Component="SelectAuditMission" Text="Select Audit Mission:"></RadzenLabel>
-            <RadzenDropDownDataGrid PageSize="5" Placeholder="Select..." TValue="Guid" TextProperty="Name" AllowSorting="true" ValueChanged="@(args => SelectedAuditMission(args))" ValueProperty="Id" Data="@_auditMissions" Name="SelectAuditMission"/>
+            <RadzenDropDownDataGrid Value="@initialAuditMission" PageSize="5" Placeholder="Select..." TValue="Guid" TextProperty="Name" AllowSorting="true" ValueChanged="@(args => SelectedAuditMission(args))" ValueProperty="Id" Data="@_auditMissions" Name="SelectAuditMission"/>
         </RadzenRow>
     </RadzenStack>
 
@@ -84,6 +84,7 @@
 
     private bool _isAuthenticated = false;
 
+    private Guid initialAuditMission { get; set; }
 }
 
 @functions
@@ -99,6 +100,10 @@
         }
 
         await FetchAuditMissions();
+
+        initialAuditMission= _auditMissions.FirstOrDefault().Id;
+        SelectedAuditMission(initialAuditMission);
+        _selectedAuditMissionId = initialAuditMission;
     }
 
     private async Task<bool> GetAuthState()
@@ -159,7 +164,11 @@
         var actionRisks = objectiveAction.actionRisks;
 
         await _dialogService.OpenAsync<ObjActionDialog>
-        ("Objective Action Risks", new Dictionary<string, object>() { { "ActionRisks", actionRisks } },
+        ("Objective Action Risks", new Dictionary<string, object>()
+            {
+                { "ActionRisks", actionRisks },
+                {"ObjectiveActionId", objectiveAction.id}
+            },
             new DialogOptions() { Width = "700px", Height = "512px", Resizable = true, Draggable = true });
     }
 

@@ -1,23 +1,38 @@
-﻿
-
-@using Frontend.EntityViewModels.ActionRisk
+﻿@using Frontend.EntityViewModels.ActionRisk
 @inject Radzen.DialogService dialogService
+@inject NavigationManager _navigationManager
+<RadzenDataGrid Data="@ActionRisks">
+    <Columns>
+        <RadzenDataGridColumn Property="name" Title="Risk Name"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="risk" Title="Risk Exposure"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="impact" Title="Risk Impact"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="probability" Title="Risk Probability"></RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+<RadzenStack class="rz-mt-10" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0.5rem">
+    @if (ActionRisks.Count > 0)
+    {
+        <RadzenButton Click="@EditActionRisks" ButtonStyle="ButtonStyle.Warning" Icon="" Variant="Variant.Flat" Text="Edit Risks " Style="width: 120px"/>
 
-    <RadzenDataGrid Data="@ActionRisks" >
-        <Columns>
-            <RadzenDataGridColumn Property="name" Title="Risk Name"></RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="risk" Title="Risk Exposure"></RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="impact" Title="Risk Impact"></RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="probability" Title="Risk Probability"></RadzenDataGridColumn>
-        </Columns>
-    </RadzenDataGrid>
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
-        <RadzenButton Click="@((args) => dialogService.Close(true))" Variant="Variant.Flat" Text="Close" Style="width: 120px" />
-    </RadzenStack>
+    }
+    else
+    {
+        <RadzenButton Click="@(()=>_navigationManager.NavigateTo("add-risks"))"  Icon="add" ButtonStyle="ButtonStyle.Warning" Text="Add Action Risks"> </RadzenButton>
 
+    }
+    <RadzenButton Click="@((args) => dialogService.Close(true))" Variant="Variant.Flat" Text="Close" Style="width: 120px"/>
+
+</RadzenStack>
 
 
 @code {
-    [Parameter]
-    public List<ActionRiskViewModel> ActionRisks { get; set; }
+    [Parameter] public List<ActionRiskViewModel> ActionRisks { get; set; }
+
+    [Parameter] public string ObjectiveActionId { get; set; }
+
+    private void EditActionRisks()
+    {
+        _navigationManager.NavigateTo($"/edit-risks/{ObjectiveActionId}");
+    }
+
 }

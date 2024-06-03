@@ -25,7 +25,6 @@
                         <RadzenText TextStyle="TextStyle.Subtitle1" Visible="@(!validObjName)" Text="Audit Mission Name must only contain letter and digits"></RadzenText>
                         <RadzenLabel Component="SelectAuditMission" Text="Select Audit Mission:"></RadzenLabel>
                         <RadzenDropDownDataGrid PageSize="5" Placeholder="Select..." TValue="Guid" TextProperty="Name" AllowSorting="true" ValueChanged="@(args => SelectedAuditMission(args))" ValueProperty="Id" Data="@_auditMissions" Name="SelectAuditMission"/>
-
                     </RadzenStack>
                 </RadzenCard>
             </RadzenStepsItem>
@@ -181,7 +180,7 @@
                     </RadzenColumn>
                 </RadzenRow>
 
-                <RadzenStack  JustifyContent="JustifyContent.End"  Orientation="Orientation.Horizontal" >
+                <RadzenStack JustifyContent="JustifyContent.End" Orientation="Orientation.Horizontal">
                     <RadzenButton IsBusy="@submitButtonBusy" Click="@SumbitCreation" Size="ButtonSize.Large" ButtonStyle="ButtonStyle.Success" Text="Submit"></RadzenButton>
                 </RadzenStack>
             </RadzenStepsItem>
@@ -331,14 +330,13 @@
 
     private async void SumbitCreation(MouseEventArgs obj)
     {
-
-        if(_selectedObjectiveName == "" || _selectedAuditMissionId == Guid.Empty)
+        if (_selectedObjectiveName == "" || _selectedAuditMissionId == Guid.Empty)
         {
             _notificationService.Notify(NotificationSeverity.Error, "Objective Name and Audit Mission are required", "Please provide a name for the objective and select an audit mission");
             return;
         }
 
-        if(_selectedAuditMissionId == Guid.Empty)
+        if (_selectedAuditMissionId == Guid.Empty)
         {
             _notificationService.Notify(NotificationSeverity.Error, "Audit Mission is required", "Please select an audit mission");
             return;
@@ -355,7 +353,8 @@
         }
 
         else
-        {   submitButtonBusy = false;
+        {
+            submitButtonBusy = false;
             _notificationService.Notify(NotificationSeverity.Error, "Failed to create objective", "The objective was not created successfully");
         }
     }

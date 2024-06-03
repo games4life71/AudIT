@@ -1,0 +1,115 @@
+﻿@page "/edit-risks/{objectiveActionId}"
+@using Frontend.Contracts.Abstract_Services.ObjectiveActionService
+@using Frontend.EntityDtos.Misc
+@using Frontend.EntityViewModels.ActionRisk
+@using Frontend.EntityViewModels.ObjectiveAction
+@using Frontend.Pages.Components
+
+@inject DialogService _dialogService
+@inject NavigationManager _navigationManager
+@inject IObjectiveActionService _objectiveActionService
+
+@if (_objectiveActionViewModel != null)
+{
+    <RadzenText class="rz-mb-4" TextStyle="TextStyle.H4" Text="Action Risks"></RadzenText>
+    <RadzenRow>
+        <RadzenDataGrid AllowSorting="true" AllowFiltering="true" TItem="ActionRiskViewModel" Data="@_objectiveActionViewModel.actionRisks">
+            <Columns>
+                <RadzenDataGridColumn  Property="name" Title="Name"/>
+                <RadzenDataGridColumn Property="risk" Title="Risk"></RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="probability" Title="Probability"></RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="impact" Title="Impact"></RadzenDataGridColumn>
+                <RadzenDataGridColumn Frozen="true" Filterable="false" Sortable="false">
+                    <Template Context="actionRisk">
+                        <RadzenButton Click="@(()=>EditActionRisk(actionRisk))" Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Warning" Text="Edit Action Risk"></RadzenButton>
+
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+
+
+        </RadzenDataGrid>
+    </RadzenRow>
+    <RadzenRow class="rz-my-12">
+    <RadzenButton Click="@(()=>_navigationManager.NavigateTo("/objectives"))" ButtonStyle="ButtonStyle.Secondary" Icon="arrow_back" Text="Back"></RadzenButton>
+    </RadzenRow>
+
+}
+else
+{
+    <RadzenText Text="Loading..."></RadzenText>
+}
+
+
+
+@code {
+    RadzenDialog dialog;
+    
+    [Parameter] public string objectiveActionId { get; set; }
+
+    private ObjectiveActionViewModel _objectiveActionViewModel = null;
+
+
+
+}
+
+@functions
+{
+
+    // void OnDialogClose( )
+    // {
+    //     if(_dialogService.Re)
+    // }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await FetchObjectiveAction();
+    }
+
+
+    private async Task FetchObjectiveAction()
+    {
+        var objectiveAction = await _objectiveActionService.GetObjectiveActionByIdAsync(Guid.Parse(objectiveActionId));
+
+        if (objectiveAction.Success && objectiveAction.DtoResponse != null)
+        {
+            _objectiveActionViewModel = new ObjectiveActionViewModel();
+            _objectiveActionViewModel = objectiveAction.DtoResponse;
+            StateHasChanged();
+        }
+    }
+
+
+    private Task EditActionRisk(ActionRiskViewModel actionRisk)
+    {
+        _dialogService.Open<EditActionRiskDialog>(
+            "Edit Action Risk",
+            new Dictionary<string, object>()
+            {
+                { "ActionRisk", actionRisk },
+                { "OnDialogClose", new EventCallback<ActionRiskViewModel>(this, OnDialogClose) }
+            },new DialogOptions()
+            {
+                Width = "700px",
+                Height = "400px",
+                Draggable = false,
+                Resizable = false
+            }
+
+            );
+
+        return Task.CompletedTask;
+    }
+    private void OnDialogClose(ActionRiskViewModel updatedActionRisk)
+    {
+        var actionRisk = _objectiveActionViewModel.actionRisks.FirstOrDefault(x => x.id == updatedActionRisk.id);
+        if (actionRisk != null)
+        {
+            actionRisk.name = updatedActionRisk.name;
+            actionRisk.risk = updatedActionRisk.risk;
+            actionRisk.probability = updatedActionRisk.probability;
+            actionRisk.impact = updatedActionRisk.impact;
+        }
+    }
+
+}
