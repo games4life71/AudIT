@@ -17,7 +17,7 @@
     }
     else
     {
-        <RadzenButton Click="@(()=>_navigationManager.NavigateTo("add-risks"))"  Icon="add" ButtonStyle="ButtonStyle.Warning" Text="Add Action Risks"> </RadzenButton>
+        <RadzenButton Click="@(()=>_navigationManager.NavigateTo($"/edit-risks/{ObjectiveActionId}"))"  Icon="add" ButtonStyle="ButtonStyle.Warning" Text="Add Action Risks"> </RadzenButton>
 
     }
     <RadzenButton Click="@((args) => dialogService.Close(true))" Variant="Variant.Flat" Text="Close" Style="width: 120px"/>

@@ -73,6 +73,7 @@ else if (_notFound == false && _auditMissionDto != null)
         </RadzenTimeline>
     </RadzenRow>
     <RadzenRow>
+        @*Audit mission details Card*@
         <RadzenColumn>
             <RadzenCard Style="height: 100%; width: 75%; display: flex;" Variant="Variant.Outlined" class="rz-mb-12">
                 <RadzenStack Style="align-items: center" Gap="10px" Orientation="Orientation.Vertical">
@@ -84,14 +85,14 @@ else if (_notFound == false && _auditMissionDto != null)
                     <RadzenTextBox Disabled="true" Placeholder="@_departmentDto.Name"></RadzenTextBox>
 
                     <RadzenLabel Text="Last Modified:" Style="font-size: large;" Component="LastModified"></RadzenLabel>
-                    <RadzenDatePicker Disabled="true" TValue="DateTime" Min="DateTime.Now.AddMonths(-2)" Max="DateTime.Today" Change="@(args => selectedDate= args.Value)" @bind-Value="@_lastModifiedDate"></RadzenDatePicker>
+                    <RadzenDatePicker Disabled="true" TValue="DateTime" Min="DateTime.Now.AddMonths(-2)" Max="DateTime.Today" Change="@(args => selectedDate = args.Value)" @bind-Value="@_lastModifiedDate"></RadzenDatePicker>
 
                     <RadzenLabel Text="Status" Component="StatusBind" Style="font-size: large;"></RadzenLabel>
                     <RadzenDropDown Disabled="@editDetailsDisabled" Style="width: 75%;" Name="StatusBind" @bind-Value="@selectedStatus" Data="@_auditMissionStatuses"></RadzenDropDown>
 
                     <RadzenRow Style="justify-content: space-between">
                         <RadzenToggleButton Click="@(() => editDetailsDisabled = !editDetailsDisabled)" ToggleButtonStyle="ButtonStyle.Warning" class="rz-mt-12" Text="Edit details"></RadzenToggleButton>
-                        <RadzenButton Click="@ShowConfirmDialog"  ButtonStyle="ButtonStyle.Info" class="rz-mt-12" Text="Save changes"></RadzenButton>
+                        <RadzenButton Click="@ShowConfirmDialog" ButtonStyle="ButtonStyle.Info" class="rz-mt-12" Text="Save changes"></RadzenButton>
                     </RadzenRow>
 
                 </RadzenStack>
@@ -101,6 +102,7 @@ else if (_notFound == false && _auditMissionDto != null)
             <RadzenCard Variant="Variant.Outlined" class="rz-mb-12">
                 @* <RadzenText Text="Recent Tasks:" TextStyle="TextStyle.DisplayH5" class="rz-mb-6 rz-mx-2"></RadzenText> *@
                 <RadzenRow>
+                    @*Recent Objectives card *@
                     <RadzenColumn >
                         <RadzenCard Style="min-height: 200px;  max-height: 400px;">
 
@@ -112,9 +114,9 @@ else if (_notFound == false && _auditMissionDto != null)
                             @foreach (var objective in _objectiveViewModel)
                             {
 
-                                    <RadzenLink Path="@($"/objective/{objective.Id}")">
-                                        <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{objective.Name}")"></RadzenText>
-                                    </RadzenLink>
+                                <RadzenLink Path="@($"/objective/{objective.Id}")">
+                                    <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{objective.Name}")"></RadzenText>
+                                </RadzenLink>
 
                             }
                             @if (_objectiveViewModel.Count == 0)
@@ -124,12 +126,12 @@ else if (_notFound == false && _auditMissionDto != null)
 
                             <RadzenRow Style="display: flex; justify-content: flex-end; align-content: flex-end ">
                                 <RadzenColumn Style="display: flex; justify-content: flex-end; align-content: flex-end ">
-                                    <RadzenButton Style="display: flex; align-self: flex-end; justify-content: flex-end;" Shade="Shade.Darker" Visible="@(_objectiveViewModel.Count > 0)" ButtonStyle="ButtonStyle.Secondary" Text="See more..."></RadzenButton>
+                                    <RadzenButton Click="@(() => _navigationManager.NavigateTo("/objectives"))" Style="display: flex; align-self: flex-end; justify-content: flex-end;" Shade="Shade.Darker" Visible="@(_objectiveViewModel.Count > 0)" ButtonStyle="ButtonStyle.Secondary" Text="See more..."></RadzenButton>
                                 </RadzenColumn>
                             </RadzenRow>
                         </RadzenCard>
                     </RadzenColumn>
-
+                    @*Recent Activities card *@
                     <RadzenColumn>
                         <RadzenCard Style="min-height: 200px; max-height: 400px;">
 
@@ -152,7 +154,9 @@ else if (_notFound == false && _auditMissionDto != null)
                         </RadzenCard>
                     </RadzenColumn>
                 </RadzenRow>
+
                 <RadzenRow class="rz-my-12">
+                    @*Recent Documents card *@
                     <RadzenColumn>
                         <RadzenCard Style="min-height: 200px;">
                             <RadzenRow class="rz-mt-2">
@@ -165,7 +169,7 @@ else if (_notFound == false && _auditMissionDto != null)
                                     <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{document.Name}")"></RadzenText>
                                 </RadzenLink>
                             }
-                            @if(_baseDocumentViewmodels.Count == 0)
+                            @if (_baseDocumentViewmodels.Count == 0)
                             {
                                 <RadzenText TextAlign="TextAlign.Center" class="rz-mt-4" Text="No documents found"></RadzenText>
                             }
@@ -177,6 +181,7 @@ else if (_notFound == false && _auditMissionDto != null)
                             </RadzenRow>
                         </RadzenCard>
                     </RadzenColumn>
+                    @*Recent FIAPS card*@
                     <RadzenColumn>
                         <RadzenCard Style="min-height: 200px;">
                             <RadzenRow class="rz-mt-2">
@@ -189,7 +194,7 @@ else if (_notFound == false && _auditMissionDto != null)
                                     <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{fiap.Name}")"></RadzenText>
                                 </RadzenLink>
                             }
-                            @if(_fiapViewModels.Count == 0)
+                            @if (_fiapViewModels.Count == 0)
                             {
                                 <RadzenText TextAlign="TextAlign.Center" class="rz-mt-4" Text="No fiaps found"></RadzenText>
                             }
@@ -237,10 +242,8 @@ else if (_notFound == false && _auditMissionDto != null)
 @functions
 {
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-
-
 
         await FetchAuditMission();
         await FetchObjectives();
