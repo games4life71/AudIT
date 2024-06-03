@@ -10,4 +10,5 @@ public interface IObjectiveActionRepository:IRepository<ObjectiveAction>
 
     public Task<Result<List<ObjectiveAction>>> FindAllByObjectiveIdAsync(Guid id);
 
+    public Task<Result<List<ObjectiveAction>>> GetAllSelectedByObjectiveId(Guid requestObjectiveId);
 }

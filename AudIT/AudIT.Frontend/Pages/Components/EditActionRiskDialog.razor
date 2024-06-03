@@ -1,0 +1,63 @@
+﻿@using Frontend.Contracts.Abstract_Services.ActionRiskService
+@using Frontend.EntityDtos.ActionRisk
+@using Frontend.EntityViewModels.ActionRisk
+@inject DialogService _dialogService
+@inject IActionRiskService _actionRiskService
+@inject NotificationService _notificationService
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenRow class="rz-my-4">
+        <RadzenColumn>
+            <RadzenLabel Text="Risk Name:" Component="forName"></RadzenLabel>
+            <RadzenTextBox @bind-Value="@ActionRisk.name" Placeholder="@ActionRisk.name"></RadzenTextBox>
+        </RadzenColumn>
+        <RadzenColumn>
+            <RadzenLabel Text="Risk:" Component="forRisk"></RadzenLabel>
+            <RadzenNumeric Min="0" Max="10" @bind-Value="ActionRisk.risk" Placeholder="@ActionRisk.risk.ToString()"></RadzenNumeric>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow class="rz-my-4">
+        <RadzenColumn>
+            <RadzenLabel Text="Probability:" Component="forProbability"></RadzenLabel>
+            <RadzenNumeric Min="0" Max="10" @bind-Value="ActionRisk.probability" Placeholder="@ActionRisk.probability.ToString()"></RadzenNumeric>
+        </RadzenColumn>
+        <RadzenColumn>
+            <RadzenLabel Text="Impact:" Component="forImpact"></RadzenLabel>
+            <RadzenNumeric Min="0" Max="10" @bind-Value="ActionRisk.impact" Placeholder="@ActionRisk.impact.ToString()"></RadzenNumeric>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenStack class="rz-my-12" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+        <RadzenButton ButtonStyle="ButtonStyle.Primary" Text="Save" Click="@(() => SumbitChanges())"></RadzenButton>
+        <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text="Cancel" Click="@(() => _dialogService.Close(null))"></RadzenButton>
+
+    </RadzenStack>
+
+</RadzenCard>
+
+
+@code {
+
+    [Parameter] public ActionRiskViewModel ActionRisk { get; set; }
+    [Parameter] public EventCallback<ActionRiskViewModel> OnDialogClose { get; set; }
+    private async Task SumbitChanges()
+    {
+        //TODO implement save changes logic
+        var updateActionRiskDto = new UpdateActionRiskDto(
+            Guid.Parse(ActionRisk.id),
+            ActionRisk.name,
+            ActionRisk.risk,
+            ActionRisk.probability,
+            ActionRisk.impact
+        );
+
+        var response = await  _actionRiskService.UpdateActionRisk(updateActionRiskDto);
+
+        if (response.Success)
+        {
+            _notificationService.Notify(NotificationSeverity.Success, "Success", "Action Risk updated successfully");
+            await OnDialogClose.InvokeAsync(response.DtoResponse);
+        }
+
+        _dialogService.Close(null);
+    }
+
+}

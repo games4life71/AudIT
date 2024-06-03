@@ -11,8 +11,8 @@ namespace AudIT.Domain.Misc
         public bool IsSuccess { get; }
         public T Value { get; }
         public string Error { get; }
-        
-        private Result(bool isSuccess, T value, string error)
+
+        public Result(bool isSuccess, T value, string error)
         {
             IsSuccess = isSuccess;
             Value = value;

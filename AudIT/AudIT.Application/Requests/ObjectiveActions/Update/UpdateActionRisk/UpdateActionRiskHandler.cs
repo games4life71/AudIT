@@ -19,7 +19,7 @@ public class UpdateActionRiskHandler(
             var actionRisk = await actionRiskRepository.FindByIdAsync(request.ActionRiskId);
             if (!actionRisk.IsSuccess)
             {
-                return new BaseDTOResponse<ActionRiskDto>($"Action Risk with id {request.ActionRiskId} not found",
+                return new BaseDTOResponse<ActionRiskDto>($"Activity Risk with id {request.ActionRiskId} not found",
                     false);
             }
 
@@ -33,15 +33,15 @@ public class UpdateActionRiskHandler(
 
             if (!result.IsSuccess)
             {
-                return new BaseDTOResponse<ActionRiskDto>($"Error updating Action Risk: {result.Error}", false);
+                return new BaseDTOResponse<ActionRiskDto>($"Error updating Activity Risk: {result.Error}", false);
             }
 
             return new BaseDTOResponse<ActionRiskDto>(mapper.Map<ActionRiskDto>(result.Value),
-                "Action Risk updated successfully", true);
+                "Activity Risk updated successfully", true);
         }
         catch (Exception e)
         {
-            return new BaseDTOResponse<ActionRiskDto>($"Error updating Action Risk: {e.Message}", false);
+            return new BaseDTOResponse<ActionRiskDto>($"Error updating Activity Risk: {e.Message}", false);
         }
     }
 }

@@ -1,0 +1,65 @@
+﻿@page "/test"
+@using System.Security.Claims
+@using Frontend.Services.AuthentificationServices
+@* @inject CustomAuthStateProvider AuthStateProvider *@
+@inject HttpClient _httpClient
+<HxButton Color="ThemeColor.Success"> This is the buttons sadasdasdadads </HxButton>
+
+@if (!String.IsNullOrEmpty(Message))
+{
+    <p>@Message</p>
+}
+
+
+@code
+{
+
+    public List<ClaimResponse> Claims { get; set; } = new List<ClaimResponse>();
+    public string Message { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // await AuthStateProvider.GetAuthenticationStateAsync();
+            // Claims =  AuthStateProvider.GetClaims();
+            var result =await  _httpClient.GetAsync("https://localhost:7248/api/v1/Authentification/get-user-claims");
+            //send the cookie with the request
+
+            if(!result.IsSuccessStatusCode)
+            {
+              //show error message
+              Message = "An error occured while fetching the claims";
+
+            }
+            Message = result.Content.ReadAsStringAsync().Result;
+
+            //
+            // var requestMessage = new HttpRequestMessage()
+            // {
+            //     Method = new HttpMethod("GET"),
+            //     RequestUri = new Uri("https://localhost:7248/api/v1/Authentification/get-user-claims"),
+            //     //Content = new StringContent(JsonConvert.SerializeObject(logininfo), Encoding.UTF8, "application/json")
+            // };
+            //
+            // requestMessage.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
+            //
+            // var response2 = await _httpClient.SendAsync(requestMessage);
+            //
+            //
+            // //convert the response to a list of claims
+            // // Claims= await result.Content.ReadFromJsonAsync<List<ClaimResponse>>().ConfigureAwait(false);
+            //
+            // Message = response2.Content.ReadAsStringAsync().Result;
+
+
+
+        }
+        catch (Exception e)
+        {
+            Message = e.Message;
+        }
+    }
+
+
+}

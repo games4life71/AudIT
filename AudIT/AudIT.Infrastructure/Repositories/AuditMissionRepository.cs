@@ -15,7 +15,10 @@ public class AuditMissionRepository(AudITContext context)
     {
         try
         {
-            var result = await _context.AuditMissions.Where(x => x.UserId == id).ToListAsync();
+            var result = await _context.AuditMissions
+                .Where(x => x.UserId == id)
+                // .Include(x=>x.LastModifiedBy)
+                .ToListAsync();
 
             if (result.Count == 0)
             {
@@ -50,4 +53,48 @@ public class AuditMissionRepository(AudITContext context)
             return Result<IReadOnlyList<AuditMission>>.Failure("Error: " + e.Message);
         }
     }
+
+    public override async Task<Result<AuditMission>> FindByIdAsync(Guid id)
+    {
+        var result = await _context.AuditMissions
+            .Where(a => a.Id == id)
+            .Include(a => a.User)
+            .Include(a => a.Department)
+            .FirstAsync();
+
+
+        if (result == null)
+        {
+            return Result<AuditMission>.Failure("No audit mission found with this id");
+        }
+
+        return Result<AuditMission>.Success(result);
+    }
+
+    // public override async Task<Result<AuditMission>> UpdateAsync(AuditMission entity)
+    // {
+    //     var result = await _context.AuditMissions.FindAsync(entity.Id);
+    //
+    //
+    //     if (result == null)
+    //     {
+    //         return Result<AuditMission>.Failure("No audit mission found with this id");
+    //     }
+    //
+    //
+    //     //update the entity
+    //
+    //     result.Update(
+    //         name: entity.Name,
+    //         department: entity.Department,
+    //         departmentId: entity.DepartmentId
+    //     );
+    //
+    //
+    //     _context.AuditMissions.Update(result);
+    //
+    //     await _context.SaveChangesAsync();
+    //
+    //     return Result<AuditMission>.Success(result);
+    // }
 }

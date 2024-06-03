@@ -23,6 +23,9 @@ namespace AudIT.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("ActivityId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("TEXT");
 
@@ -52,61 +55,23 @@ namespace AudIT.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ReadAccesUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("WriteAccesUserId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ActivityId");
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("BaseDocument");
+                    b.ToTable("BaseDocuments");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("BaseDocument");
 
                     b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("AudiT.Domain.Entities.Action", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("AuditMissionId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("DepartmentId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("LastModifiedDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AuditMissionId");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Activities");
                 });
 
             modelBuilder.Entity("AudiT.Domain.Entities.ActionRisk", b =>
@@ -138,6 +103,63 @@ namespace AudIT.Infrastructure.Migrations
                     b.ToTable("ActionRisk");
                 });
 
+            modelBuilder.Entity("AudiT.Domain.Entities.Activity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AuditMissionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("DepartmentId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid?>("ObjectiveActionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReadAccesUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("WriteAccesUserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuditMissionId");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("ObjectiveActionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Activities");
+                });
+
             modelBuilder.Entity("AudiT.Domain.Entities.AuditMission", b =>
                 {
                     b.Property<Guid>("Id")
@@ -163,8 +185,17 @@ namespace AudIT.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ReadAccesUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("UserId")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("WriteAccesUserId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -218,6 +249,27 @@ namespace AudIT.Infrastructure.Migrations
                     b.ToTable("AuditMissionObjectives");
                 });
 
+            modelBuilder.Entity("AudiT.Domain.Entities.AuditMissionRecommendations", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AuditMissionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RecommendationId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuditMissionId");
+
+                    b.HasIndex("RecommendationId");
+
+                    b.ToTable("AuditMissionRecommendations");
+                });
+
             modelBuilder.Entity("AudiT.Domain.Entities.Department", b =>
                 {
                     b.Property<Guid>("Id")
@@ -249,6 +301,12 @@ namespace AudIT.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReadAccesUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("WriteAccesUserId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -298,6 +356,12 @@ namespace AudIT.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ReadAccesUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("WriteAccesUserId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("InstitutionAdminId1");
@@ -314,8 +378,26 @@ namespace AudIT.Infrastructure.Migrations
                     b.Property<Guid>("AuditMissionId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReadAccesUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("WriteAccesUserId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -339,6 +421,18 @@ namespace AudIT.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -346,14 +440,147 @@ namespace AudIT.Infrastructure.Migrations
                     b.Property<Guid>("ObjectiveId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ReadAccesUserId")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("Selected")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("WriteAccesUserId")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ObjectiveId");
 
                     b.ToTable("ObjectiveAction");
+                });
+
+            modelBuilder.Entity("AudiT.Domain.Entities.ObjectiveActionFiap", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AditionalFindings")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AuditMissionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("AuditedPeriodEnd")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("AuditedPeriodStart")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Cause")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Consequence")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ObjectiveActionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Problem")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReadAccesUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Recommendation")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("WriteAccesUserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuditMissionId");
+
+                    b.HasIndex("ObjectiveActionId");
+
+                    b.ToTable("ObjectiveActionFiap");
+                });
+
+            modelBuilder.Entity("AudiT.Domain.Entities.Recommendation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AditionalFindings")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Cause")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Consequence")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("LastModifiedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ObjectiveActionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Problem")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReadAccesUserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RecommendationDescription")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("WriteAccesUserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ObjectiveActionId");
+
+                    b.ToTable("Recommendations");
                 });
 
             modelBuilder.Entity("AudiT.Domain.Entities.User", b =>
@@ -443,6 +670,28 @@ namespace AudIT.Infrastructure.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("AudiT.Domain.Entities.UserInstitution", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("InstitutionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstitutionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserInstitution");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -604,6 +853,10 @@ namespace AudIT.Infrastructure.Migrations
 
             modelBuilder.Entity("AudIT.Domain.Misc.BaseDocument", b =>
                 {
+                    b.HasOne("AudiT.Domain.Entities.Activity", null)
+                        .WithMany("AttachedDocuments")
+                        .HasForeignKey("ActivityId");
+
                     b.HasOne("AudiT.Domain.Entities.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
@@ -613,29 +866,6 @@ namespace AudIT.Infrastructure.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("AudiT.Domain.Entities.Action", b =>
-                {
-                    b.HasOne("AudiT.Domain.Entities.AuditMission", null)
-                        .WithMany("Actions")
-                        .HasForeignKey("AuditMissionId");
-
-                    b.HasOne("AudiT.Domain.Entities.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AudiT.Domain.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Department");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("AudiT.Domain.Entities.ActionRisk", b =>
                 {
                     b.HasOne("AudiT.Domain.Entities.ObjectiveAction", null)
@@ -643,6 +873,39 @@ namespace AudIT.Infrastructure.Migrations
                         .HasForeignKey("ObjectiveActionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("AudiT.Domain.Entities.Activity", b =>
+                {
+                    b.HasOne("AudiT.Domain.Entities.AuditMission", "AuditMission")
+                        .WithMany("Actions")
+                        .HasForeignKey("AuditMissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AudiT.Domain.Entities.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AudiT.Domain.Entities.ObjectiveAction", "ObjectiveAction")
+                        .WithMany()
+                        .HasForeignKey("ObjectiveActionId");
+
+                    b.HasOne("AudiT.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AuditMission");
+
+                    b.Navigation("Department");
+
+                    b.Navigation("ObjectiveAction");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AudiT.Domain.Entities.AuditMission", b =>
@@ -702,6 +965,25 @@ namespace AudIT.Infrastructure.Migrations
                     b.Navigation("Objective");
                 });
 
+            modelBuilder.Entity("AudiT.Domain.Entities.AuditMissionRecommendations", b =>
+                {
+                    b.HasOne("AudiT.Domain.Entities.AuditMission", "AuditMission")
+                        .WithMany()
+                        .HasForeignKey("AuditMissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AudiT.Domain.Entities.Recommendation", "Recommendation")
+                        .WithMany()
+                        .HasForeignKey("RecommendationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AuditMission");
+
+                    b.Navigation("Recommendation");
+                });
+
             modelBuilder.Entity("AudiT.Domain.Entities.Department", b =>
                 {
                     b.HasOne("AudiT.Domain.Entities.Institution", "Institution")
@@ -744,6 +1026,36 @@ namespace AudIT.Infrastructure.Migrations
                     b.Navigation("Objective");
                 });
 
+            modelBuilder.Entity("AudiT.Domain.Entities.ObjectiveActionFiap", b =>
+                {
+                    b.HasOne("AudiT.Domain.Entities.AuditMission", "AuditMission")
+                        .WithMany()
+                        .HasForeignKey("AuditMissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AudiT.Domain.Entities.ObjectiveAction", "ObjectiveAction")
+                        .WithMany()
+                        .HasForeignKey("ObjectiveActionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AuditMission");
+
+                    b.Navigation("ObjectiveAction");
+                });
+
+            modelBuilder.Entity("AudiT.Domain.Entities.Recommendation", b =>
+                {
+                    b.HasOne("AudiT.Domain.Entities.ObjectiveAction", "ObjectiveAction")
+                        .WithMany()
+                        .HasForeignKey("ObjectiveActionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ObjectiveAction");
+                });
+
             modelBuilder.Entity("AudiT.Domain.Entities.User", b =>
                 {
                     b.HasOne("AudiT.Domain.Entities.Department", "Department")
@@ -751,6 +1063,25 @@ namespace AudIT.Infrastructure.Migrations
                         .HasForeignKey("DepartmentId");
 
                     b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("AudiT.Domain.Entities.UserInstitution", b =>
+                {
+                    b.HasOne("AudiT.Domain.Entities.Institution", "Institution")
+                        .WithMany()
+                        .HasForeignKey("InstitutionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AudiT.Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Institution");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -813,6 +1144,11 @@ namespace AudIT.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("AudiT.Domain.Entities.Activity", b =>
+                {
+                    b.Navigation("AttachedDocuments");
                 });
 
             modelBuilder.Entity("AudiT.Domain.Entities.AuditMission", b =>

@@ -8,6 +8,7 @@
 public interface IAuthorization
 {
 
+
     public Task<(int, string)> ValidateUser(string token);
 
 }

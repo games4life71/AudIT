@@ -4,7 +4,13 @@ using AudIT.Applicationa.Models.AuthDTO;
 using AudIT.Applicationa.Services.EmailServices;
 using AudIT.Applicationa.Services.UtilsServices;
 using AudiT.Domain.Entities;
+using AudIT.Domain.Misc;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
@@ -19,13 +25,16 @@ public class AuthService(
     IInstitutionRepository institutionRepository,
     EmailService emailService,
     UtilsService utilsService,
-    SignInManager<User> signInManager)
+    SignInManager<User> signInManager,
+    IUserInstitutionRepository userInstitutionRepository
+)
     : IAuthService // This is the implementation of the IAuthService interface
 {
     private readonly IConfiguration _configuration = configuration;
     private readonly IInstitutionRepository _institutionRepository = institutionRepository;
     private readonly EmailService _emailService = emailService;
     private readonly UtilsService _utilsService = utilsService;
+    private readonly IUserInstitutionRepository _userInstitutionRepository = userInstitutionRepository;
 
     public async Task<(int, string)> Registration(RegistrationModel model, string role)
     {
@@ -35,7 +44,7 @@ public class AuthService(
             return (0, "User already exists!");
         }
 
-        Console.WriteLine("Email is aaaaaa: " + model.EmailAddress);
+        // Console.WriteLine("Email is aaaaaa: " + model.EmailAddress);
 
         var emailExist = await userManager.FindByEmailAsync(model.EmailAddress);
         if (emailExist != null)
@@ -61,25 +70,7 @@ public class AuthService(
 
         IdentityResult result;
         var newUserValue = new_user.Value;
-        try
-        {
-            result = await userManager.CreateAsync(newUserValue, model.Password);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            return (0, e.Message);
-        }
 
-
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new IdentityRole(role));
-        }
-
-
-        await roleManager.CreateAsync(new IdentityRole(role));
-        await userManager.AddToRoleAsync(newUserValue, role);
 
         var emailDomain = model.EmailAddress.Split('@')[1];
 
@@ -87,8 +78,11 @@ public class AuthService(
 
         if (institution.IsSuccess == false)
         {
-            return (0, institution.Error);
+            return (0, $"No institutioon with domain {emailDomain} found");
         }
+
+        //add the institution to the user
+
 
         // Console.WriteLine("FOUND THE INSTITURION");
         var institutionAdmin = institution.Value.InstitutionAdmin;
@@ -98,22 +92,57 @@ public class AuthService(
         }
 
         Console.WriteLine("INSTITUTION : " + institution.Value.Id);
-        if (institutionAdmin == null)
-        {
-            return (0, "Institution admin not found");
-        }
+        // if (institutionAdmin == null)
+        // {
+        //     return (0, "Institution admin not found");
+        // }
 
         if (institutionAdmin != null)
         {
             Console.WriteLine("INSTITUTION ADMIN IS NOT NULL");
         }
 
-        var emailResult = await emailService.SendAuthorizeEmail(institutionAdmin.Id, newUserValue);
+        // var emailResult = await emailService.SendAuthorizeEmail(institutionAdmin.Id, newUserValue);
+        //
+        // if (emailResult.Item2 == false)
+        // {
+        //     return (0, "Email not sent");
+        // }
 
-        if (emailResult.Item2 == false)
+        try
         {
-            return (0, "Email not sent");
+            result = await userManager.CreateAsync(newUserValue, model.Password);
+
+
+            if (!result.Succeeded)
+            {
+                return (1, "Failed to create user");
+            }
+
+            //add the institution to the user
+            var userInstitution = UserInstitution.Create(
+                newUserValue.Id,
+                institution.Value.Id,
+                institution.Value
+            );
+
+            if (userInstitution.IsSuccess)
+            {
+                //save it to the database
+                await _userInstitutionRepository.AddAsync(userInstitution.Value);
+            }
+
+
+            await roleManager.CreateAsync(new IdentityRole(role));
+            await userManager.AddToRoleAsync(newUserValue, role);
         }
+        //get the user
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return (0, e.Message);
+        }
+
 
         return (1, "User created successfully!");
     }
@@ -149,10 +178,36 @@ public class AuthService(
             authClaims.Add(new Claim(ClaimTypes.Role, userRole));
         }
 
+        // Add the claims to the user
+        foreach (var claim in authClaims)
+        {
+            if ((await userManager.GetClaimsAsync(user)).All(c => c.Type != claim.Type))
+            {
+                await userManager.AddClaimAsync(user, claim);
+            }
+        }
+
+        var claimsIdentity = new ClaimsIdentity(authClaims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+        var authProperties = new AuthenticationProperties();
+
+        await signInManager.Context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(claimsIdentity), authProperties);
 
         var token = utilsService.GenerateToken(authClaims);
 
-
         return (1, token);
+    }
+
+    public async Task<Result<List<User>>> GetAllUsersByInstitutionId(Guid institutionId)
+    {
+        var results = await userInstitutionRepository.GetAllUsersByInstitutionId(institutionId);
+
+        if (!results.IsSuccess)
+        {
+            return Result<List<User>>.Failure("No users found");
+        }
+
+        return Result<List<User>>.Success(results.Value);
     }
 }

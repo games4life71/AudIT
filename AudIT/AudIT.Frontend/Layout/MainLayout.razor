@@ -1,0 +1,180 @@
+﻿@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.Services.AuthentificationServices
+@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
+@inject CustomAuthStateProvider customAuthState
+@inject NavigationManager NavigationManager
+@inject DialogService DialogService
+@inject IAuditMissionService _auditMissionService
+@inject NotificationService NotificationService
+<RadzenLayout Style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body'">
+    <RadzenHeader Style="display: flex; justify-content: space-between;">
+
+
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+            <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)"/>
+            <RadzenLabel Text="AudIT App"/>
+        </RadzenStack>
+
+        <RadzenStack class="rz-mx-12" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+            <RadzenMenu>
+                <RadzenMenuItem Icon="dashboard" Text="Menu">
+                    <RadzenMenuItem Icon="account_circle" Text="Profile"></RadzenMenuItem>
+                    <RadzenMenuItem Icon="markunread_mailbox" Text="Notifications"> </RadzenMenuItem>
+                </RadzenMenuItem>
+            </RadzenMenu>
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenSidebar Style="display: flex;  justify-content: space-between; flex-direction: column;" @bind-Expanded="@sidebarExpanded">
+        <RadzenPanelMenu>
+
+
+            @if (!isAuthenticated)
+            {
+                <RadzenPanelMenuItem Text="Home" Icon="home"/>
+                <RadzenPanelMenuItem Text="Login" Icon="account_circle" Click="@(() => NavigationManager.NavigateTo("/login"))"/>
+                <RadzenPanelMenuItem Text="Register" Icon="account_circle" Click="@(() => NavigationManager.NavigateTo("/register"))"/>
+            }
+            else
+            {
+                <RadzenPanelMenuItem class="rz-my-4" Text="Home" Path="/" Icon="home"/>
+                <RadzenPanelMenuItem Icon="chrome_reader_mode" Text="Audit Missions">
+                    <RadzenPanelMenuItem class="rz-my-2" Text="Create Mission" Path="/create-mission" Icon="add"/>
+                    <RadzenPanelMenuItem class="rz-my-2" Text="List Missions" Path="/audit-missions" Icon="list"/>
+                    <RadzenPanelMenuItem class="rz-my-2" Text="Search Audit Mission" Icon="search">
+                        <RadzenStack  class="rz-my-2" Orientation="Orientation.Vertical">
+
+                            <RadzenAutoComplete ValueChanged="@((value)=>AuditMissionSearchChanged(value))" TextProperty="Name" Data="@_auditMissions" Placeholder="Audit Mission name..."></RadzenAutoComplete>
+                                <RadzenButton Click="@NavigateToAuditMission" Text="Go" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small" ></RadzenButton>
+                        </RadzenStack>
+                    </RadzenPanelMenuItem>
+                </RadzenPanelMenuItem>
+                <RadzenPanelMenuItem class="rz-my-4" Icon="all_out" Text="Objectives">
+                    <RadzenPanelMenuItem class="rz-my-2" Text="Create Objective" Path="/create-objective" Icon="add"/>
+                    <RadzenPanelMenuItem class="rz-my-2" Text="List Objectives" Path="/objectives" Icon="list"/>
+                    <RadzenPanelMenuItem class="rz-my-2" Text="Search Objective" Icon="search">
+
+                        <RadzenStack Orientation="Orientation.Vertical">
+                            @* <RadzenAutoComplete Data="@_objectives"   Placeholder="Objective name..." ></RadzenAutoComplete> *@
+                            <RadzenButton class="rz-mb-2" Size="ButtonSize.Small" Text="Search"></RadzenButton>
+                        </RadzenStack>
+
+                    </RadzenPanelMenuItem>
+
+                </RadzenPanelMenuItem>
+                <RadzenPanelMenuItem class="rz-my-4" Icon="feedback" Text="Recommendations">
+                    <RadzenPanelMenuItem class="rz-my-2" Path="add-recommendation" Icon="add" Text="Add Recommendation"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem class="rz-my-2" Path="recommendations" Icon="list" Text="View Recommendations"></RadzenPanelMenuItem>
+                </RadzenPanelMenuItem>
+                <RadzenPanelMenuItem class="rz-my-4" Icon="description" Text="Documents">
+                    <RadzenPanelMenuItem class="rz-my-2" Text="Upload Document" Path="/create-document" Icon="add"/>
+                    <RadzenPanelMenuItem class="rz-my-2" Text="List Documents" Path="/documents" Icon="list"/>
+                </RadzenPanelMenuItem>
+                <RadzenPanelMenuItem class="rz-my-4" Icon="history" Text="Activities">
+                    <RadzenPanelMenuItem Icon="add" Text="Add Activity"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Icon="list" Text="List Activities"></RadzenPanelMenuItem>
+                </RadzenPanelMenuItem>
+                <RadzenPanelMenuItem Icon="bookmark_border" class="rz-my-4" Text="Export"></RadzenPanelMenuItem>
+                <RadzenPanelMenuItem class="rz-my-4" Icon="card_membership" Text="Acces control"></RadzenPanelMenuItem>
+                <RadzenPanelMenuItem class="rz-my-4" Icon="build" Text="Configure">
+                    <RadzenPanelMenuItem Icon="book" Text="Configure Departments" class="rz-my-2"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Icon="account_balance" class="rz-my-2" Text="Configure Institutions"></RadzenPanelMenuItem>
+                </RadzenPanelMenuItem>
+            }
+        </RadzenPanelMenu>
+        <RadzenPanelMenu>
+            @if (isAuthenticated)
+            {
+                <RadzenButton Text="Logout" Click="@SignOut" Icon="logout"></RadzenButton>
+            }
+
+        </RadzenPanelMenu>
+
+    </RadzenSidebar>
+    <RadzenBody>
+
+
+        <main>
+            <article class="content px-4">
+                @Body
+            </article>
+        </main>
+    </RadzenBody>
+</RadzenLayout>
+<RadzenDialog/>
+<RadzenNotification></RadzenNotification>
+<RadzenTooltip></RadzenTooltip>
+
+@code
+{
+
+    bool sidebarExpanded = true;
+    bool isAuthenticated = false;
+    private Guid _selectedAuditMissionId = Guid.Empty;
+    private List<BaseAuditMissionDto> _auditMissions = [];
+    protected override async Task OnInitializedAsync()
+    {
+        customAuthState.AuthenticationStateChanged += RefreshNavbar;
+        var authState = await customAuthState.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity is { IsAuthenticated: true };
+
+        await FetchAuditMissions();
+    }
+
+    private async Task FetchAuditMissions()
+    {
+        var auditMissions = await _auditMissionService.GetAuditMissionByOwnerId();
+        if (auditMissions.Success)
+        {
+            _auditMissions = auditMissions.DtoResponses;
+        }
+    }
+
+    private async void RefreshNavbar(Task<AuthenticationState> task)
+    {
+        // await OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    private async void SignOut()
+    {
+        var confirm = await DialogService.Confirm("Are you sure you want to Log out ?", "Confirm Logout", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+        if (confirm.Value == true)
+        {
+            isAuthenticated = false;
+            customAuthState.SignOut();
+            NavigationManager.NavigateTo("/login");
+        }
+        else
+        {
+            return;
+        }
+    }
+    private void NavigateToAuditMission()
+    {
+        if (_selectedAuditMissionId != Guid.Empty)
+        {
+            NavigationManager.NavigateTo($"/audit-mission/{_selectedAuditMissionId}");
+            _selectedAuditMissionId = Guid.Empty;
+        }
+
+
+        else
+        {
+        }
+    }
+
+    private Task AuditMissionSearchChanged(string value)
+    {
+        var auditMission =   _auditMissions.Find(x => x.Name.Equals(value));
+
+        if (auditMission != null)
+        {
+            _selectedAuditMissionId = auditMission.Id;
+        }
+
+        return Task.CompletedTask;
+    }
+}

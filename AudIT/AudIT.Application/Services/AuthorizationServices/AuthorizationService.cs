@@ -1,4 +1,6 @@
-﻿using AudIT.Applicationa.Services.UtilsServices;
+﻿using AudIT.Applicationa.Contracts.AbstractRepositories;
+using AudIT.Applicationa.Models.Misc;
+using AudIT.Applicationa.Services.UtilsServices;
 using AudiT.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 
@@ -8,7 +10,10 @@ using AudIT.Applicationa.Contracts.Identity;
 
 public class AuthorizationService(
     UtilsService utilsService,
-    UserManager<User> userManager) : IAuthorization
+    IInstitutionRepository institutionRepository,
+    UserManager<User> userManager,
+    RoleManager<IdentityRole> roleManager
+) : IAuthorization
 {
     /// <summary>
     /// Decodes the token and validates the user.
@@ -17,7 +22,6 @@ public class AuthorizationService(
     /// <returns></returns>
     public Task<(int, string)> ValidateUser(string token)
     {
-
         Console.WriteLine("Validating user");
         string userId = "";
         //validate the token
@@ -25,6 +29,7 @@ public class AuthorizationService(
         {
             return Task.FromResult((0, "Token is empty"));
         }
+
         //validate the token signature
         if (!utilsService.ValidateToken(token))
         {
@@ -46,12 +51,18 @@ public class AuthorizationService(
         //TODO implement the logic to change the user status to active
 
         var user = userManager.FindByIdAsync(userId);
+
+        var userDomain = user.Result?.Email?.Split('@')[1];
+
+
+        //set the institution to the user
+
         if (user.Result == null)
         {
             return Task.FromResult((0, "User not found"));
         }
 
-        if(user.Result.Verified)
+        if (user.Result.Verified)
         {
             return Task.FromResult((0, "User already verified"));
         }
@@ -59,7 +70,22 @@ public class AuthorizationService(
         //change the user status to active
         user.Result.VerifyUser();
         //save the changes
+
+
         userManager.UpdateAsync(user.Result);
+        //update the user role
+
+        if (!roleManager.RoleExistsAsync(UserRoles.Verified).Result)
+        {
+            userManager.RemoveFromRoleAsync(user.Result, UserRoles.Unverified);
+            userManager.AddToRoleAsync(user.Result, UserRoles.Verified);
+            userManager.AddToRoleAsync(user.Result, UserRoles.User);
+        }
+        //set the department to the user
+
+
+        userManager.UpdateAsync(user.Result);
+
 
         return Task.FromResult((1, "User verified successfully"));
     }

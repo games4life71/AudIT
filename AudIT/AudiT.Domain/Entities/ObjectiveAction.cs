@@ -6,7 +6,7 @@ namespace AudiT.Domain.Entities;
 /// <summary>
 /// This class models the action in a specific objective of an audit mission
 /// </summary>
-public class ObjectiveAction
+public class ObjectiveAction : AuditableEntity
 {
     public Guid Id { get; private set; }
 
@@ -49,6 +49,21 @@ public class ObjectiveAction
             return false;
         ActionRisks.Add(actionRisk);
         return true;
+    }
+
+    public void SetSelected(bool selected)
+    {
+        Selected = selected;
+    }
+
+    public void AddControaleInterneExistente(string control)
+    {
+        ControaleInterneExistente.Add(control);
+    }
+
+    public void AddControaleInterneAsteptate(string control)
+    {
+        ControaleInterneAsteptate.Add(control);
     }
 }
 
@@ -121,6 +136,7 @@ public class ActionRisk
 
 public enum Risk
 {
+    None,
     Mic,
     Mediu,
     Mare

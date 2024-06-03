@@ -7,19 +7,24 @@ using MediatR;
 namespace AudIT.Applicationa.Requests.AuditMission.Queries.GetBy.GetByOwnerId;
 
 public class GetAuditMissByOwnerHandler(IAuditMissionRepository _repository, IMapper _mapper)
-    : IRequestHandler<GetAudMissByOwnerId, BaseDTOResponse<BaseAuditMissionDto>>
+    : IRequestHandler<GetAudMissByOwnerId, BaseDTOResponse<AuditMissionWithDateDto>>
 {
-    public async Task<BaseDTOResponse<BaseAuditMissionDto>> Handle(GetAudMissByOwnerId request,
+    public async Task<BaseDTOResponse<AuditMissionWithDateDto>> Handle(GetAudMissByOwnerId request,
         CancellationToken cancellationToken)
     {
         try
         {
             var result = await _repository.GetByOwnerId(request.Id);
-            return new BaseDTOResponse<BaseAuditMissionDto>(_mapper.Map<BaseAuditMissionDto>(result));
+            if(!result.IsSuccess)
+            {
+                return new BaseDTOResponse<AuditMissionWithDateDto>(result.Error, false);
+            }
+            var mappedResult = _mapper.Map<IEnumerable<AuditMissionWithDateDto>>(result.Value).ToList();
+            return new BaseDTOResponse<AuditMissionWithDateDto>(mappedResult, "Success", true);
         }
         catch (Exception e)
         {
-            return new BaseDTOResponse<BaseAuditMissionDto>(e.Message, false);
+            return new BaseDTOResponse<AuditMissionWithDateDto>(e.Message, false);
         }
     }
 }

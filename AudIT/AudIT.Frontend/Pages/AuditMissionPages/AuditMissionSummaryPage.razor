@@ -1,0 +1,407 @@
+﻿@page "/audit-mission/{AuditMissionId}"
+@using Frontend.Contracts.Abstract_Services.ActivityService
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.DepartmentService
+@using Frontend.Contracts.Abstract_Services.DocumentService
+@using Frontend.Contracts.Abstract_Services.FiapService
+@using Frontend.Contracts.Abstract_Services.ObjectiveService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityDtos.Department
+@using Frontend.EntityViewModels.Activity
+@using Frontend.EntityViewModels.Document
+@using Frontend.EntityViewModels.Fiap
+@using Frontend.EntityViewModels.Objective
+@using Frontend.Pages.Components
+@using Frontend.Services.AuthentificationServices
+
+
+@inject NotificationService NotificationService
+@inject DialogService DialogService
+@inject IFiapService _fiapService
+@inject IActivityService _activityService
+@inject CustomAuthStateProvider _customAuthState
+@inject  IDocumentService _documentService
+@inject IObjectiveService _objectiveService
+@inject TooltipService tooltipService
+@inject IAuditMissionService _auditMissionService
+@inject IDepartmentService _departmentService
+@inject NavigationManager _navigationManager
+@if (_notFound == true)
+{
+    <NotFound/>
+}
+else if (_notFound == false && _auditMissionDto != null)
+{
+    <RadzenRow>
+        <RadzenColumn>
+            <RadzenCard Variant="Variant.Text" class="rz-mb-6">
+                <RadzenText Text=@($"Audit Mission Summary") TextStyle="TextStyle.DisplayH3"></RadzenText>
+            </RadzenCard>
+        </RadzenColumn>
+
+    </RadzenRow>
+    <RadzenRow JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
+        <RadzenTimeline class="rz-mb-6" Orientation="Orientation.Horizontal">
+            <Items>
+
+                @foreach (var status in _auditMissionStatuses)
+                {
+                    if (_auditMissionDto.Status.ToString().Equals(status))
+                    {
+                        <RadzenTimelineItem class="rz" PointSize="PointSize.Medium" PointStyle="PointStyle.Primary">
+                            <LabelContent>
+                                <RadzenText Text=@($"{status}")></RadzenText>
+                            </LabelContent>
+                            <ChildContent>
+                                <RadzenText Text=" "></RadzenText>
+                            </ChildContent>
+                        </RadzenTimelineItem>
+                    }
+                    else
+                    {
+                        <RadzenTimelineItem PointSize="PointSize.Small" PointStyle="PointStyle.Dark">
+                            <LabelContent>
+                                <RadzenText Text=@($"{status}")></RadzenText>
+                            </LabelContent>
+                            <ChildContent>
+                                <RadzenLabel Text=" "> </RadzenLabel>
+                            </ChildContent>
+                        </RadzenTimelineItem>
+                    }
+                }
+            </Items>
+        </RadzenTimeline>
+    </RadzenRow>
+    <RadzenRow>
+        @*Audit mission details Card*@
+        <RadzenColumn>
+            <RadzenCard Style="height: 100%; width: 75%; display: flex;" Variant="Variant.Outlined" class="rz-mb-12">
+                <RadzenStack Style="align-items: center" Gap="10px" Orientation="Orientation.Vertical">
+
+                    <RadzenLabel Component="Name" Text="Name:" Style="font-size: large;"></RadzenLabel>
+                    <RadzenTextBox Disabled="@editDetailsDisabled" @bind-Value="@_updateAuditMissionDto.Name" Placeholder="@_updateAuditMissionDto.Name"></RadzenTextBox>
+
+                    <RadzenLabel Component="Department" Text="Department:" Style="font-size: large;"></RadzenLabel>
+                    <RadzenTextBox Disabled="true" Placeholder="@_departmentDto.Name"></RadzenTextBox>
+
+                    <RadzenLabel Text="Last Modified:" Style="font-size: large;" Component="LastModified"></RadzenLabel>
+                    <RadzenDatePicker Disabled="true" TValue="DateTime" Min="DateTime.Now.AddMonths(-2)" Max="DateTime.Today" Change="@(args => selectedDate = args.Value)" @bind-Value="@_lastModifiedDate"></RadzenDatePicker>
+
+                    <RadzenLabel Text="Status" Component="StatusBind" Style="font-size: large;"></RadzenLabel>
+                    <RadzenDropDown Disabled="@editDetailsDisabled" Style="width: 75%;" Name="StatusBind" @bind-Value="@selectedStatus" Data="@_auditMissionStatuses"></RadzenDropDown>
+
+                    <RadzenRow Style="justify-content: space-between">
+                        <RadzenToggleButton Click="@(() => editDetailsDisabled = !editDetailsDisabled)" ToggleButtonStyle="ButtonStyle.Warning" class="rz-mt-12" Text="Edit details"></RadzenToggleButton>
+                        <RadzenButton Click="@ShowConfirmDialog" ButtonStyle="ButtonStyle.Info" class="rz-mt-12" Text="Save changes"></RadzenButton>
+                    </RadzenRow>
+
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+        <RadzenColumn Size="8">
+            <RadzenCard Variant="Variant.Outlined" class="rz-mb-12">
+                @* <RadzenText Text="Recent Tasks:" TextStyle="TextStyle.DisplayH5" class="rz-mb-6 rz-mx-2"></RadzenText> *@
+                <RadzenRow>
+                    @*Recent Objectives card *@
+                    <RadzenColumn >
+                        <RadzenCard Style="min-height: 200px;  max-height: 400px;">
+
+                            <RadzenRow class="rz-mt-2">
+                                <RadzenText TextStyle="TextStyle.Overline" Style="font-size: 15px;" Text="Recent Objectives: "></RadzenText>
+                                <RadzenIcon Icon="label"></RadzenIcon>
+                            </RadzenRow>
+
+                            @foreach (var objective in _objectiveViewModel)
+                            {
+
+                                <RadzenLink Path="@($"/objective/{objective.Id}")">
+                                    <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{objective.Name}")"></RadzenText>
+                                </RadzenLink>
+
+                            }
+                            @if (_objectiveViewModel.Count == 0)
+                            {
+                                <RadzenText TextAlign="TextAlign.Center" class="rz-mt-4" Text="No objectives found"></RadzenText>
+                            }
+
+                            <RadzenRow Style="display: flex; justify-content: flex-end; align-content: flex-end ">
+                                <RadzenColumn Style="display: flex; justify-content: flex-end; align-content: flex-end ">
+                                    <RadzenButton Click="@(() => _navigationManager.NavigateTo("/objectives"))" Style="display: flex; align-self: flex-end; justify-content: flex-end;" Shade="Shade.Darker" Visible="@(_objectiveViewModel.Count > 0)" ButtonStyle="ButtonStyle.Secondary" Text="See more..."></RadzenButton>
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenCard>
+                    </RadzenColumn>
+                    @*Recent Activities card *@
+                    <RadzenColumn>
+                        <RadzenCard Style="min-height: 200px; max-height: 400px;">
+
+                            <RadzenRow class="rz-mt-2">
+                                <RadzenText TextStyle="TextStyle.Overline" Style="font-size: 15px;" Text="Recent Activities:"></RadzenText>
+                                <RadzenIcon Icon="assignment"></RadzenIcon>
+                            </RadzenRow>
+                            @foreach (var activity in _activityViewModels)
+                            {
+                                <RadzenLink Path="@($"/activities/{activity.Id}")">
+                                    <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{activity.Name}")"></RadzenText>
+                                </RadzenLink>
+                            }
+                            <RadzenRow >
+                                <RadzenColumn Style="display: flex; justify-content: end; align-content: flex-end ">
+                                    <RadzenButton Shade="Shade.Darker" Visible="@(_activityViewModels.Count > 0)" ButtonStyle="ButtonStyle.Secondary" Text="See more..."></RadzenButton>
+                                </RadzenColumn>
+
+                            </RadzenRow>
+                        </RadzenCard>
+                    </RadzenColumn>
+                </RadzenRow>
+
+                <RadzenRow class="rz-my-12">
+                    @*Recent Documents card *@
+                    <RadzenColumn>
+                        <RadzenCard Style="min-height: 200px;">
+                            <RadzenRow class="rz-mt-2">
+                                <RadzenText TextStyle="TextStyle.Overline" Style="font-size: 15px;" Text="Recent Documents:"></RadzenText>
+                                <RadzenIcon Icon="description"></RadzenIcon>
+                            </RadzenRow>
+                            @foreach (var document in _baseDocumentViewmodels)
+                            {
+                                <RadzenLink Path="@($"/document-preview/{document.Id}")">
+                                    <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{document.Name}")"></RadzenText>
+                                </RadzenLink>
+                            }
+                            @if (_baseDocumentViewmodels.Count == 0)
+                            {
+                                <RadzenText TextAlign="TextAlign.Center" class="rz-mt-4" Text="No documents found"></RadzenText>
+                            }
+                            <RadzenRow >
+                                <RadzenColumn Style="display: flex; justify-content: end; align-content: flex-end ">
+                                    <RadzenButton Shade="Shade.Darker" Visible="@(_activityViewModels.Count > 0)" ButtonStyle="ButtonStyle.Secondary" Text="See more..."></RadzenButton>
+                                </RadzenColumn>
+
+                            </RadzenRow>
+                        </RadzenCard>
+                    </RadzenColumn>
+                    @*Recent FIAPS card*@
+                    <RadzenColumn>
+                        <RadzenCard Style="min-height: 200px;">
+                            <RadzenRow class="rz-mt-2">
+                                <RadzenText TextStyle="TextStyle.Overline" Style="font-size: 15px;" Text="Recent FIAPS:"></RadzenText>
+                                <RadzenIcon Icon="description"></RadzenIcon>
+                            </RadzenRow>
+                            @foreach (var fiap in _fiapViewModels)
+                            {
+                                <RadzenLink Path="@($"/fiap-preview/{fiap.Id}")">
+                                    <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{fiap.Name}")"></RadzenText>
+                                </RadzenLink>
+                            }
+                            @if (_fiapViewModels.Count == 0)
+                            {
+                                <RadzenText TextAlign="TextAlign.Center" class="rz-mt-4" Text="No fiaps found"></RadzenText>
+                            }
+
+
+                            <RadzenRow >
+                                <RadzenColumn Style="display: flex; justify-content: end; align-content: flex-end ">
+                                    <RadzenButton Shade="Shade.Darker" Visible="@(_activityViewModels.Count > 0)" ButtonStyle="ButtonStyle.Secondary" Text="See more..."></RadzenButton>
+                                </RadzenColumn>
+
+                            </RadzenRow>
+                        </RadzenCard>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+}
+
+@code {
+
+
+    [Parameter] public required string AuditMissionId { get; set; }
+    private UpdateAuditMissionDto _updateAuditMissionDto;
+
+    private List<string> _auditMissionStatuses = Enum.GetNames(typeof(AuditMissionStatus)).ToList();
+
+    private BaseAuditMissionDto _auditMissionDto = null;
+    private BaseDepartmentDto _departmentDto = null;
+
+    private string selectedStatus="";
+    private DateTime selectedDate;
+    private List<BaseDocumentViewmodel> _baseDocumentViewmodels = [];
+    private List<BaseActivityViewmodel> _activityViewModels = [];
+    private List<BaseObjectiveViewModel> _objectiveViewModel = [];
+    private List<BaseObjActionFiapViewmodel> _fiapViewModels = [];
+    private bool _notFound;
+    private bool _navigateHome;
+    private bool editDetailsDisabled = true;
+
+    DateTime _lastModifiedDate;
+}
+
+
+@functions
+{
+
+    protected override async Task OnParametersSetAsync()
+    {
+
+        await FetchAuditMission();
+        await FetchObjectives();
+        await FetchDocuments();
+        await FetchActivities();
+        await FetchFiaps();
+
+        _updateAuditMissionDto = new UpdateAuditMissionDto()
+        {
+            Id = _auditMissionDto.Id,
+            Name = _auditMissionDto.Name,
+            DepartmentId = _auditMissionDto.DepartmentId,
+            Status = _auditMissionDto.Status,
+        };
+
+        selectedStatus = _auditMissionDto.Status.ToString();
+
+        _baseDocumentViewmodels.Add(new BaseDocumentViewmodel(
+            new Guid(),
+            "Document 1",
+            "Document 1 description",
+            "Document 1 type"
+        ));
+    }
+
+    private async Task FetchAuditMission()
+    {
+        var result = await _auditMissionService.GetAuditMissionById(Guid.Parse(AuditMissionId));
+
+        if (result.Success && result.DtoResponse != null)
+        {
+            _auditMissionDto = result.DtoResponse;
+            _lastModifiedDate = _auditMissionDto.LastModifiedDate.ToLocalTime();
+
+            var department = await _departmentService.GetDepartmentByIdAsync(_auditMissionDto.DepartmentId);
+
+            if (department.Success && department.DtoResponse != null)
+            {
+                _departmentDto = department.DtoResponse;
+            }
+            else
+            {
+                _notFound = true;
+                // await NavigateHome();
+                // StateHasChanged();
+            }
+        }
+        else
+        {
+            _notFound = true;
+            // await NavigateHome();
+            // StateHasChanged();
+        }
+    }
+
+    private async Task FetchActivities()
+    {
+        var result = await _activityService.GetRecentActivitiesByAuditMissionIdAsync(Guid.Parse(AuditMissionId));
+
+        if (result.Success && result.DtoResponses.Count > 0)
+        {
+            _activityViewModels = result.DtoResponses;
+        }
+    }
+
+    private async Task FetchFiaps()
+    {
+        var result = await _fiapService.GetRecentFiapsByAudidMissionAsync(Guid.Parse(AuditMissionId));
+
+        if (result.Success && result.DtoResponses.Count > 0)
+        {
+            // _fiapViewModel = [];
+            _fiapViewModels = result.DtoResponses;
+        }
+    }
+
+    private Task HandleClick()
+    {
+        _navigationManager.NavigateTo("/new-page");
+        return Task.CompletedTask;
+    }
+
+    private async Task FetchObjectives()
+    {
+        var result = await _objectiveService.GetMostRecentObjectiveByAuditMissionIdAsync(Guid.Parse(AuditMissionId));
+
+        if (result.Success && result.DtoResponses.Count > 0)
+        {
+            // _objectiveViewModel = [];
+            _objectiveViewModel = result.DtoResponses;
+        }
+    }
+
+    private async Task FetchDocuments()
+    {
+
+
+
+        var result = await _documentService.GetRecentDocumentsAsync();
+
+        if (result.Success && result.DtoResponses.Count > 0)
+        {
+            _baseDocumentViewmodels = result.DtoResponses;
+        }
+    }
+
+    void ShowTooltip(ElementReference elementReference, TooltipOptions options = null)
+    {
+        tooltipService.Open(elementReference, "Click to follow link ", new TooltipOptions()
+        {
+            Position = TooltipPosition.Top,
+            Duration = 500,
+            Delay = 0,
+            Style = "background-color: #000; color: #fff;"
+        });
+    }
+
+    private async  Task ShowConfirmDialog(MouseEventArgs obj)
+    {
+        var confirm = await DialogService.OpenAsync("Confirmation", ds =>
+            @<div>
+                <p>Are you sure you want to update the audit mission with the following parameters?</p>
+                <p>Name: "@_updateAuditMissionDto.Name"</p>
+                <p>Department: "@_departmentDto.Name"</p>
+                <p>Status: "@selectedStatus"</p>
+                <p>Last Modified at: "@selectedDate."</p>
+                <RadzenButton Text="Yes" Click="@(() => { ds.Close(true); UpdateAuditMission(); })"/>
+                <RadzenButton Text="No" Click="@(() => ds.Close(false))"/>
+        </div>, new DialogOptions() { });
+    }
+
+    private async  Task UpdateAuditMission()
+    {
+
+        // _updateAuditMissionDto.Name = _auditMissionDto.Name;
+        _updateAuditMissionDto.DepartmentId = _auditMissionDto.DepartmentId;
+        _updateAuditMissionDto.Status = (AuditMissionStatus)Enum.Parse(typeof(AuditMissionStatus), selectedStatus);
+
+
+        var result = await _auditMissionService.UpdateAuditMissionAsync(_updateAuditMissionDto);
+
+        if (result.Success)
+        {
+            //display an alert
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Success", Detail = "Audit Mission updated successfully", Duration = 4000 });
+            Console.WriteLine("Audit mission updated successfully");
+
+            Console.WriteLine(result.DtoResponse.Name);
+        }
+        else
+        {
+            //display an alert
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "Failed to update audit mission", Duration = 4000 });
+            Console.WriteLine("Failed to update audit mission");
+        }
+
+
+        return;
+
+    }
+}

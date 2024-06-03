@@ -21,7 +21,7 @@ public class AddActionRiskHandler(
 
             if (!objectveAction.IsSuccess)
                 return new BaseDTOResponse<ObjActionWithRisksDto>(
-                    $"Objective Action with id {request.ObjectiveActionId} not found ", false);
+                    $"Objective Activity with id {request.ObjectiveActionId} not found ", false);
 
             // Add the risk to the objective action
 

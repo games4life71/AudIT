@@ -1,0 +1,194 @@
+﻿@page "/register"
+@using Frontend.Models
+@inject NavigationManager NavigationManager
+@inject  HttpClient _httpClient
+
+
+<RadzenStack Gap="0" Class="rz-my-12 rz-mx-auto rz-border-radius-6 rz-shadow-10" Style="width: 100%; max-width: 600px; overflow: hidden;">
+    <RadzenCard Class="rz-shadow-0 rz-border-radius-0 rz-background-color-info rz-p-12" style="text-align: center;">
+        <RadzenText TextStyle="TextStyle.DisplayH3" TagName="TagName.H5" Class="rz-color-white rz-mb-0">Create Account</RadzenText>
+    </RadzenCard>
+    <RadzenCard Class="rz-shadow-0 rz-p-12" Style="width: 100%; max-width: 1000px; overflow: hidden;">
+        <RadzenTemplateForm TItem="RegisterModel" Data="@_registerModel" Submit="@OnRegister" InvalidSubmit="@OnInvalid">
+            @* <RadzenLogin AllowRegister="false" AllowResetPassword="true" /> *@
+            <RadzenFormField Text="Username" Style="width: 100%; margin-bottom: 20px;">
+                <RadzenColumn>
+                    <RadzenTextBox style="display: block; width: 100%;" Name="username" @bind-Value="@_registerModel.userName"></RadzenTextBox>
+                    <RadzenRequiredValidator Component="username" Popup="@popup" Style="position: absolute" class="w-100" Text="Username is required"></RadzenRequiredValidator>
+                </RadzenColumn>
+            </RadzenFormField>
+
+            <RadzenFormField Text="Valid Institution Email" Style="width: 100%; margin-bottom: 20px;">
+                <RadzenColumn Gap="10px">
+                    <RadzenTextBox Placeholder="Insitution valid email..." @bind-Value="@_registerModel.emailAddress" style="display: block; width: 100%;" Name="email"></RadzenTextBox>
+                    <RadzenRequiredValidator Component="email" Popup="@popup" Style="position: absolute" class="w-100" Text="emailAddress is required"></RadzenRequiredValidator>
+                    <RadzenEmailValidator Component="email" Text="Provide a valid email address" Popup="@popup" Style="position: absolute" class="w-100"/>
+                </RadzenColumn>
+            </RadzenFormField>
+
+            <RadzenFormField class="w-100" Text="Password" Style="width: 100%; margin-bottom: 20px;">
+                <RadzenColumn Gap="10px" class="rz.mx-10">
+                    <RadzenPassword style="display: block; width: 100%;" Name="password" @bind-Value="@_registerModel.password"> </RadzenPassword>
+                    @* <RadzenRequiredValidator Component="password" Style="position: absolute" class="w-100" Popup=@popup Text="Password is required !"></RadzenRequiredValidator> *@
+                    <RadzenCustomValidator Popup=@popup Style="position: absolute" class="w-100" Validator="@(() => ValidatePasswordStrength(_registerModel.password))" Component="password" Text="Password is not strong enough"></RadzenCustomValidator>
+                    @* <RadzenCustomValidator  Popup="@popup" @Validator="@(() => ValidatePassword(@_loginModel.password))" Component="password" Text="Password is not strong"></RadzenCustomValidator> *@
+                </RadzenColumn>
+            </RadzenFormField>
+
+            <RadzenFormField class="w-100" Text="Confirm Password" Style="width: 100%; margin-bottom: 20px;">
+                <RadzenColumn Gap="10px" class="rz.mx-10">
+                    <RadzenPassword style="display: block; width: 100%;" Name="confirm_password" @bind-Value="@confirmPassword"> </RadzenPassword>
+                    @* <RadzenRequiredValidator Component="confirm_password" Style="position: absolute" class="w-100" Popup=@popup Text="Password is required !"></RadzenRequiredValidator> *@
+
+                    <RadzenCustomValidator Style="position: absolute" class="w-100" Component="confirm_password" Validator="@(() => ValidatePassword())" Popup=@popup Text="Password and confirm password do not match"></RadzenCustomValidator>
+                    @* <RadzenRepeatValidator Visible=@(!string.IsNullOrEmpty(_registerModel.ConfirmPassword))  Value=@_registerModel.password Component="confirm_password" Text="Passwords should be the same" Popup=@popup Style="position: absolute"></RadzenRepeatValidator> *@
+                </RadzenColumn>
+            </RadzenFormField>
+
+            <RadzenFormField Text="Address" Style="width: 100%; margin-bottom: 20px;">
+                <RadzenColumn>
+                    <RadzenTextBox style="display: block; width: 100%;" Name="address" @bind-Value="@_registerModel.address"> </RadzenTextBox>
+                    <RadzenRequiredValidator Component="address" Style="position: absolute" class="w-100" Popup=@popup Text="Address is required"></RadzenRequiredValidator>
+                </RadzenColumn>
+            </RadzenFormField>
+
+
+            <RadzenFormField Text="Phone number" Style="width: 100%; margin-bottom: 20px;">
+                <RadzenColumn>
+                    <RadzenTextBox style="display: block; width: 100%;" Name="phone" @bind-Value="@_registerModel.phoneNumber"> </RadzenTextBox>
+                    <RadzenRequiredValidator Component="phone" Style="position: absolute" class="w-100" Popup=@popup Text="Phone number is required"></RadzenRequiredValidator>
+                    <RadzenCustomValidator Component="phone" Style="position: absolute" class="w-100" Validator="@(() => PhoneNoValidator(_registerModel.phoneNumber))" Text="Phone number should only contain digits"></RadzenCustomValidator>
+                </RadzenColumn>
+            </RadzenFormField>
+
+            @if (!succesResponse)
+            {
+                <RadzenAlert Close="@OnAlertClose" AlertStyle="AlertStyle.Danger" ShowIcon="false" Variant="Variant.Flat" Shade="Shade.Lighter">
+                    @responseMessage
+                </RadzenAlert>
+            }
+
+            <RadzenAlert @bind-Visible="@visibleSucces" AllowClose="false" AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
+                Successfully registered ! Proceed to login ...
+            </RadzenAlert>
+            <RadzenSplitter></RadzenSplitter>
+            <RadzenButton IsBusy=@buttonBusy ButtonType="ButtonType.Submit" Icon="" Style="width: 50%;" Text="Register"></RadzenButton>
+        </RadzenTemplateForm>
+
+
+        <RadzenCard Class=" rz-mt-10">
+            <RadzenRow JustifyContent="JustifyContent.SpaceBetween">
+                <RadzenText Text="Already have an account ?"></RadzenText>
+                <RadzenButton ButtonStyle="ButtonStyle.Info" Style="opacity:0.7; " Text="Log In" Click=@NavigateLogIn></RadzenButton>
+            </RadzenRow>
+        </RadzenCard>
+
+    </RadzenCard>
+</RadzenStack>
+
+
+@code
+{
+    private string passwordString;
+    private RegisterModel _registerModel;
+    private bool visibleSucces = false;
+    private bool succesResponse = true;
+    private bool popup;
+    private bool buttonBusy = false;
+    private string responseMessage;
+    private string confirmPassword;
+}
+
+@functions
+{
+
+    protected override Task OnInitializedAsync()
+    {
+        _registerModel = new RegisterModel();
+        return base.OnInitializedAsync();
+    }
+
+    private void NavigateLogIn(MouseEventArgs obj)
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+
+    private bool PhoneNoValidator(string phoneNo)
+    {
+        //it only contains digits
+
+        return phoneNo.All(char.IsDigit);
+    }
+
+    private async void OnRegister(RegisterModel obj)
+    {
+        try
+        {
+            buttonBusy = true;
+            var response = await _httpClient.PostAsJsonAsync("https://localhost:7248/api/v1/Authentification/register", _registerModel);
+            buttonBusy = false;
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Error");
+                succesResponse = false;
+                responseMessage = response.Content.ReadAsStringAsync().Result;
+                StateHasChanged();
+            }
+            else
+            {
+                succesResponse = true;
+                visibleSucces = true;
+                Console.WriteLine("Success");
+                StateHasChanged();
+                await Task.Delay(3000); // Wait for 3 seconds before redirecting
+                NavigationManager.NavigateTo("/login");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    private void OnInvalid(FormInvalidSubmitEventArgs obj)
+    {
+    }
+
+    void OnAlertClose()
+    {
+        succesResponse = true; // Hide the alert box
+        StateHasChanged(); // Force the component to re-render
+    }
+
+    private bool ValidatePassword()
+    {
+        return _registerModel.password.Equals(confirmPassword);
+    }
+
+    private bool ValidatePasswordStrength(string password)
+    {
+        Console.WriteLine("ValidatePasswordStrength method called with password: " + password);
+        //if the password is empty or null
+
+        if (string.IsNullOrEmpty(password))
+        {
+            return false;
+        }
+
+        //if the password is less than 8 characters
+        if (password.Length < 8)
+        {
+            return false;
+        }
+
+        //if the password does not contain a number
+        if (!password.Any(char.IsDigit))
+        {
+            return false;
+        }
+
+        //if the password does not contain a special character
+        return !password.All(char.IsLetterOrDigit);
+    }
+}

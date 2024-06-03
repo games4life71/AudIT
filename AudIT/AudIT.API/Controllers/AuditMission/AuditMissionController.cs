@@ -1,10 +1,21 @@
-﻿using AudIT.Applicationa.Requests.AuditMission.Commands.Create;
+﻿using System.Security.Claims;
+using AudIT.Applicationa.Contracts.AbstractRepositories;
+using AudIT.Applicationa.Requests.AuditMission.Commands.Create;
+using AudIT.Applicationa.Requests.AuditMission.Commands.Update;
+using AudIT.Applicationa.Requests.AuditMission.Queries.GetBy.GetByDepartmentId;
+using AudIT.Applicationa.Requests.AuditMission.Queries.GetBy.GetByOwnerId;
 using AudIT.Applicationa.Requests.AuditMission.Queries.GetById;
+using AudIT.Domain.Misc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AudIT.API.Controllers.AuditMission;
 
-public class AuditMissionController : BaseController
+public class AuditMissionController(
+    IAuthorizationService authorizationService,
+    IAuditMissionRepository auditMissionRepository
+) : BaseController
 {
     [HttpPost]
     [Route("add-audit-mission")]
@@ -23,10 +34,50 @@ public class AuditMissionController : BaseController
 
     [HttpGet]
     [Route("get-audit-mission/{id}")]
+    // [Authorize(Policy = "EntityOwnerPolicy")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    // [Authorize]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetAuditMission(Guid id)
     {
         var result = await Mediator.Send(new GetByIdQuery(id));
+
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        var auditMission = await auditMissionRepository.FindByIdAsync(id);
+        // var auditableEntity = (AuditableEntity)auditMission.Value;
+        // var authorizationResult =
+        //     await authorizationService.AuthorizeAsync(User, auditMission.Value, "EntityReadPolicy");
+        //
+        // if (!authorizationResult.Succeeded)
+        // {
+        //     return StatusCode(StatusCodes.Status403Forbidden, "You are not authorized to access this resource");
+        // }
+
+
+        return Ok(result);
+    }
+
+
+    [HttpGet]
+    [Route("get-audit-mission-by-owner")]
+    // [Authorize(Roles = "Admin")] // only admin can access this route
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAuditMissionByOwner()
+    {
+        //get the id of the user from the http context
+        var id = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        if (id == null)
+        {
+            return BadRequest("User not found");
+        }
+
+
+
+        var result = await Mediator.Send(new GetAudMissByOwnerId(id.Value.ToString()));
         if (!result.Success)
         {
             return BadRequest(result.Message);
@@ -36,5 +87,41 @@ public class AuditMissionController : BaseController
     }
 
 
+    [HttpGet]
+    [Route("get-audit-mission-by-department/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAuditMissionByDepartment(Guid id)
+    {
+        var result = await Mediator.Send(new GetByDepartIdQuery(id));
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
 
+        var auditMission = await auditMissionRepository.FindByIdAsync(id);
+        // var auditableEntity = (AuditableEntity)auditMission.Value;
+        var authorizationResult =
+            await authorizationService.AuthorizeAsync(User, auditMission.Value, "EntityReadPolicy");
+
+        if (!authorizationResult.Succeeded)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, "You are not authorized to access this resource");
+        }
+
+        return Ok(result);
+    }
+
+    [HttpPut]
+    [Route("update-audit-mission")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> UpdateAuditMission(UpdateAuditMissionCommand command)
+    {
+        var result = await Mediator.Send(command);
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
 }

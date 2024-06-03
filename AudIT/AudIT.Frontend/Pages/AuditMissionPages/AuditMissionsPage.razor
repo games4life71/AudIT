@@ -1,0 +1,147 @@
+﻿@page "/audit-missions"
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.DepartmentService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityDtos.Department
+@using Frontend.Services.AuthentificationServices
+@* <h3>AuditMissions</h3> *@
+
+@inject NavigationManager NavigationManager
+@inject IAuditMissionService auditMissionService
+@inject IDepartmentService departmentService
+@inject CustomAuthStateProvider customAuthState
+
+@if (isAuthenticated)
+{
+    <RadzenDataGrid Data="@_auditMissionsDto" AllowSorting="true" AllowFiltering="true">
+
+        <Columns>
+
+            @* <RadzenDataGridColumn Property="Id" Title="Id"></RadzenDataGridColumn> *@
+            <RadzenDataGridColumn Property="Name" Title="Name"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="DepartmentName" Title="Department Name">
+
+                <Template Context="data">
+                    <div @onclick="() => DepartmentCellClicked(data)">
+                        @data.DepartmentName
+                    </div>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="Status" Title="Status"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="LastModifiedDate" Title="Last Modified"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Width="15%" Frozen="true" Sortable="false" Filterable="false" TItem="AuditMissionWithDepartmentName" Title="">
+                <Template Context="auditMission">
+                    <RadzenButton Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Text" Text="More details " Click="@(() => ButtonClicked(auditMission))"></RadzenButton>
+                </Template>
+            </RadzenDataGridColumn>
+
+        </Columns>
+    </RadzenDataGrid>
+}
+@* else if(!isAuthenticated) *@
+@* { *@
+@*  //display a loading spinner *@
+@*     <h1>Not authenticated</h1> *@
+@* } *@
+else
+{
+    <RadzenPanel Style="justify-content: center; align-content: center;">
+        <RadzenLabel Text="Loading..."/>
+        <RadzenProgressBar Height="10px"/>
+    </RadzenPanel>
+}
+
+
+@code {
+
+    // RadzenDataGrid<AuditMissionWithDepartmentName> grid;
+    string? Message { get; set; }
+    string? Name { get; set; }
+    private BaseDepartmentDto _departmentDto;
+    private List<AuditMissionWithDepartmentName> _auditMissionsDto = [];
+    bool isAuthenticated;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await customAuthState.GetAuthenticationStateAsync();
+        if (authState.User.Identity is { IsAuthenticated: true })
+        {
+            isAuthenticated = true;
+        }
+        else
+        {
+            isAuthenticated = false;
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+
+        var result = await auditMissionService.GetAuditMissionByOwnerId();
+
+        if (!result.Success)
+        {
+            // Message = "Failed to load audit missions";
+            Message = result.Message;
+            // _auditMissionsDto = result.DtoResponses;
+        }
+
+        else
+        {
+            Message = result.DtoResponses[0].Name;
+
+            var tempAuditMissionsDto = new List<AuditMissionWithDepartmentName>();
+            _auditMissionsDto = [];
+            foreach (var auditMissionDto in result.DtoResponses)
+            {
+                var departmentResult = await departmentService.GetDepartmentByIdAsync(auditMissionDto.DepartmentId);
+                string? departmentName = "";
+                if (!departmentResult.Success)
+                {
+                    departmentName = "Department not found";
+                }
+                else
+                {
+                    if (departmentResult.DtoResponse?.Name != null) departmentName = departmentResult.DtoResponse?.Name;
+                }
+
+                var newAuditMission = new AuditMissionWithDepartmentName(
+                    auditMissionDto.Id,
+                    auditMissionDto.Name,
+                    auditMissionDto.UserId,
+                    auditMissionDto.DepartmentId,
+                    departmentName,
+                    auditMissionDto.LastModifiedDate,
+                        auditMissionDto.Status
+                );
+
+                _auditMissionsDto.Add(newAuditMission);
+            }
+
+            // _auditMissionsDto = tempAuditMissionsDto;
+        }
+    }
+
+    private Task GoHome()
+    {
+        NavigationManager.NavigateTo("/");
+        return Task.CompletedTask;
+    }
+
+    private Task ButtonClicked(AuditMissionWithDepartmentName auditMission)
+    {
+        // Console.WriteLine($"Button clicked for order {order.OrderID}");
+        NavigationManager.NavigateTo($"/audit-mission/{auditMission.Id}");
+        return Task.CompletedTask;
+
+    }
+
+
+
+    private Task DepartmentCellClicked(AuditMissionWithDepartmentName data)
+    {
+        Console.WriteLine($"Department cell clicked for department {data.DepartmentName}");
+        return Task.CompletedTask;
+    }
+
+}

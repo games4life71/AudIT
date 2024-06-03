@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Web;
+using AudIT.Applicationa.Requests.Document.Get.GetDocumentsByDepartmentID;
 using AudIT.Applicationa.Requests.Document.StandaloneDocument.Commands.Create;
 using AudIT.Applicationa.Requests.Document.StandaloneDocument.Commands.Download;
 using AudIT.Applicationa.Requests.Document.StandaloneDocument.Commands.Upload;
@@ -124,6 +125,28 @@ public class StandaloneDocumentController : BaseController
 
             //return File(result.Item2.ResponseStream, result.Item2.Headers.ContentType, key);
             return new FileStreamResult(result.Item2.ResponseStream, result.Item2.Headers.ContentType);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    [HttpGet]
+    [Route("get-standalone-documents-by-department-id/{departmentId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetDocumentsByDepartmentId(Guid departmentId)
+    {
+        try
+        {
+            var result = await Mediator.Send(new GetDocumentsByDepartmentIdQuery(departmentId));
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result);
         }
         catch (Exception e)
         {

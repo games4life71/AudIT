@@ -1,0 +1,285 @@
+﻿@page "/create-mission"
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.DepartmentService
+@using Frontend.Contracts.Abstract_Services.InstitutionsService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityDtos.Department
+@using Frontend.EntityDtos.Institution
+@using Frontend.Services.AuthentificationServices
+@using Frontend.Services.InstitutionServices
+@inject IInstitutionService institutionService
+@inject IDepartmentService departmentService
+@inject NotificationService NotificationService
+@inject IAuditMissionService _auditMissionService
+@inject CustomAuthStateProvider authState
+@inject DialogService DialogService
+@inject NavigationManager _NavigationManager
+
+@if (institutions == null)
+{
+    //show loading spinner
+    <RadzenLoadingText Text="Loading institutions..."></RadzenLoadingText>
+}
+else
+{
+    <RadzenCard>
+
+
+        <RadzenSteps CanChange="@CanChange" Style="display: flex; justify-content: space-between;">
+            <Steps>
+                <RadzenStepsItem Text="Name">
+                    <RadzenText class="rz-my-10" Text="Choose a name for the audit mission "></RadzenText>
+                    <RadzenFieldset Text="Name">
+                        <RadzenTextBox Value="@_selectedAuditName" ValueChanged="s => GetName(s)" Name="Name"></RadzenTextBox>
+                        <RadzenText TextStyle="TextStyle.Subtitle1" Visible="@(!validName)" Text="Audit Mission Name must only contain letter and digits"></RadzenText>
+                    </RadzenFieldset>
+                </RadzenStepsItem>
+                <RadzenStepsItem Text="Institution">
+                    <RadzenText Text="Choose an institution: "></RadzenText>
+                    <RadzenFieldset>
+                        <RadzenDropDown AllowFiltering="true"
+                                        TValue="Guid" Placeholder="Institution:" ValueChanged="@OnInstitutionChange"
+                                        Data="@(institutions)" TextProperty="Name" ValueProperty="Id"/>
+                    </RadzenFieldset>
+                </RadzenStepsItem>
+
+                <RadzenStepsItem Text="Department ">
+                    <RadzenRow>
+                        <RadzenColumn>
+                            @{
+                                bool foundDepart = !(_departments != null && _departments.Count() > 0);
+                                bool foundNeg = !foundDepart;
+                            }
+
+                            <RadzenText Text="Choose the Department"></RadzenText>
+                            <RadzenFieldset>
+                                <RadzenDropDown Disabled="@foundDepart" @bind-Value="_selectedDepartmentId" AllowFiltering="true"
+                                                TValue="Guid" Placeholder="Department:"
+                                                Data="@(_departments)" TextProperty="Name" ValueProperty="Id"/>
+
+
+                                <RadzenText Text="No departments found for the selected institution" Visible="@foundDepart"></RadzenText>
+                            </RadzenFieldset>
+
+
+                        </RadzenColumn>
+                        <RadzenButton Style="height: 10%; display: flex; align-self: flex-end" ButtonType="ButtonType.Submit" Icon="add_circle_outline" Click="@SubmitForm">Submit</RadzenButton>
+                    </RadzenRow>
+
+
+                </RadzenStepsItem>
+
+            </Steps>
+
+
+        </RadzenSteps>
+
+
+    </RadzenCard>
+}
+
+
+@code {
+
+    public class Test(string name, string value)
+    {
+        public string Name { get; set; } = name;
+        public string Value { get; set; } = value;
+    }
+
+    List<BaseInstitutionDto> institutions;
+    List<BaseDepartmentDto> _departments;
+
+    private string _selectedAuditName = "";
+    private Guid _selectedInstitutionId = Guid.Empty;
+    private Guid _selectedDepartmentId = Guid.Empty;
+
+    bool successForm = false;
+    string _ValidationError = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await institutionService.GetAllInstitutionsAsync();
+
+        if (!result.Success)
+        {
+            //show error message
+        }
+        else
+        {
+            institutions = [];
+            foreach (var institution in result.DtoResponses)
+            {
+                institutions.Add(new BaseInstitutionDto(
+                    institution.Id,
+                    institution.Name,
+                    institution.Address
+                ));
+            }
+        }
+    }
+
+    string Name { get; set; }
+    bool validName;
+
+    private Task GetName(string s)
+    {
+        //check if the name is valid
+        var isValid = !string.IsNullOrEmpty(s);
+        //if it contains only letters and numbers
+        if (isValid)
+        {
+            isValid = s.All(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c));
+        }
+
+
+        if (!isValid)
+        {
+            //show an error message
+            validName = false;
+        }
+        else
+        {
+            validName = true;
+        }
+
+        _selectedAuditName = s;
+        return Task.CompletedTask;
+    }
+
+    private void CanChange(StepsCanChangeEventArgs obj)
+    {
+        obj.SelectedIndex = 0;
+    }
+
+    private async void OnInstitutionChange(Guid InstitutionId)
+    {
+        _selectedInstitutionId = InstitutionId;
+        //get the departments of the selected institution
+
+
+        var result = await departmentService.GetDepartmentsByInstitutionIdAsync(InstitutionId);
+
+
+        if (!result.Success)
+        {
+            //show error message
+        }
+        else
+        {
+            _departments = [];
+
+            foreach (var department in result.DtoResponses)
+            {
+                _departments.Add(new BaseDepartmentDto(
+                    department.Id,
+                    department.Name,
+                    department.Address,
+                    department.HomePhoneNumber,
+                    institutions.FirstOrDefault(x => x.Id == department.Id)
+                ));
+            }
+        }
+    }
+
+
+    private async void SubmitForm()
+    {
+        if (_selectedDepartmentId == Guid.Empty)
+        {
+            //show error message
+            successForm = false;
+            _ValidationError = "Please select a department";
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "Please select a department", Duration = 4000 });
+            return;
+        }
+        else if (_selectedInstitutionId == Guid.Empty)
+        {
+            //show error message
+            successForm = false;
+            //show a notification
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "Please select an institution", Duration = 4000 });
+            _ValidationError = "Please select an institution";
+            return;
+        }
+        else if (!validName)
+        {
+            //show error message
+            successForm = false;
+            _ValidationError = "Please enter a valid name";
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "Please enter a valid name", Duration = 4000 });
+            return;
+        }
+        else
+        {
+            //submit the form
+
+            _ValidationError = "";
+            successForm = true;
+
+            var InstitutionName = institutions.Where(x => x.Id == _selectedInstitutionId).First().Name;
+            var DepartmentName = _departments.Where(x => x.Id == _selectedDepartmentId).First().Name;
+
+
+            // Open the confirmation dialog
+            bool confirmOption = false;
+            // var confirm = await DialogService.Confirm($"Are you sure you want to create a new audit mission with the following parameters?\n\nName: {_selectedAuditName}\nInstitution ID: {_selectedInstitutionId}\nDepartment ID: {_selectedDepartmentId}", "Confirm Creation", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+            var confirm = await DialogService.OpenAsync("Confirmation", ds =>
+                @<div>
+                    <p>Are you sure you want to create a new audit mission with the following parameters?</p>
+                    <p>Name: "@_selectedAuditName"</p>
+                    <p>Institution: "@InstitutionName"</p>
+                    <p>Department: "@DepartmentName"</p>
+                    <RadzenButton Text="Yes" Click="@(() => { ds.Close(true); CreateAuditMission(); })"/>
+                    <RadzenButton Text="No" Click="@(() => ds.Close(false))"/>
+            </div>, new DialogOptions() { });
+
+            if (confirm.Value == true)
+            {
+                //submit the form
+                _ValidationError = "";
+                successForm = true;
+                //TODO show a dialog to confirm the submission
+            }
+        }
+
+        return;
+    }
+
+}
+
+@code {
+
+    private async void CreateAuditMission()
+    {
+        //get the user id
+        var userId = await authState.GetUserIdFromTokenAsync();
+        if (!userId.Item2)
+        {
+            //show error message
+        }
+
+        //create the audit mission
+        var result = await _auditMissionService.CreateAuditMissionAsync(new CreateAuditMissionDto
+        {
+            name = _selectedAuditName,
+            userId = userId.Item1,
+            departmentId = _selectedDepartmentId
+        });
+
+        if (!result.Success)
+        {
+            //show error message
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "An error occurred while creating the audit mission", Duration = 4000 });
+        }
+        else
+        {
+            //show success message
+            NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Success", Detail = "Audit Mission created successfully", Duration = 4000 });
+            await Task.Delay(1000);
+            _NavigationManager.NavigateTo("/audit-missions");
+            return;
+        }
+    }
+
+}
