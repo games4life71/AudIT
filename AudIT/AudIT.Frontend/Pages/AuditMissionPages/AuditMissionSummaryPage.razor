@@ -1,6 +1,7 @@
 ﻿@page "/audit-mission/{AuditMissionId}"
 @using Frontend.Contracts.Abstract_Services.ActivityService
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
 @using Frontend.Contracts.Abstract_Services.DepartmentService
 @using Frontend.Contracts.Abstract_Services.DocumentService
 @using Frontend.Contracts.Abstract_Services.FiapService
@@ -26,6 +27,7 @@
 @inject IAuditMissionService _auditMissionService
 @inject IDepartmentService _departmentService
 @inject NavigationManager _navigationManager
+@inject ICurrentUserAuditMissionService _currentUserAuditMissionService
 @if (_notFound == true)
 {
     <NotFound/>
@@ -209,6 +211,17 @@ else if (_notFound == false && _auditMissionDto != null)
                         </RadzenCard>
                     </RadzenColumn>
                 </RadzenRow>
+                <RadzenStack JustifyContent="JustifyContent.End" Orientation="Orientation.Horizontal">
+                    <RadzenButton Click="@SelectCurrentAuditMission" MouseLeave="@CloseToolTip" MouseEnter="@ShowTooltipSelect" Text="Select this audit mission"></RadzenButton>
+                @code{
+
+                        private void CloseToolTip()
+                        {
+                            tooltipService.Close();
+                        }
+
+                    }
+                </RadzenStack>
             </RadzenCard>
         </RadzenColumn>
     </RadzenRow>
@@ -402,6 +415,51 @@ else if (_notFound == false && _auditMissionDto != null)
 
 
         return;
+
+    }
+
+    private void ShowTooltipSelect(ElementReference elementReference)
+    {
+        tooltipService.Open(elementReference, "Select this Audit Mission as the principal one ", new TooltipOptions()
+        {
+            Position = TooltipPosition.Left,
+            Duration = 3000,
+            Delay = 0,
+            Style = "background-color: #000; color: #fff;"
+        });
+
+
+    }
+
+    private async  void SelectCurrentAuditMission()
+    {
+        //display  a dialog to confirm the selection
+        var response = await DialogService.Confirm("Are you sure you want to select this audit mission as the main one ? ",
+            "Confirm",
+            new ConfirmOptions()
+            {
+                OkButtonText = "Yes",
+                CancelButtonText = "No"
+            }
+        );
+
+        if (response.Value)
+        {
+             var result = await _currentUserAuditMissionService.SetCurrentUserAuditMissionAsync(_auditMissionDto.Id);
+
+             if (result.Success)
+             {
+                 //display an alert
+
+                    NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Success", Detail = "Audit Mission selected successfully", Duration = 4000 });
+             }
+             else
+             {
+                    //display an alert
+                    NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "Failed to select audit mission", Duration = 4000 });
+             }
+        }
+
 
     }
 }

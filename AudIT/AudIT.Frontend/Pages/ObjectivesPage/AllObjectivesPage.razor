@@ -1,5 +1,6 @@
 ﻿@page "/objectives"
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
 @using Frontend.Contracts.Abstract_Services.ObjectiveService
 @using Frontend.EntityDtos.AuditMission
 @using Frontend.EntityViewModels.Objective
@@ -10,6 +11,7 @@
 @inject NotificationService _notificationService
 @inject IAuditMissionService _auditMissionService
 @inject IObjectiveService _objectiveService
+@inject ICurrentUserAuditMissionService _currentUserAuditMissionService
 @inject NavigationManager _navigationManager
 @inject DialogService _dialogService
 @inject CustomAuthStateProvider _authStateProvider
@@ -78,6 +80,8 @@
 
 @code
 {
+
+    private Guid _currentUserAuditMission = Guid.Empty;
     private List<BaseAuditMissionDto> _auditMissions = [];
     private Guid _selectedAuditMissionId = Guid.Empty;
     private List<ObjectiveFullViewModel> _objectiveFullViewModels = [];
@@ -100,10 +104,34 @@
         }
 
         await FetchAuditMissions();
+        await FetchCurrentAuditMission();
 
-        initialAuditMission= _auditMissions.FirstOrDefault().Id;
-        SelectedAuditMission(initialAuditMission);
-        _selectedAuditMissionId = initialAuditMission;
+
+        //if the user has an audit mission selected , select it
+        if (_currentUserAuditMission != Guid.Empty)
+        {
+            initialAuditMission = _currentUserAuditMission;
+            SelectedAuditMission(_currentUserAuditMission);
+        }
+        else
+        {
+            //if the user has no audit mission selected , select the first one
+            initialAuditMission= _auditMissions.FirstOrDefault().Id;
+            SelectedAuditMission(initialAuditMission);
+            _selectedAuditMissionId = initialAuditMission;
+        }
+
+    }
+
+    private async Task FetchCurrentAuditMission()
+    {
+        var result = await _currentUserAuditMissionService.GetCurrentUserAuditMissionAsync();
+
+        if (result.Success)
+        {
+            _currentUserAuditMission = result.DtoResponse.AuditMissionId;
+        }
+
     }
 
     private async Task<bool> GetAuthState()

@@ -9,5 +9,5 @@ public interface ICurrentUserAuditMissionService
     public const string ApiPath = "https://localhost:7248/api/v1/AuditMission";
     public Task<BaseDTOResponse<CurrentUserAuditMissionViewModel>> GetCurrentUserAuditMissionAsync();
 
-
+    public Task<BaseDTOResponse<CurrentUserAuditMissionViewModel>> SetCurrentUserAuditMissionAsync(Guid AuditMissionId);
 }
