@@ -62,4 +62,26 @@ public class FiapService(HttpClient httpClient) : IFiapService
             Message = "An error occurred while fetching data"
         };
     }
+
+    public async Task<BaseDTOResponse<BaseObjActionFiapViewmodel>> GetFiapByObjectiveActionIdAsync(
+        Guid objectiveActionId)
+    {
+        var response = await httpClient.GetAsync(
+            $"{IFiapService.ApiPath}/get-obj-action-fiap-by-obj-action-id/{objectiveActionId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseObjActionFiapViewmodel>>(content);
+
+            if (result != null) return result;
+        }
+
+        return new BaseDTOResponse<BaseObjActionFiapViewmodel>
+        {
+            Success = false,
+            Message = "An error occurred while fetching data"
+        };
+    }
 }

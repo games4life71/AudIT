@@ -11,4 +11,6 @@ public interface IFiapService
     public Task<BaseDTOResponse<BaseObjActionFiapViewmodel>> GetRecentFiapsByAudidMissionAsync(Guid audiMissionId);
 
     public Task<BaseDTOResponse<BaseObjActionFiapViewmodel>> GetFiapsByAudidMissionAsync(Guid audiMissionId);
+
+    public Task<BaseDTOResponse<BaseObjActionFiapViewmodel>> GetFiapByObjectiveActionIdAsync(Guid objectiveActionId);
 }

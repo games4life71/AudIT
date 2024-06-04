@@ -2,6 +2,7 @@
 using AudIT.Applicationa.Requests.ObjectiveActionFiap.Commands.Queries.GetById;
 using AudIT.Applicationa.Requests.ObjectiveActionFiap.Commands.Update;
 using AudIT.Applicationa.Requests.ObjectiveActionFiap.Queries.GetByAuditMissionId;
+using AudIT.Applicationa.Requests.ObjectiveActionFiap.Queries.GetByObjectiveActionId;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AudIT.API.Controllers.ObjectiveActionFiap;
@@ -25,6 +26,20 @@ public class ObjActionFiapController : BaseController
         return Ok(result);
     }
 
+    [HttpGet]
+    [Route("get-obj-action-fiap-by-obj-action-id/{objectiveActionId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetObjActionFiapByObjectiveActionId(Guid objectiveActionId)
+    {
+        var result = await Mediator.Send(new GetFiapByObjActionIdQuery(objectiveActionId));
+
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
 
     [HttpGet]
     [Route("get-obj-action-fiap-by-audit-mission-id/{auditMissionId}")]

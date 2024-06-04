@@ -1,9 +1,12 @@
 ﻿@page "/objective-action/{ObjectiveActionId}"
+@using Frontend.Contracts.Abstract_Services.FiapService
 @using Frontend.Contracts.Abstract_Services.ObjectiveActionService
 @using Frontend.EntityViewModels.ActionRisk
+@using Frontend.EntityViewModels.Fiap
 @using Frontend.EntityViewModels.ObjectiveAction
+@inject TooltipService _tooltipService
 @inject IObjectiveActionService _objActionService
-
+@inject IFiapService _fiapService
 @*Summary of the Objective Action*@
 <RadzenRow class="rz-my-6" JustifyContent="JustifyContent.Start">
     <RadzenCard Variant="Variant.Outlined">
@@ -72,27 +75,46 @@
                     <RadzenDataGridColumn >
                         <Template Context="actionRisk">
                             <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
-                            <RadzenButton ButtonStyle="ButtonStyle.Warning" Click="@(() => OpenRiskEdit(actionRisk))" Icon="edit" Text="Edit"></RadzenButton>
-                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Click="@(() => DeleteRisk(actionRisk))" Icon="delete" Text="Delete"></RadzenButton>
+                                <RadzenButton ButtonStyle="ButtonStyle.Warning" Click="@(() => OpenRiskEdit(actionRisk))" Icon="edit" Text="Edit"></RadzenButton>
+                                <RadzenButton ButtonStyle="ButtonStyle.Danger" Click="@(() => DeleteRisk(actionRisk))" Icon="delete" Text="Delete"></RadzenButton>
                             </RadzenStack>
                         </Template>
                     </RadzenDataGridColumn>
-                    </Columns>
-                
+                </Columns>
+
             </RadzenDataGrid>
         </RadzenStack>
     </RadzenCard>
 </RadzenRow>
+
+
 @*Associated Fiaps*@
 <RadzenRow>
     <RadzenRow class="rz-my-6">
-        <RadzenDataGrid Data="@_tests" TItem="Test">
-            <Columns>
-                <RadzenDataGridColumn Property="Name"></RadzenDataGridColumn>
-                <RadzenDataGridColumn Property="Selected"></RadzenDataGridColumn>
-
-            </Columns>
-        </RadzenDataGrid>
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenStack Orientation="Orientation.Vertical">
+                <RadzenText TextStyle="TextStyle.DisplayH5" Text="Associated FIAPS"></RadzenText>
+                <RadzenDataGrid Data="@_fiaps"  TItem="BaseObjActionFiapViewmodel">
+                    <Columns>
+                        <RadzenDataGridColumn Filterable="true" Sortable="true" Title="Name" Property="Name"></RadzenDataGridColumn>
+                        <RadzenDataGridColumn  Filterable="true" Sortable="true"Title="Start" Property="AuditedPeriodStart"></RadzenDataGridColumn>
+                        <RadzenDataGridColumn Filterable="true" Sortable="true" Title="End" Property="AuditedPeriodEnd"></RadzenDataGridColumn>
+                        <RadzenDataGridColumn  Filterable="true" Sortable="true"Title="Problem" Property="Problem"></RadzenDataGridColumn>
+                        <RadzenDataGridColumn  Filterable="true" Sortable="true"Title="Cause" Property="Cause"></RadzenDataGridColumn>
+                        <RadzenDataGridColumn  Filterable="true" Sortable="true" Title="Recommendation" Property="Recommendation"></RadzenDataGridColumn>
+                        <RadzenDataGridColumn >
+                            <Template Context="fiap">
+                                <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+                                    <RadzenButton MouseEnter="@((obj)=>ShowToolTipText(obj,"Edit"))" ButtonStyle="ButtonStyle.Warning" Click="@(() => NavigateFiapEdit(fiap))" Icon="edit"></RadzenButton>
+                                    <RadzenButton MouseEnter="@((obj)=>ShowToolTipText(obj,"Delete"))" ButtonStyle="ButtonStyle.Danger" Click="@(() => DeleteFiap(fiap))" Icon="delete"></RadzenButton>
+                                    <RadzenButton MouseEnter="@ShowExportToolTip" ButtonStyle="ButtonStyle.Info" Click="@(() => ExportFiap(fiap))" Icon="open_in_new_off"></RadzenButton>
+                                </RadzenStack>
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenStack>
+        </RadzenCard>
     </RadzenRow>
 </RadzenRow>
 @*Associated Risks*@
@@ -112,6 +134,7 @@
 
     private ObjectiveActionViewModel _objectiveActionViewModel = new ObjectiveActionViewModel();
 
+    private List<BaseObjActionFiapViewmodel> _fiaps = [];
 
     public class Test
     {
@@ -131,6 +154,7 @@
     protected override async Task OnInitializedAsync()
     {
         await FetchObjectiveAction();
+        await FetchFiaps();
 
         _tests.Add(new Test("asdasad", "adassadasd"));
         _tests.Add(new Test("asdasad", "adassadasd"));
@@ -143,6 +167,16 @@
 
 @functions
 {
+
+    private async Task FetchFiaps()
+    {
+        var result = await _fiapService.GetFiapByObjectiveActionIdAsync(Guid.Parse(ObjectiveActionId));
+
+        if (result.Success)
+        {
+            _fiaps = result.DtoResponses;
+        }
+    }
 
     private async Task FetchObjectiveAction()
     {
@@ -162,5 +196,32 @@
     private Task DeleteRisk(ActionRiskViewModel actionRisk)
     {
         throw new NotImplementedException();
+    }
+
+    private Task NavigateFiapEdit(BaseObjActionFiapViewmodel fiap)
+    {
+        throw new NotImplementedException();
+    }
+
+    private Task DeleteFiap(BaseObjActionFiapViewmodel fiap)
+    {
+        throw new NotImplementedException();
+    }
+
+    private Task ExportFiap(BaseObjActionFiapViewmodel fiap)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void ShowToolTipText(ElementReference obj, string text)
+    {
+        _tooltipService.OpenOnTheTop(obj, text, new TooltipOptions() {  Position = TooltipPosition.Top, Duration = 2000 });
+    }
+
+    private void ShowExportToolTip(ElementReference obj)
+    {
+        //display a tool tip
+
+        _tooltipService.OpenOnTheTop(obj, "Export", new TooltipOptions() { Position = TooltipPosition.Top, Duration = 2000 });
     }
 }
