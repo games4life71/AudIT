@@ -10,5 +10,7 @@ public interface IActivityService
     public Task<BaseDTOResponse<BaseActivityViewmodel>> GetActivitiesByAuditMissionIdAsync(Guid auditMissionId);
     public Task<BaseDTOResponse<BaseActivityViewmodel>> GetRecentActivitiesByAuditMissionIdAsync(Guid auditMissionId);
 
+    public Task<BaseDTOResponse<ActivityWithDepartViewModel>> GetActivitiesByObjectiveActionIdAsync(Guid objectiveActionId);
+
 
 }

@@ -63,4 +63,23 @@ public class ActivityService(HttpClient httpClient) : IActivityService
             Message = "An error occurred while fetching activities"
         };
     }
+
+    public async Task<BaseDTOResponse<ActivityWithDepartViewModel>> GetActivitiesByObjectiveActionIdAsync(
+        Guid objectiveActionId)
+    {
+        var response = await
+            httpClient.GetAsync($"{IActivityService.ApiPath}/get-activities-by-objective-action/{objectiveActionId}");
+
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<ActivityWithDepartViewModel>>(content);
+
+            if (result != null) return result;
+        }
+
+        return new BaseDTOResponse<ActivityWithDepartViewModel>(response.ReasonPhrase);
+    }
 }

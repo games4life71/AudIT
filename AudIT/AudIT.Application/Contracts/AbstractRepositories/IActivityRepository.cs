@@ -20,4 +20,5 @@ public interface IActivityRepository : IRepository<Activity>
 
     public Task<Result<List<Activity>>> FindMostRecentByAuditMissionId(Guid requestAuditMissionId);
     public Task<Result<List<Activity>>> FindByAuditMissionId(Guid requestAuditMissionId);
+    Task<Result<List<Activity>>> GetByObjectiveActionId(Guid requestActivityIf);
 }

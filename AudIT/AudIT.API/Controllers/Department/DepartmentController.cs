@@ -1,4 +1,5 @@
 ﻿using AudIT.Applicationa.Requests.AuditMission.Queries.GetById;
+using AudIT.Applicationa.Requests.Department.Command.Create;
 using AudIT.Applicationa.Requests.Department.Queries.GetById;
 using AudIT.Applicationa.Requests.Department.Queries.GetByInstitutionId;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,21 @@ public class DepartmentController : BaseController
         return Ok(result);
     }
 
+    [HttpPost]
+    [Route("create-department")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> CreateDepartment([FromBody] CreateDepartmentCommand command)
+    {
+        var result = await Mediator.Send(command);
+
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
 
     [HttpGet]
     [Route("get-departments-by-institution-id/{id}")]

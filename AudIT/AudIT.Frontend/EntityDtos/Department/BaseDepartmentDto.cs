@@ -4,15 +4,15 @@ namespace Frontend.EntityDtos.Department;
 
 public class BaseDepartmentDto
 {
-    public Guid Id { get; private set; }
+    public Guid Id { get;  set; }
 
-    public string? Name { get; private set; }
+    public string? Name { get;  set; }
 
-    public string Address { get; private set; }
+    public string Address { get;  set; }
 
-    public string HomePhoneNumber { get; private set; }
+    public string HomePhoneNumber { get;  set; }
 
-    public BaseInstitutionDto Institution { get; private set; }
+    public BaseInstitutionDto Institution { get;  set; }
 
 
     public BaseDepartmentDto(Guid id, string? name, string address, string homePhoneNumber,
@@ -23,5 +23,10 @@ public class BaseDepartmentDto
         Address = address;
         HomePhoneNumber = homePhoneNumber;
         Institution = institution;
+    }
+
+    public BaseDepartmentDto()
+    {
+
     }
 }

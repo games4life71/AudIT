@@ -11,7 +11,7 @@ public class ObjectiveActionViewModel
 
     public string name { get; set; }
 
-    public List<ActionRiskViewModel> actionRisks { get; set; }
+    public List<ActionRiskViewModel> actionRisks { get; set; } = [];
 
     public List<object> controaleInterneExistente { get; set; }
 

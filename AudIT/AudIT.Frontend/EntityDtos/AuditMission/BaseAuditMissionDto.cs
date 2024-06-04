@@ -25,6 +25,11 @@ public class BaseAuditMissionDto
         LastModifiedDate = lastModifiedDate;
     }
 
+    public BaseAuditMissionDto()
+    {
+
+    }
+
 }
 
 public enum AuditMissionStatus

@@ -31,7 +31,6 @@ public enum ActivityType
 {
     //the activity is a mission
     Mission,
-
     //the activity is a task
     Task,
     ForObjectiveAction //the activity is binded to an objective action

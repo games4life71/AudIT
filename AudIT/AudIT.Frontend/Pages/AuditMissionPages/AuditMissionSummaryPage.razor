@@ -231,12 +231,12 @@ else if (_notFound == false && _auditMissionDto != null)
 
 
     [Parameter] public required string AuditMissionId { get; set; }
-    private UpdateAuditMissionDto _updateAuditMissionDto;
+    private UpdateAuditMissionDto _updateAuditMissionDto = new UpdateAuditMissionDto();
 
     private List<string> _auditMissionStatuses = Enum.GetNames(typeof(AuditMissionStatus)).ToList();
 
-    private BaseAuditMissionDto _auditMissionDto = null;
-    private BaseDepartmentDto _departmentDto = null;
+    private BaseAuditMissionDto _auditMissionDto = new BaseAuditMissionDto();
+    private BaseDepartmentDto _departmentDto =new BaseDepartmentDto();
 
     private string selectedStatus="";
     private DateTime selectedDate;

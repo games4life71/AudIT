@@ -53,7 +53,7 @@ else
 
                             <RadzenText Text="Choose the Department"></RadzenText>
                             <RadzenFieldset>
-                                <RadzenDropDown Disabled="@foundDepart" @bind-Value="_selectedDepartmentId" AllowFiltering="true"
+                                <RadzenDropDown @bind-Value="@_selectedDepartmentId"  AllowFiltering="true"
                                                 TValue="Guid" Placeholder="Department:"
                                                 Data="@(_departments)" TextProperty="Name" ValueProperty="Id"/>
 
@@ -76,6 +76,8 @@ else
 
 
     </RadzenCard>
+    <RadzenText Text="@($"the selected id is {_selectedDepartmentId}")" ></RadzenText>
+    <RadzenText Text="@($"the selected id is {_selectedInstitutionId}")" ></RadzenText>
 }
 
 
@@ -87,8 +89,8 @@ else
         public string Value { get; set; } = value;
     }
 
-    List<BaseInstitutionDto> institutions;
-    List<BaseDepartmentDto> _departments;
+    List<BaseInstitutionDto> institutions=[];
+    List<BaseDepartmentDto> _departments=[];
 
     private string _selectedAuditName = "";
     private Guid _selectedInstitutionId = Guid.Empty;
@@ -152,13 +154,12 @@ else
         obj.SelectedIndex = 0;
     }
 
-    private async void OnInstitutionChange(Guid InstitutionId)
+    private async void OnInstitutionChange(Guid institutionId)
     {
-        _selectedInstitutionId = InstitutionId;
+        _selectedInstitutionId = institutionId;
         //get the departments of the selected institution
 
-
-        var result = await departmentService.GetDepartmentsByInstitutionIdAsync(InstitutionId);
+        var result = await departmentService.GetDepartmentsByInstitutionIdAsync(institutionId);
 
 
         if (!result.Success)
@@ -166,6 +167,7 @@ else
             //show error message
         }
         else
+
         {
             _departments = [];
 
@@ -223,7 +225,7 @@ else
 
             // Open the confirmation dialog
             bool confirmOption = false;
-            // var confirm = await DialogService.Confirm($"Are you sure you want to create a new audit mission with the following parameters?\n\nName: {_selectedAuditName}\nInstitution ID: {_selectedInstitutionId}\nDepartment ID: {_selectedDepartmentId}", "Confirm Creation", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
             var confirm = await DialogService.OpenAsync("Confirmation", ds =>
                 @<div>
                     <p>Are you sure you want to create a new audit mission with the following parameters?</p>
@@ -280,6 +282,13 @@ else
             _NavigationManager.NavigateTo("/audit-missions");
             return;
         }
+    }
+
+    private Task SelectDepartment(Guid value)
+    {
+        _selectedDepartmentId = value;
+
+        return Task.CompletedTask;
     }
 
 }

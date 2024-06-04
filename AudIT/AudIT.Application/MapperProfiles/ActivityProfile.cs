@@ -11,7 +11,7 @@ public class ActivityProfile:MyCustomProfile
         CreateMap<Activity, BaseActivityDto>();
         CreateMap<Activity, ActivityWIthDocumentsDto>()
             .ForMember(dest => dest.AttachedDocuments, opt => opt.MapFrom(src => src.AttachedDocuments));
-
+        CreateMap<Activity, ActivityWithDepartmentDto>();
     }
 
     

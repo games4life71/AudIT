@@ -29,7 +29,7 @@ public class BaseDTOResponse<T> : BaseResponse where T : class
         // Message = "An error occurred";
     }
 
-    public BaseDTOResponse(string message) : base(message, false)
+    public BaseDTOResponse(string? message) : base(message, false)
     {
         DtoResponse = null;
         // Success = false;

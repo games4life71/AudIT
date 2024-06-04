@@ -114,4 +114,19 @@ public class ActivityRepository(AudITContext context) : BaseRepository<Activity>
 
         return Result<List<Activity>>.Success(activities);
     }
+
+    public async Task<Result<List<Activity>>> GetByObjectiveActionId(Guid requestActivityId)
+    {
+        var activities = await _dbcContext.Activities
+            .Where(a => a.ObjectiveActionId == requestActivityId)
+            .Include(a=>a.Department)
+            .ToListAsync();
+
+        if (activities.Count == 0)
+        {
+            return Result<List<Activity>>.Failure("Cannot find any activities with the given objective action id");
+        }
+
+        return Result<List<Activity>>.Success(activities);
+    }
 }

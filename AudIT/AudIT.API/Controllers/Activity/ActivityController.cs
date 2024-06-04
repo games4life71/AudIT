@@ -5,6 +5,7 @@ using AudIT.Applicationa.Requests.Activity.Commands.Update;
 using AudIT.Applicationa.Requests.Activity.Queries;
 using AudIT.Applicationa.Requests.Activity.Queries.GetByAuditMissionId;
 using AudIT.Applicationa.Requests.Activity.Queries.GetByDate;
+using AudIT.Applicationa.Requests.Activity.Queries.GetByObjectiveActionId;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AudIT.API.Controllers.Activity;
@@ -26,6 +27,23 @@ public class ActivityController : BaseController
 
         return Ok(result);
     }
+
+
+    [HttpGet]
+    [Route("get-activities-by-objective-action/{objectiveActionId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetActivitiesByObjectiveActionId(Guid objectiveActionId)
+    {
+        var result = await Mediator.Send(new GetActivityByObjActionIdCommand(objectiveActionId));
+
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
+
 
     [HttpGet]
     [Route("get-activities-by-audit-mission/{auditMissionId}")]

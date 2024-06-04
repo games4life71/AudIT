@@ -1,9 +1,17 @@
 ﻿@page "/objective-action/{ObjectiveActionId}"
+@using Frontend.Contracts.Abstract_Services.ActivityService
+@using Frontend.Contracts.Abstract_Services.DepartmentService
 @using Frontend.Contracts.Abstract_Services.FiapService
 @using Frontend.Contracts.Abstract_Services.ObjectiveActionService
+@using Frontend.EntityDtos.Department
 @using Frontend.EntityViewModels.ActionRisk
+@using Frontend.EntityViewModels.Activity
 @using Frontend.EntityViewModels.Fiap
 @using Frontend.EntityViewModels.ObjectiveAction
+
+@inject IDepartmentService _departmentService
+@inject IActivityService _activityService
+@inject NavigationManager NavigationManager
 @inject TooltipService _tooltipService
 @inject IObjectiveActionService _objActionService
 @inject IFiapService _fiapService
@@ -94,19 +102,19 @@
         <RadzenCard Variant="Variant.Outlined">
             <RadzenStack Orientation="Orientation.Vertical">
                 <RadzenText TextStyle="TextStyle.DisplayH5" Text="Associated FIAPS"></RadzenText>
-                <RadzenDataGrid Data="@_fiaps"  TItem="BaseObjActionFiapViewmodel">
+                <RadzenDataGrid Data="@_fiaps" TItem="BaseObjActionFiapViewmodel">
                     <Columns>
                         <RadzenDataGridColumn Filterable="true" Sortable="true" Title="Name" Property="Name"></RadzenDataGridColumn>
-                        <RadzenDataGridColumn  Filterable="true" Sortable="true"Title="Start" Property="AuditedPeriodStart"></RadzenDataGridColumn>
+                        <RadzenDataGridColumn Filterable="true" Sortable="true"Title="Start" Property="AuditedPeriodStart"></RadzenDataGridColumn>
                         <RadzenDataGridColumn Filterable="true" Sortable="true" Title="End" Property="AuditedPeriodEnd"></RadzenDataGridColumn>
-                        <RadzenDataGridColumn  Filterable="true" Sortable="true"Title="Problem" Property="Problem"></RadzenDataGridColumn>
-                        <RadzenDataGridColumn  Filterable="true" Sortable="true"Title="Cause" Property="Cause"></RadzenDataGridColumn>
-                        <RadzenDataGridColumn  Filterable="true" Sortable="true" Title="Recommendation" Property="Recommendation"></RadzenDataGridColumn>
+                        <RadzenDataGridColumn Filterable="true" Sortable="true"Title="Problem" Property="Problem"></RadzenDataGridColumn>
+                        <RadzenDataGridColumn Filterable="true" Sortable="true"Title="Cause" Property="Cause"></RadzenDataGridColumn>
+                        <RadzenDataGridColumn Filterable="true" Sortable="true" Title="Recommendation" Property="Recommendation"></RadzenDataGridColumn>
                         <RadzenDataGridColumn >
                             <Template Context="fiap">
                                 <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
-                                    <RadzenButton MouseEnter="@((obj)=>ShowToolTipText(obj,"Edit"))" ButtonStyle="ButtonStyle.Warning" Click="@(() => NavigateFiapEdit(fiap))" Icon="edit"></RadzenButton>
-                                    <RadzenButton MouseEnter="@((obj)=>ShowToolTipText(obj,"Delete"))" ButtonStyle="ButtonStyle.Danger" Click="@(() => DeleteFiap(fiap))" Icon="delete"></RadzenButton>
+                                    <RadzenButton MouseEnter="@((obj) => ShowToolTipText(obj, "Edit"))" ButtonStyle="ButtonStyle.Warning" Click="@(() => NavigateFiapEdit(fiap))" Icon="edit"></RadzenButton>
+                                    <RadzenButton MouseEnter="@((obj) => ShowToolTipText(obj, "Delete"))" ButtonStyle="ButtonStyle.Danger" Click="@(() => DeleteFiap(fiap))" Icon="delete"></RadzenButton>
                                     <RadzenButton MouseEnter="@ShowExportToolTip" ButtonStyle="ButtonStyle.Info" Click="@(() => ExportFiap(fiap))" Icon="open_in_new_off"></RadzenButton>
                                 </RadzenStack>
                             </Template>
@@ -117,16 +125,44 @@
         </RadzenCard>
     </RadzenRow>
 </RadzenRow>
-@*Associated Risks*@
-<RadzenRow class="rz-my-6">
-    <RadzenDataGrid Data="@_tests" TItem="Test">
-        <Columns>
-            <RadzenDataGridColumn Property="Name"></RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="Selected"></RadzenDataGridColumn>
 
-        </Columns>
-    </RadzenDataGrid>
+@*Associated Activities*@
+<RadzenRow class="rz-my-6">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenText TextStyle="TextStyle.DisplayH5" Text="Associated Activities"></RadzenText>
+                <RadzenDataGrid AllowFiltering="true"  AllowSorting="true" Data="@_activities" TItem="ActivityWithDepartViewModel">
+                    <Columns>
+                        <RadzenDataGridColumn Title="Name" Property="Name"></RadzenDataGridColumn>
+                        <RadzenDataGridColumn Title=" Department Name" Property="Department.Name"></RadzenDataGridColumn>
+                        <RadzenDataGridColumn Title="Type" Property="Type"></RadzenDataGridColumn>
+                        <RadzenDataGridColumn>
+                            <Template Context="activity">
+                                <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+                                    <RadzenButton ButtonStyle="ButtonStyle.Warning" Click="@(() => OpenActivityEdit(activity))" Icon="edit" Text="Edit"></RadzenButton>
+                                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Click="@(() => DeleteActivity(activity))" Icon="delete" Text="Delete"></RadzenButton>
+                                </RadzenStack>
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+
+                </RadzenDataGrid>
+
+
+
+        </RadzenStack>
+    </RadzenCard>
 </RadzenRow>
+<RadzenRow class=rz-mt-4>
+
+    <RadzenStack JustifyContent="JustifyContent.Start" Orientation="Orientation.Horizontal">
+        <RadzenButton Click="@NavigateBack" Text="Back" ButtonStyle="ButtonStyle.Secondary" Icon="arrow_back"></RadzenButton>
+    </RadzenStack>
+
+</RadzenRow>
+
+
+
 
 @code {
 
@@ -134,7 +170,10 @@
 
     private ObjectiveActionViewModel _objectiveActionViewModel = new ObjectiveActionViewModel();
 
+    private List<ActivityWithDepartViewModel> _activities =[];
+    // private List<ActivityWithDepartmentViewModel> _activities = [];
     private List<BaseObjActionFiapViewmodel> _fiaps = [];
+    private List<BaseDepartmentDto> _departments = [];
 
     public class Test
     {
@@ -151,22 +190,60 @@
 
     List<Test> _tests = [];
 
-    protected override async Task OnInitializedAsync()
+
+    protected override async Task OnParametersSetAsync()
     {
         await FetchObjectiveAction();
         await FetchFiaps();
+        await FetchActivities();
+        // await FetchDepartments();
 
-        _tests.Add(new Test("asdasad", "adassadasd"));
-        _tests.Add(new Test("asdasad", "adassadasd"));
-        _tests.Add(new Test("asdasad", "adassadasd"));
-        _tests.Add(new Test("asdasad", "adassadasd"));
-        _tests.Add(new Test("asdasad", "adassadasd"));
+        // _activities.Add(new ActivityWithDepartmentViewModel
+        // {
+        //     Id = Guid.NewGuid(),
+        //     Name = "Test",
+        //     Type = 0,
+        //     DepartmentId = Guid.NewGuid(),
+        //     ObjectiveActionId = Guid.NewGuid(),
+        //     UserId = Guid.NewGuid().ToString(),
+        //     Department = "Test"
+        // });_activities.Add(new ActivityWithDepartmentViewModel
+
     }
 
 }
 
 @functions
 {
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo("/objectives");
+    }
+
+    private async Task FetchActivities()
+    {
+        try
+        {
+            var result = await _activityService.GetActivitiesByObjectiveActionIdAsync(Guid.Parse(ObjectiveActionId));
+
+            if (result.Success)
+            {
+                _activities = result.DtoResponses;
+
+
+            }
+            else
+            {
+                Console.WriteLine("Failed to fetch activities. Error message: " + result.Message);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Exception occurred while fetching activities: " + ex.Message);
+        }
+    }
+
+
 
     private async Task FetchFiaps()
     {
@@ -215,7 +292,7 @@
 
     private void ShowToolTipText(ElementReference obj, string text)
     {
-        _tooltipService.OpenOnTheTop(obj, text, new TooltipOptions() {  Position = TooltipPosition.Top, Duration = 2000 });
+        _tooltipService.OpenOnTheTop(obj, text, new TooltipOptions() { Position = TooltipPosition.Top, Duration = 2000 });
     }
 
     private void ShowExportToolTip(ElementReference obj)
@@ -223,5 +300,15 @@
         //display a tool tip
 
         _tooltipService.OpenOnTheTop(obj, "Export", new TooltipOptions() { Position = TooltipPosition.Top, Duration = 2000 });
+    }
+
+    private Task OpenActivityEdit(ActivityWithDepartViewModel activity)
+    {
+        throw new NotImplementedException();
+    }
+
+    private Task DeleteActivity(ActivityWithDepartViewModel activity)
+    {
+        throw new NotImplementedException();
     }
 }
