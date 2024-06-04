@@ -3,10 +3,10 @@
 @inject NavigationManager _navigationManager
 <RadzenDataGrid Data="@ActionRisks">
     <Columns>
-        <RadzenDataGridColumn Property="name" Title="Risk Name"></RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="risk" Title="Risk Exposure"></RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="impact" Title="Risk Impact"></RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="probability" Title="Risk Probability"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Filterable="true" Sortable="true" Property="name" Title="Risk Name"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Filterable="true" Sortable="true" Property="risk" Title="Risk Exposure"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Filterable="true" Sortable="true"  Property="probability" Title="Risk Probability"></RadzenDataGridColumn>
+        <RadzenDataGridColumn  Filterable="true" Sortable="true" Property="impact" Title="Risk Impact(total score)"></RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 <RadzenStack class="rz-mt-10" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0.5rem">

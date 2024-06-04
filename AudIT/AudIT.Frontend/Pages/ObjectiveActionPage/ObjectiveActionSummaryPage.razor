@@ -1,0 +1,166 @@
+﻿@page "/objective-action/{ObjectiveActionId}"
+@using Frontend.Contracts.Abstract_Services.ObjectiveActionService
+@using Frontend.EntityViewModels.ActionRisk
+@using Frontend.EntityViewModels.ObjectiveAction
+@inject IObjectiveActionService _objActionService
+
+@*Summary of the Objective Action*@
+<RadzenRow class="rz-my-6" JustifyContent="JustifyContent.Start">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenText class="rz-mb-4" TextStyle="TextStyle.DisplayH5" Text="Summary"></RadzenText>
+        <RadzenStack Orientation="Orientation.Vertical">
+            @*First row of info *@
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenLabel Component="forName" Text="Name:"></RadzenLabel>
+                    <RadzenText Text="@_objectiveActionViewModel.name"> </RadzenText>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenLabel Component="forSelected" Text="Selected:"></RadzenLabel>
+                    <RadzenText Text="@_objectiveActionViewModel.selected.ToString()"> </RadzenText>
+                </RadzenStack>
+            </RadzenStack>
+            @*Second row of info *@
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenStack Orientation="Orientation.Vertical">
+                        <RadzenLabel Component="forControl1" Text="Controale interne asteptate:"></RadzenLabel>
+                        <RadzenTextArea Rows="3" Text="@(() => fromListToString(_objectiveActionViewModel.controaleInterneAsteptate))"> </RadzenTextArea>
+
+                        @code
+                        {
+                            private string fromListToString(List<object> list)
+                            {
+                                if (list.Count == 0)
+                                {
+                                    return "No elements found !";
+                                }
+
+                                string result = "";
+                                foreach (var item in list)
+                                {
+                                    result += item + "\n";
+                                }
+
+                                return result;
+                            }
+                        }
+
+                    </RadzenStack>
+                    <RadzenStack Orientation="Orientation.Vertical">
+                        <RadzenLabel Component="forControl1" Text="Controale interne asteptate:"></RadzenLabel>
+                        <RadzenTextArea Rows="3" Text="@(() => fromListToString(_objectiveActionViewModel.controaleInterneExistente))"> </RadzenTextArea>
+                    </RadzenStack>
+                </RadzenStack>
+
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+</RadzenRow>
+
+@*Actiuni cu riscuri asociate*@
+<RadzenRow class="rz-my-6">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenText TextStyle="TextStyle.DisplayH5" Text="Action Risks"></RadzenText>
+            <RadzenDataGrid Data="@_objectiveActionViewModel.actionRisks" TItem="ActionRiskViewModel">
+                <Columns>
+                    <RadzenDataGridColumn Title="Risk Name" Property="name"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Title="Impact" Property="impact"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Title="Probability" Property="probability"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Title="Risk score" Property="risk"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn >
+                        <Template Context="actionRisk">
+                            <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+                            <RadzenButton ButtonStyle="ButtonStyle.Warning" Click="@(() => OpenRiskEdit(actionRisk))" Icon="edit" Text="Edit"></RadzenButton>
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Click="@(() => DeleteRisk(actionRisk))" Icon="delete" Text="Delete"></RadzenButton>
+                            </RadzenStack>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    </Columns>
+                
+            </RadzenDataGrid>
+        </RadzenStack>
+    </RadzenCard>
+</RadzenRow>
+@*Associated Fiaps*@
+<RadzenRow>
+    <RadzenRow class="rz-my-6">
+        <RadzenDataGrid Data="@_tests" TItem="Test">
+            <Columns>
+                <RadzenDataGridColumn Property="Name"></RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="Selected"></RadzenDataGridColumn>
+
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenRow>
+</RadzenRow>
+@*Associated Risks*@
+<RadzenRow class="rz-my-6">
+    <RadzenDataGrid Data="@_tests" TItem="Test">
+        <Columns>
+            <RadzenDataGridColumn Property="Name"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="Selected"></RadzenDataGridColumn>
+
+        </Columns>
+    </RadzenDataGrid>
+</RadzenRow>
+
+@code {
+
+    [Parameter] public string ObjectiveActionId { get; set; }
+
+    private ObjectiveActionViewModel _objectiveActionViewModel = new ObjectiveActionViewModel();
+
+
+    public class Test
+    {
+        public string Name { get; set; }
+
+        public string Selected { get; set; }
+
+        public Test(string name, string selected)
+        {
+            Name = name;
+            Selected = selected;
+        }
+    }
+
+    List<Test> _tests = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchObjectiveAction();
+
+        _tests.Add(new Test("asdasad", "adassadasd"));
+        _tests.Add(new Test("asdasad", "adassadasd"));
+        _tests.Add(new Test("asdasad", "adassadasd"));
+        _tests.Add(new Test("asdasad", "adassadasd"));
+        _tests.Add(new Test("asdasad", "adassadasd"));
+    }
+
+}
+
+@functions
+{
+
+    private async Task FetchObjectiveAction()
+    {
+        var result = await _objActionService.GetObjectiveActionByIdAsync(Guid.Parse(ObjectiveActionId));
+
+        if (result.Success && result.DtoResponse != null)
+        {
+            _objectiveActionViewModel = result.DtoResponse;
+        }
+    }
+
+    private Task OpenRiskEdit(ActionRiskViewModel actionRisk)
+    {
+        throw new NotImplementedException();
+    }
+
+    private Task DeleteRisk(ActionRiskViewModel actionRisk)
+    {
+        throw new NotImplementedException();
+    }
+}
