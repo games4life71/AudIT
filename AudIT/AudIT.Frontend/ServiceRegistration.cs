@@ -4,16 +4,19 @@ using Blazored.LocalStorage;
 using Frontend.Contracts.Abstract_Services.ActionRiskService;
 using Frontend.Contracts.Abstract_Services.ActivityService;
 using Frontend.Contracts.Abstract_Services.AuditMissionService;
+using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService;
 using Frontend.Contracts.Abstract_Services.DepartmentService;
 using Frontend.Contracts.Abstract_Services.DocumentService;
 using Frontend.Contracts.Abstract_Services.FiapService;
 using Frontend.Contracts.Abstract_Services.InstitutionsService;
 using Frontend.Contracts.Abstract_Services.ObjectiveActionService;
 using Frontend.Contracts.Abstract_Services.ObjectiveService;
+using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel;
 using Frontend.Services.ActionRiskServices;
 using Frontend.Services.Activity;
 using Frontend.Services.AuditMission;
 using Frontend.Services.AuthentificationServices;
+using Frontend.Services.CurrentUserAuditMissionService;
 using Frontend.Services.Department;
 using Frontend.Services.Document;
 using Frontend.Services.FiapService;
@@ -48,6 +51,7 @@ public static class ServiceRegistration
         services.AddScoped<IFiapService, FiapService>();
         services.AddScoped<IObjectiveActionService, ObjectiveActionService>();
         services.AddScoped<IActionRiskService, ActionRiskService>();
+        services.AddScoped<ICurrentUserAuditMissionService, CurrentUserAuditMissionService>();
         services.AddBlazoredLocalStorage();
 
         // services.AddScoped<ClaimsPrincipal>();

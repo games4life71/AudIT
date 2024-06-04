@@ -1,9 +1,16 @@
 ﻿@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
+@using Frontend.Contracts.Abstract_Services.ObjectiveService
 @using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityViewModels.Objective
 @using Frontend.Services.AuthentificationServices
 @using Microsoft.AspNetCore.Components.Authorization
 @inherits LayoutComponentBase
+
+
+@inject IObjectiveService _objectiveService
 @inject CustomAuthStateProvider customAuthState
+@inject ICurrentUserAuditMissionService _currentAuditMissionService
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
 @inject IAuditMissionService _auditMissionService
@@ -43,10 +50,14 @@
                     <RadzenPanelMenuItem class="rz-my-2" Text="Create Mission" Path="/create-mission" Icon="add"/>
                     <RadzenPanelMenuItem class="rz-my-2" Text="List Missions" Path="/audit-missions" Icon="list"/>
                     <RadzenPanelMenuItem class="rz-my-2" Text="Search Audit Mission" Icon="search">
-                        <RadzenStack  class="rz-my-2" Orientation="Orientation.Vertical">
+                        <RadzenStack class="rz-my-2" Orientation="Orientation.Vertical">
 
-                            <RadzenAutoComplete ValueChanged="@((value)=>AuditMissionSearchChanged(value))" TextProperty="Name" Data="@_auditMissions" Placeholder="Audit Mission name..."></RadzenAutoComplete>
-                                <RadzenButton Click="@NavigateToAuditMission" Text="Go" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small" ></RadzenButton>
+                            <RadzenAutoComplete ValueChanged="@((value) => AuditMissionSearchChanged(value))"
+                                                TextProperty="Name"
+                                                Data="@_auditMissions"
+                                                Placeholder="Audit Mission name...">
+                            </RadzenAutoComplete>
+                            <RadzenButton Click="@NavigateToAuditMission" Text="Go" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small"></RadzenButton>
                         </RadzenStack>
                     </RadzenPanelMenuItem>
                 </RadzenPanelMenuItem>
@@ -56,8 +67,12 @@
                     <RadzenPanelMenuItem class="rz-my-2" Text="Search Objective" Icon="search">
 
                         <RadzenStack Orientation="Orientation.Vertical">
-                            @* <RadzenAutoComplete Data="@_objectives"   Placeholder="Objective name..." ></RadzenAutoComplete> *@
-                            <RadzenButton class="rz-mb-2" Size="ButtonSize.Small" Text="Search"></RadzenButton>
+                            <RadzenAutoComplete Data="@_objectives"
+                                                TextProperty="Name"
+                                                ValueChanged="@((value) => ObjectiveChanged(value))"
+                                                Placeholder="Objective name...">
+                            </RadzenAutoComplete>
+                            <RadzenButton Click="@NavigateToObjective" Text="Go" ButtonStyle="ButtonStyle.Dark" Size="ButtonSize.Small"></RadzenButton>
                         </RadzenStack>
 
                     </RadzenPanelMenuItem>
@@ -111,8 +126,14 @@
 
     bool sidebarExpanded = true;
     bool isAuthenticated = false;
+    private Guid _currentUserAuditMission = Guid.Empty;
+
+    private Guid _selectedObjectiveId = Guid.Empty;
     private Guid _selectedAuditMissionId = Guid.Empty;
+
     private List<BaseAuditMissionDto> _auditMissions = [];
+    private List<BaseObjectiveViewModel> _objectives = [];
+
     protected override async Task OnInitializedAsync()
     {
         customAuthState.AuthenticationStateChanged += RefreshNavbar;
@@ -120,6 +141,8 @@
         isAuthenticated = authState.User.Identity is { IsAuthenticated: true };
 
         await FetchAuditMissions();
+        await FetchCurrentAuditMission();
+        await FetchObjectives();
     }
 
     private async Task FetchAuditMissions()
@@ -128,6 +151,32 @@
         if (auditMissions.Success)
         {
             _auditMissions = auditMissions.DtoResponses;
+        }
+    }
+
+    private async Task FetchCurrentAuditMission()
+    {
+        var result = await _currentAuditMissionService.GetCurrentUserAuditMissionAsync();
+
+        if (result.Success)
+        {
+            _currentUserAuditMission = result.DtoResponse.AuditMissionId;
+        }
+    }
+
+    private async Task FetchObjectives()
+    {
+        if (_currentUserAuditMission == Guid.Empty)
+        {
+            await FetchCurrentAuditMission();
+        }
+
+
+        var response = await _objectiveService.GetObjectivesByAuditMissionIdAsync(_currentUserAuditMission);
+
+        if (response.Success)
+        {
+            _objectives = response.DtoResponses;
         }
     }
 
@@ -152,6 +201,7 @@
             return;
         }
     }
+
     private void NavigateToAuditMission()
     {
         if (_selectedAuditMissionId != Guid.Empty)
@@ -159,8 +209,6 @@
             NavigationManager.NavigateTo($"/audit-mission/{_selectedAuditMissionId}");
             _selectedAuditMissionId = Guid.Empty;
         }
-
-
         else
         {
         }
@@ -168,7 +216,7 @@
 
     private Task AuditMissionSearchChanged(string value)
     {
-        var auditMission =   _auditMissions.Find(x => x.Name.Equals(value));
+        var auditMission = _auditMissions.Find(x => x.Name.Equals(value));
 
         if (auditMission != null)
         {
@@ -176,5 +224,30 @@
         }
 
         return Task.CompletedTask;
+    }
+
+    private Task ObjectiveChanged(string value)
+    {
+        var objective = _objectives.Find(x => x.Name.Equals(value));
+
+
+        if (objective != null)
+        {
+            _selectedObjectiveId = objective.Id;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private void NavigateToObjective()
+    {
+        if(_selectedObjectiveId!=Guid.Empty)
+        {
+            NavigationManager.NavigateTo($"/objective/{_selectedObjectiveId}");
+            _selectedObjectiveId = Guid.Empty;
+        }
+        else
+        {
+        }
     }
 }

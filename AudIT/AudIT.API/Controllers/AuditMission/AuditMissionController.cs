@@ -1,7 +1,9 @@
 ﻿using System.Security.Claims;
 using AudIT.Applicationa.Contracts.AbstractRepositories;
 using AudIT.Applicationa.Requests.AuditMission.Commands.Create;
+using AudIT.Applicationa.Requests.AuditMission.Commands.SetCurrentUserAuditMission;
 using AudIT.Applicationa.Requests.AuditMission.Commands.Update;
+using AudIT.Applicationa.Requests.AuditMission.GetCurrentUserAuditMission;
 using AudIT.Applicationa.Requests.AuditMission.Queries.GetBy.GetByDepartmentId;
 using AudIT.Applicationa.Requests.AuditMission.Queries.GetBy.GetByOwnerId;
 using AudIT.Applicationa.Requests.AuditMission.Queries.GetById;
@@ -29,6 +31,38 @@ public class AuditMissionController(
         }
 
         return Ok(result);
+    }
+
+
+    [HttpPost]
+    [Route("set-current-user-audit-mission")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> SetCurrentUserAuditMission([FromQuery] Guid auditMissionId)
+    {
+
+        var UserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+
+        if (UserId == null)
+        {
+            return BadRequest("User not found");
+        }
+
+        var command = new SetCurrentUsersAuditMissionCommand
+        {
+            UserId = UserId.Value,
+            AuditMissionId = auditMissionId
+        };
+
+        var result = await Mediator.Send(command);
+
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+
+
     }
 
 
@@ -61,6 +95,26 @@ public class AuditMissionController(
         return Ok(result);
     }
 
+    [HttpGet]
+    [Route("get-current-user-audit-mission")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetCurrentUserAuditMission()
+    {
+        var UserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+
+        if (UserId == null)
+        {
+            return BadRequest("User not found");
+        }
+
+        var result = await Mediator.Send(new GetCurrentUserAuditMissionQuery(UserId.Value));
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
 
     [HttpGet]
     [Route("get-audit-mission-by-owner")]

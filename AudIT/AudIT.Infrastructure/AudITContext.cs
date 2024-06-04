@@ -41,6 +41,8 @@ public class AudITContext : IdentityDbContext<User>
     public DbSet<UserInstitution> UserInstitution { get; set; }
     public DbSet<ObjectiveActionFiap> ObjectiveActionFiap { get; set; }
 
+    public DbSet<CurrentUsersAuditMission> CurrentUsersAuditMission { get; set; }
+
     //Services
     private readonly IHttpContextAccessor _httpContextAccessor;
 
