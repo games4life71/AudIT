@@ -10,6 +10,9 @@ public class ObjActionWithRisksDto
 
     public List<ActionRisk> ActionRisks { get; private set; }
 
+    public List<string> controaleInterneExistente { get; set; } = [];
+
+    public List<string> controaleInterneAsteptate { get; set; } = [];
 
     public ObjActionWithRisksDto(Guid id, string name, List<ActionRisk> actionRisks)
     {

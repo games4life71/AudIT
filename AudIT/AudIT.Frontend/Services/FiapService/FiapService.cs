@@ -84,4 +84,17 @@ public class FiapService(HttpClient httpClient) : IFiapService
             Message = "An error occurred while fetching data"
         };
     }
+
+    public async Task<BaseResponse> DeleteFiapAsync(Guid id)
+    {
+        var response = await httpClient.DeleteAsync($"{IFiapService.ApiPath}/delete-obj-action-fiap/{id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            return new BaseResponse("Succes", true);
+        }
+
+        return new BaseResponse(response.ReasonPhrase, false);
+
+    }
 }

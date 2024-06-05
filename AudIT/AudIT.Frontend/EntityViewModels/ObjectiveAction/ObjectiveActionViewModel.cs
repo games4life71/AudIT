@@ -13,9 +13,9 @@ public class ObjectiveActionViewModel
 
     public List<ActionRiskViewModel> actionRisks { get; set; } = [];
 
-    public List<object> controaleInterneExistente { get; set; }
+    public List<string> controaleInterneExistente { get; set; } = [];
 
-    public List<object> controaleInterneAsteptate { get; set; }
+    public List<string> controaleInterneAsteptate { get; set; } = [];
 
     public bool selected { get; set; }
 

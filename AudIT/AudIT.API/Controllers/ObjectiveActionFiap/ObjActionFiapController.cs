@@ -1,4 +1,5 @@
 ﻿using AudIT.Applicationa.Requests.ObjectiveActionFiap.Commands.Create;
+using AudIT.Applicationa.Requests.ObjectiveActionFiap.Commands.Delete;
 using AudIT.Applicationa.Requests.ObjectiveActionFiap.Commands.Queries.GetById;
 using AudIT.Applicationa.Requests.ObjectiveActionFiap.Commands.Update;
 using AudIT.Applicationa.Requests.ObjectiveActionFiap.Queries.GetByAuditMissionId;
@@ -17,6 +18,21 @@ public class ObjActionFiapController : BaseController
     public async Task<IActionResult> CreateObjActionFiap([FromBody] CreateObjActionFiapCommand command)
     {
         var result = await Mediator.Send(command);
+
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
+
+    [HttpDelete]
+    [Route("delete-obj-action-fiap/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteObjActionFiap(Guid id)
+    {
+        var result = await Mediator.Send(new DeleteFiapCommand(id));
 
         if (!result.Success)
         {

@@ -1,4 +1,5 @@
 ﻿@page "/objective-action/{ObjectiveActionId}"
+@using Frontend.Contracts.Abstract_Services.ActionRiskService
 @using Frontend.Contracts.Abstract_Services.ActivityService
 @using Frontend.Contracts.Abstract_Services.DepartmentService
 @using Frontend.Contracts.Abstract_Services.FiapService
@@ -8,6 +9,7 @@
 @using Frontend.EntityViewModels.Activity
 @using Frontend.EntityViewModels.Fiap
 @using Frontend.EntityViewModels.ObjectiveAction
+@using Frontend.Pages.Components
 
 @inject IDepartmentService _departmentService
 @inject IActivityService _activityService
@@ -15,6 +17,9 @@
 @inject TooltipService _tooltipService
 @inject IObjectiveActionService _objActionService
 @inject IFiapService _fiapService
+@inject DialogService DialogService
+@inject IActionRiskService _actionRiskService
+@inject NotificationService _NotificationService
 @*Summary of the Objective Action*@
 <RadzenRow class="rz-my-6" JustifyContent="JustifyContent.Start">
     <RadzenCard Variant="Variant.Outlined">
@@ -36,11 +41,23 @@
                 <RadzenStack Orientation="Orientation.Horizontal">
                     <RadzenStack Orientation="Orientation.Vertical">
                         <RadzenLabel Component="forControl1" Text="Controale interne asteptate:"></RadzenLabel>
-                        <RadzenTextArea Rows="3" Text="@(() => fromListToString(_objectiveActionViewModel.controaleInterneAsteptate))"> </RadzenTextArea>
+                        @* <RadzenTextArea Rows="3" Text="@(() => fromListToString(_objectiveActionViewModel.controaleInterneAsteptate))"> </RadzenTextArea> *@
+                        @if (_objectiveActionViewModel != null && _objectiveActionViewModel.controaleInterneAsteptate.Any())
+                            @foreach (var item in _objectiveActionViewModel.controaleInterneAsteptate)
+                        {
+                            Console.WriteLine("Element found !");
+                            <RadzenCard Variant="Variant.Outlined">
+                                <RadzenText Name="forControl1" Text="@item"></RadzenText>
+                            </RadzenCard>
+                        }
+                        else
+                        {
+                            Console.WriteLine("No elements found !");
+                        }
 
                         @code
                         {
-                            private string fromListToString(List<object> list)
+                            private string fromListToString(List<string> list)
                             {
                                 if (list.Count == 0)
                                 {
@@ -60,7 +77,15 @@
                     </RadzenStack>
                     <RadzenStack Orientation="Orientation.Vertical">
                         <RadzenLabel Component="forControl1" Text="Controale interne asteptate:"></RadzenLabel>
-                        <RadzenTextArea Rows="3" Text="@(() => fromListToString(_objectiveActionViewModel.controaleInterneExistente))"> </RadzenTextArea>
+                        @* <RadzenTextArea Rows="3" Text="@(() => fromListToString(_objectiveActionViewModel.controaleInterneExistente))"> </RadzenTextArea> *@
+                        @if (_objectiveActionViewModel.controaleInterneExistente.Any())
+                            @foreach (var item in _objectiveActionViewModel.controaleInterneExistente)
+                        {
+                            Console.WriteLine("Element found !");
+                            <RadzenCard Variant="Variant.Outlined">
+                                <RadzenText Name="forControl1" Text="@item"></RadzenText>
+                            </RadzenCard>
+                        }
                     </RadzenStack>
                 </RadzenStack>
 
@@ -74,7 +99,7 @@
     <RadzenCard Variant="Variant.Outlined">
         <RadzenStack Orientation="Orientation.Vertical">
             <RadzenText TextStyle="TextStyle.DisplayH5" Text="Action Risks"></RadzenText>
-            <RadzenDataGrid Data="@_objectiveActionViewModel.actionRisks" TItem="ActionRiskViewModel">
+            <RadzenDataGrid @ref="@actionDataGrid" Data="@_objectiveActionViewModel.actionRisks" TItem="ActionRiskViewModel">
                 <Columns>
                     <RadzenDataGridColumn Title="Risk Name" Property="name"></RadzenDataGridColumn>
                     <RadzenDataGridColumn Title="Impact" Property="impact"></RadzenDataGridColumn>
@@ -91,6 +116,7 @@
                 </Columns>
 
             </RadzenDataGrid>
+            <RadzenButton Click="@AddNewActionRisk" Text="Add new Action Risk" ButtonStyle="ButtonStyle.Dark" Icon="add" ></RadzenButton>
         </RadzenStack>
     </RadzenCard>
 </RadzenRow>
@@ -121,6 +147,7 @@
                         </RadzenDataGridColumn>
                     </Columns>
                 </RadzenDataGrid>
+                <RadzenButton Click="@AddNewFiapNavigate" Text="Add new FIAP" ButtonStyle="ButtonStyle.Dark" Icon="add" ></RadzenButton>
             </RadzenStack>
         </RadzenCard>
     </RadzenRow>
@@ -131,25 +158,24 @@
     <RadzenCard Variant="Variant.Outlined">
         <RadzenStack Orientation="Orientation.Vertical">
             <RadzenText TextStyle="TextStyle.DisplayH5" Text="Associated Activities"></RadzenText>
-                <RadzenDataGrid AllowFiltering="true"  AllowSorting="true" Data="@_activities" TItem="ActivityWithDepartViewModel">
-                    <Columns>
-                        <RadzenDataGridColumn Title="Name" Property="Name"></RadzenDataGridColumn>
-                        <RadzenDataGridColumn Title=" Department Name" Property="Department.Name"></RadzenDataGridColumn>
-                        <RadzenDataGridColumn Title="Type" Property="Type"></RadzenDataGridColumn>
-                        <RadzenDataGridColumn>
-                            <Template Context="activity">
-                                <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
-                                    <RadzenButton ButtonStyle="ButtonStyle.Warning" Click="@(() => OpenActivityEdit(activity))" Icon="edit" Text="Edit"></RadzenButton>
-                                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Click="@(() => DeleteActivity(activity))" Icon="delete" Text="Delete"></RadzenButton>
-                                </RadzenStack>
-                            </Template>
-                        </RadzenDataGridColumn>
-                    </Columns>
+            <RadzenDataGrid AllowFiltering="true" AllowSorting="true" Data="@_activities" TItem="ActivityWithDepartViewModel">
+                <Columns>
+                    <RadzenDataGridColumn Title="Name" Property="Name"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Title=" Department Name" Property="Department.Name"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Title="Type" Property="Type"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn>
+                        <Template Context="activity">
+                            <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+                                <RadzenButton ButtonStyle="ButtonStyle.Warning" Click="@(() => OpenActivityEdit(activity))" Icon="edit" Text="Edit"></RadzenButton>
+                                <RadzenButton ButtonStyle="ButtonStyle.Danger" Click="@(() => DeleteActivity(activity))" Icon="delete" Text="Delete"></RadzenButton>
+                            </RadzenStack>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
 
-                </RadzenDataGrid>
+            </RadzenDataGrid>
 
-
-
+            <RadzenButton Click="@AddNewActivityNavigate" Text="Add new Activity" ButtonStyle="ButtonStyle.Dark" Icon="add" ></RadzenButton>
         </RadzenStack>
     </RadzenCard>
 </RadzenRow>
@@ -162,15 +188,16 @@
 </RadzenRow>
 
 
-
-
 @code {
 
     [Parameter] public string ObjectiveActionId { get; set; }
 
     private ObjectiveActionViewModel _objectiveActionViewModel = new ObjectiveActionViewModel();
 
-    private List<ActivityWithDepartViewModel> _activities =[];
+    private RadzenDataGrid<ActionRiskViewModel> actionDataGrid;
+
+    private List<ActivityWithDepartViewModel> _activities = [];
+
     // private List<ActivityWithDepartmentViewModel> _activities = [];
     private List<BaseObjActionFiapViewmodel> _fiaps = [];
     private List<BaseDepartmentDto> _departments = [];
@@ -208,7 +235,6 @@
         //     UserId = Guid.NewGuid().ToString(),
         //     Department = "Test"
         // });_activities.Add(new ActivityWithDepartmentViewModel
-
     }
 
 }
@@ -220,6 +246,7 @@
         NavigationManager.NavigateTo("/objectives");
     }
 
+
     private async Task FetchActivities()
     {
         try
@@ -229,8 +256,6 @@
             if (result.Success)
             {
                 _activities = result.DtoResponses;
-
-
             }
             else
             {
@@ -242,7 +267,6 @@
             Console.WriteLine("Exception occurred while fetching activities: " + ex.Message);
         }
     }
-
 
 
     private async Task FetchFiaps()
@@ -262,17 +286,72 @@
         if (result.Success && result.DtoResponse != null)
         {
             _objectiveActionViewModel = result.DtoResponse;
+            StateHasChanged();
         }
     }
 
     private Task OpenRiskEdit(ActionRiskViewModel actionRisk)
     {
-        throw new NotImplementedException();
+        DialogService.Open<EditActionRiskDialog>(
+            "Edit Action Risk",
+            new Dictionary<string, object>()
+            {
+                { "ActionRisk", actionRisk },
+                { "OnDialogClose", new EventCallback<ActionRiskViewModel>(this, OnDialogClose) }
+            }, new DialogOptions()
+            {
+                Width = "700px",
+                Height = "400px",
+                Draggable = false,
+                Resizable = false
+            }
+        );
+
+        return Task.CompletedTask;
     }
 
-    private Task DeleteRisk(ActionRiskViewModel actionRisk)
+    private void OnDialogClose(ActionRiskViewModel updatedActionRisk)
     {
-        throw new NotImplementedException();
+        var actionRisk = _objectiveActionViewModel.actionRisks.FirstOrDefault(x => x.id == updatedActionRisk.id);
+        if (actionRisk != null)
+        {
+            actionRisk.name = updatedActionRisk.name;
+            actionRisk.risk = updatedActionRisk.risk;
+            actionRisk.probability = updatedActionRisk.probability;
+            actionRisk.impact = updatedActionRisk.impact;
+        }
+    }
+
+    private async Task DeleteRisk(ActionRiskViewModel actionRisk)
+    {
+        var result = await DialogService.Confirm("Are you sure you want to delete this risk?", "Delete Risk", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+        if (result.Value)
+        {
+            var RiskToBeDeleted = _objectiveActionViewModel.actionRisks.FirstOrDefault(x => x.id == actionRisk.id);
+
+            if (RiskToBeDeleted != null)
+            {
+
+                var delelteResult = await _actionRiskService.DeleteActionRiskAsync(Guid.Parse(RiskToBeDeleted.id));
+
+                var newActionRisks = _objectiveActionViewModel.actionRisks.Where(x => x.id != actionRisk.id).ToList();
+
+                _objectiveActionViewModel.actionRisks = newActionRisks;
+
+                if (delelteResult.Success)
+                {
+                    //display a success message
+                    _NotificationService.Notify(NotificationSeverity.Success, "Risk deleted successfully");
+                    await InvokeAsync(StateHasChanged);
+                }
+                else
+                {
+                    //display an error message
+                    _NotificationService.Notify(NotificationSeverity.Error, "Failed to delete risk");
+                }
+            }
+        }
     }
 
     private Task NavigateFiapEdit(BaseObjActionFiapViewmodel fiap)
@@ -280,14 +359,42 @@
         throw new NotImplementedException();
     }
 
-    private Task DeleteFiap(BaseObjActionFiapViewmodel fiap)
+    private async Task DeleteFiap(BaseObjActionFiapViewmodel fiap)
     {
-        throw new NotImplementedException();
+        //show a confirmation dialog
+
+        var result = await DialogService.Confirm("Are you sure you want to delete this FIAP?",
+            "Delete FIAP", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+        if (result.Value)
+        {
+            var resultDelete = await _fiapService.DeleteFiapAsync(fiap.Id);
+
+            if (resultDelete.Success)
+            {
+                //display a success message
+                _NotificationService.Notify(NotificationSeverity.Success, "FIAP deleted successfully");
+
+                // Create a new list without the deleted fiap
+                var updatedFiaps = _fiaps.Where(f => f.Id != fiap.Id).ToList();
+
+                // Assign the new list to _fiaps
+                _fiaps = updatedFiaps;
+                await InvokeAsync(StateHasChanged);
+            }
+            else
+            {
+                //display an error message
+                _NotificationService.Notify(NotificationSeverity.Error, "Failed to delete FIAP");
+            }
+        }
     }
 
     private Task ExportFiap(BaseObjActionFiapViewmodel fiap)
     {
-        throw new NotImplementedException();
+       NavigationManager.NavigateTo($"export-fiap/{fiap.Id}");
+
+       return Task.CompletedTask;
     }
 
     private void ShowToolTipText(ElementReference obj, string text)
@@ -310,5 +417,42 @@
     private Task DeleteActivity(ActivityWithDepartViewModel activity)
     {
         throw new NotImplementedException();
+    }
+
+    private void AddNewFiapNavigate(MouseEventArgs obj)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void AddNewActivityNavigate(MouseEventArgs obj)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void AddNewActionRisk(MouseEventArgs obj)
+    {
+        var newActionRisk = new ActionRiskViewModel();
+
+        //open a dialog
+        DialogService.Open<CreateActionRiskDialog>(
+            "Create New Action Risk",
+            new Dictionary<string, object>()
+            {
+                { "ObjectiveActionId", ObjectiveActionId },
+                { "OnDialogClose", new EventCallback<ActionRiskViewModel>(this, OnCreateDialogClose) }
+            }, new DialogOptions()
+            {
+                Width = "700px",
+                Height = "400px",
+                Draggable = false,
+                Resizable = false
+            }
+        );
+    }
+    private async void OnCreateDialogClose(ActionRiskViewModel newActionRisk)
+    {
+        _objectiveActionViewModel.actionRisks.Add(newActionRisk);
+        await actionDataGrid.Reload();
+        StateHasChanged();
     }
 }
