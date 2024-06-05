@@ -1,4 +1,6 @@
-﻿using Frontend.Contracts.Abstract_Services.FiapService;
+﻿using System.Net.Http.Json;
+using Frontend.Contracts.Abstract_Services.FiapService;
+using Frontend.EntityDtos.Fiap;
 using Frontend.EntityDtos.Misc;
 using Frontend.EntityViewModels.Fiap;
 using Newtonsoft.Json;
@@ -95,6 +97,26 @@ public class FiapService(HttpClient httpClient) : IFiapService
         }
 
         return new BaseResponse(response.ReasonPhrase, false);
+    }
 
+    public async Task<BaseDTOResponse<BaseObjActionFiapViewmodel>> CreateFiapAsync(BaseCreateFiapDto fiap)
+    {
+        var response = await httpClient.PostAsJsonAsync(
+            $"{IFiapService.ApiPath}/create-obj-action-fiap", fiap);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseObjActionFiapViewmodel>>(content);
+
+            if (result != null) return result;
+        }
+
+        return new BaseDTOResponse<BaseObjActionFiapViewmodel>
+        {
+            Success = false,
+            Message = "An error occurred while posting data:" + response.ReasonPhrase
+        };
     }
 }

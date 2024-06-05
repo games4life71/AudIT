@@ -89,11 +89,11 @@ public class ObjActionFiapController : BaseController
     }
 
     [HttpPut]
-    [Route("update-obj-action-fiap/{id}")]
+    [Route("update-obj-action-fiap")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> UpdateObjActionFiap(Guid id, [FromBody] UpdateObjectiveActionFiapCommand command)
+    public async Task<IActionResult> UpdateObjActionFiap([FromBody] UpdateObjectiveActionFiapCommand command)
     {
-        command.Id = id;
+
         var result = await Mediator.Send(command);
 
         if (!result.Success)

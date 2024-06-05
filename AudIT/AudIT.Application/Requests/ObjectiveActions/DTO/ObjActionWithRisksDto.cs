@@ -14,6 +14,8 @@ public class ObjActionWithRisksDto
 
     public List<string> controaleInterneAsteptate { get; set; } = [];
 
+    public Guid ObjectiveId { get; set; }
+
     public ObjActionWithRisksDto(Guid id, string name, List<ActionRisk> actionRisks)
     {
         Id = id;

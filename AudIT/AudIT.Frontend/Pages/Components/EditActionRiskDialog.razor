@@ -37,7 +37,7 @@
 @code {
 
     [Parameter] public ActionRiskViewModel ActionRisk { get; set; }
-    [Parameter] public EventCallback<ActionRiskViewModel> OnDialogClose { get; set; }
+    [Parameter] public EventCallback<ActionRiskViewModel> OnCreateFiapDialogClose { get; set; }
     private async Task SumbitChanges()
     {
         //TODO implement save changes logic
@@ -54,7 +54,7 @@
         if (response.Success)
         {
             _notificationService.Notify(NotificationSeverity.Success, "Success", "Action Risk updated successfully");
-            await OnDialogClose.InvokeAsync(response.DtoResponse);
+            await OnCreateFiapDialogClose.InvokeAsync(response.DtoResponse);
         }
 
         _dialogService.Close(null);
