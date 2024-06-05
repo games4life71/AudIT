@@ -19,4 +19,7 @@ public interface IFiapService
 
     public Task<BaseDTOResponse<BaseObjActionFiapViewmodel>> CreateFiapAsync(BaseCreateFiapDto fiap);
 
+    public Task<BaseDTOResponse<BaseObjActionFiapViewmodel>> UpdateFiapAsync(UpdateFiapDto fiap);
+
+
 }

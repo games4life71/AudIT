@@ -1,0 +1,117 @@
+﻿@using Frontend.Contracts.Abstract_Services.FiapService
+@using Frontend.EntityDtos.Fiap
+@using Frontend.EntityViewModels.Fiap
+
+
+@inject IFiapService _fiapService
+@inject DialogService _dialogService
+@inject NotificationService _notificationService
+
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenRow class="rz-mb-4">
+        <RadzenText Text="Create Fiap" TextStyle="TextStyle.H4"></RadzenText>
+    </RadzenRow>
+    <RadzenTemplateForm On Submit="@UpdateFiap" Data="UpdateFiapDto" TItem="@BaseObjActionFiapViewmodel">
+        <RadzenRow JustifyContent="JustifyContent.Left">
+            <RadzenColumn>
+                <RadzenStack Orientation="Orientation.Vertical">
+                    <RadzenLabel Text="Start Date:" Component="forStart"></RadzenLabel>
+                    <RadzenDatePicker @bind-Value="@UpdateFiapDto.AuditedPeriodStart" Name="forStart" Placeholder="Start Date:"></RadzenDatePicker>
+                    <RadzenRequiredValidator Text="Field is required " Component="forStart"></RadzenRequiredValidator>
+                    <RadzenLabel Text="End Date:" Component="forEnd"></RadzenLabel>
+                    <RadzenDatePicker @bind-Value="@UpdateFiapDto.AuditedPeriodEnd" Name="forEnd" Placeholder="Start Date:"></RadzenDatePicker>
+                    <RadzenRequiredValidator Text="Field is required " Component="forEnd"></RadzenRequiredValidator>
+                </RadzenStack>
+            </RadzenColumn>
+
+            <RadzenColumn>
+                <RadzenStack Orientation="Orientation.Vertical">
+                    <RadzenLabel Text="Name:" Component="forName"></RadzenLabel>
+                    <RadzenTextBox @bind-Value="@UpdateFiapDto.Name" Placeholder="Name..." Name="forName"></RadzenTextBox>
+                    <RadzenRequiredValidator Text="Name is required " Component="forName"></RadzenRequiredValidator>
+
+                    <RadzenLabel Text="Problem:" Component="forProblem"></RadzenLabel>
+                    <RadzenTextBox @bind-Value="@UpdateFiapDto.Problem" Placeholder="Problem..." Name="forProblem"></RadzenTextBox>
+                    <RadzenRequiredValidator Text="Problem is required " Component="forProblem"></RadzenRequiredValidator>
+
+
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow JustifyContent="JustifyContent.SpaceAround" class="rz-my-10">
+
+
+            <RadzenStack Orientation="Orientation.Vertical">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenStack Orientation="Orientation.Vertical">
+
+
+                        <RadzenLabel Text="Cause:" Component="forCause"></RadzenLabel>
+                        <RadzenTextBox @bind-Value="@UpdateFiapDto.Cause" Placeholder="Cause..." Name="forCause"></RadzenTextBox>
+                        <RadzenRequiredValidator Component="forCause" Text="Cause is required!"></RadzenRequiredValidator>
+                    </RadzenStack>
+
+                    <RadzenStack Orientation="Orientation.Vertical">
+                        <RadzenLabel Text="Consequence:" Component="forConsequence"></RadzenLabel>
+                        <RadzenTextBox @bind-Value="@UpdateFiapDto.Consequence" Placeholder="Consequence..." Name="forConsequence"></RadzenTextBox>
+                        <RadzenRequiredValidator Text="Consequence is required " Component="forConsequence"></RadzenRequiredValidator>
+                    </RadzenStack>
+                    <RadzenStack Orientation="Orientation.Vertical">
+                        <RadzenLabel Text="Additional findings:" Component="forFindings"></RadzenLabel>
+                        <RadzenTextBox @bind-Value="@UpdateFiapDto.AditionalFindings" Placeholder="Additional findings..." Name="forFindings"></RadzenTextBox>
+                        <RadzenRequiredValidator Text="Field is required " Component="forFindings"></RadzenRequiredValidator>
+                    </RadzenStack>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical">
+                    <RadzenLabel Text="Recommendation:"></RadzenLabel>
+                    <RadzenTextArea @bind-Value="@UpdateFiapDto.Recommendation" Placeholder="Recommendation..." Name="forRecommendation"></RadzenTextArea>
+                </RadzenStack>
+                <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="Submit"></RadzenButton>
+                <RadzenButton Click="@Cancel" ButtonStyle="ButtonStyle.Dark" Text="Cancel"></RadzenButton>
+            </RadzenStack>
+
+
+        </RadzenRow>
+    </RadzenTemplateForm>
+</RadzenCard>
+
+@code {
+
+    [Parameter] public BaseObjActionFiapViewmodel UpdateFiapDto { get; set; }
+    [Parameter] public EventCallback<BaseObjActionFiapViewmodel> OnFiapEditDialogClose { get; set; }
+
+    private async Task UpdateFiap(BaseObjActionFiapViewmodel obj)
+    {
+        var fiapUpdateDto = new UpdateFiapDto(
+            UpdateFiapDto.Id,
+            UpdateFiapDto.Name,
+            UpdateFiapDto.AuditedPeriodStart,
+            UpdateFiapDto.AuditedPeriodEnd,
+            UpdateFiapDto.Problem,
+            UpdateFiapDto.AditionalFindings,
+            UpdateFiapDto.Cause,
+            UpdateFiapDto.Consequence,
+            UpdateFiapDto.Recommendation
+        );
+
+
+        var response = await _fiapService.UpdateFiapAsync(fiapUpdateDto);
+
+        if (!response.Success)
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Error", response.Message);
+        }
+        else
+        {
+            _notificationService.Notify(NotificationSeverity.Success, "Success", response.Message);
+            await OnFiapEditDialogClose.InvokeAsync(response.DtoResponse);
+            _dialogService.Close(null);
+        }
+    }
+
+    private void Cancel()
+    {
+        _dialogService.Close();
+    }
+
+}

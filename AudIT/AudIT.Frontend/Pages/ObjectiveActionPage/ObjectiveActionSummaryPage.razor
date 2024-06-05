@@ -13,6 +13,7 @@
 @using Frontend.EntityViewModels.Objective
 @using Frontend.EntityViewModels.ObjectiveAction
 @using Frontend.Pages.Components
+@using Havit.Linq
 
 @inject IDepartmentService _departmentService
 @inject IActivityService _activityService
@@ -25,6 +26,7 @@
 @inject IActionRiskService _actionRiskService
 @inject NotificationService _NotificationService
 @*Summary of the Objective Action*@
+
 <RadzenRow class="rz-my-6" JustifyContent="JustifyContent.Start">
     <RadzenCard Variant="Variant.Outlined">
         <RadzenText class="rz-mb-4" TextStyle="TextStyle.DisplayH5" Text="Summary"></RadzenText>
@@ -124,7 +126,6 @@
         </RadzenStack>
     </RadzenCard>
 </RadzenRow>
-
 
 @*Associated Fiaps*@
 <RadzenRow>
@@ -359,8 +360,41 @@
 
     private Task NavigateFiapEdit(BaseObjActionFiapViewmodel fiap)
     {
-        throw new NotImplementedException();
+        DialogService.Open<EditFiapDialog>(
+            "Edit FIAP",
+            new Dictionary<string, object>()
+            {
+                { "UpdateFiapDto", fiap },
+                {
+                    "OnFiapEditDialogClose", new EventCallback<BaseObjActionFiapViewmodel>(this, OnEditFiapDialogClose)
+
+                }
+            }, new DialogOptions()
+            {
+                Width = "1000px",
+                Height = "750px",
+                Draggable = false,
+                Resizable = false
+
+            }
+        );
+
+        return Task.CompletedTask;
     }
+
+    private void OnEditFiapDialogClose(BaseObjActionFiapViewmodel editedFiap)
+    {
+        var fiap = _fiaps.FirstOrDefault(f => f.Id == editedFiap.Id);
+
+        fiap=editedFiap;
+
+       StateHasChanged();
+        fiapDataGrid.Reload();
+
+
+    }
+
+
 
     private async Task DeleteFiap(BaseObjActionFiapViewmodel fiap)
     {
@@ -478,7 +512,6 @@
 
         await InvokeAsync(StateHasChanged);
     }
-
 
     private void AddNewActivityNavigate(MouseEventArgs obj)
     {

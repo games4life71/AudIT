@@ -119,4 +119,27 @@ public class FiapService(HttpClient httpClient) : IFiapService
             Message = "An error occurred while posting data:" + response.ReasonPhrase
         };
     }
+
+    public async  Task<BaseDTOResponse<BaseObjActionFiapViewmodel>> UpdateFiapAsync(UpdateFiapDto fiap)
+    {
+
+        var response = await httpClient.PutAsJsonAsync($"{IFiapService.ApiPath}/update-obj-action-fiap", fiap);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseObjActionFiapViewmodel>>(content);
+
+            if (result != null) return result;
+        }
+
+        return new BaseDTOResponse<BaseObjActionFiapViewmodel>
+        {
+            Success = false,
+            Message = "An error occurred while updating data:" + response.ReasonPhrase
+        };
+
+
+    }
 }
