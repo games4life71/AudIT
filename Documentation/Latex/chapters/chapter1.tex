@@ -12,10 +12,27 @@ Avand in vedere aceste vulnerabilitati din sistemul public de audit, platforma w
 
 \section{Solutia propusa}
 Platforma Web AudIT este conceputa ca o solutie inovatoare asupra provocarilor datorate digitalizarii in instituiile publice, oferind un set de instrumente si functionalitati care fac mult mai accesibila si fluenta munca auditorului public cat si cea a reprezentantilor institutiilor audidate.\\
-Aplicatie are ca si scop principal cresterea eficientei in procesul de audit public, prin implementarea diferitelor functionalitati care vor imbunatati drastic accesul utilizatorilor la informatii si documente relevante, vor creste nivelul eficientei, auditorii concentrandu-se pe aspecte esentiale ale auditului, fara a-si consuma  astfel timpul si energia pe numeroase sarcini care se pot dovedi repetitive, amanuntite si obositoare in final	respectiv va facilita un mod de comunicare eficace intre persoanele care iau parte la misiunea de audit.\\
+Aplicatie are ca si scop principal cresterea eficientei in procesul de audit public, prin implementarea diferitelor functionalitati care vor imbunatati drastic accesul utilizatorilor la informatii si documente relevante, vor creste nivelul eficientei, auditorii concentrandu-se pe aspecte esentiale ale auditului, fara a-si consuma  astfel timpul si energia pe numeroase sarcini care se pot dovedi repetitive, amanuntite si obositoare in final	respectiv va facilita un mod de comunicare eficace intre persoanele care iau parte la misiunea de audit.
 
 
 
 \section{Functionalitatile aplicatiei}
+Subsectiunile care vor urma o sa explice in detaliu functionalitatile de baza ale platformei,
+modul in care acestea au fost implemnentate, cat si dificultati si provocari ulterioare in ceea ce priveste facilitatile oferite de acestea.
 
-Pellentesque pulvinar pellentesque habitant morbi tristique senectus et. Ornare suspendisse sed nisi lacus sed viverra tellus in hac. Non sodales neque sodales ut etiam sit. In hendrerit gravida rutrum quisque non. Diam quam nulla porttitor massa id neque aliquam. Diam sit amet nisl suscipit adipiscing bibendum est ultricies integer. Cras fermentum odio eu feugiat pretium nibh ipsum. Egestas integer eget aliquet nibh praesent tristique magna. Porttitor eget dolor morbi non arcu risus quis varius quam. Gravida rutrum quisque non tellus orci. Diam volutpat commodo sed egestas egestas.
+\subsection{Autentificarea pe platforma}
+Prima interactiune a fiecarui utilizator cu platforma web o constituie pagina de autentificare, care asigura faptul ca accesul la functionalitatile aplicatiei este restrictionat doar celor care detin sau doresc sa isi creeze un cont pe aceasta aplicatie.\\
+Procesul de creare a unui cont nou este conceput astfel incat sa se ajusteze pe necesitatile de securitate de baza ale institutiilor publice.\\
+ Presupunand faptul ca fiecare angajat al unui departamant dintr-o institutie a statului detine o adresa de email cu domeniul institutiei de care apartine, tot ce treuie sa faca noul potential utilizator este sa se foloseasca de aceasta adresa de email ca sa isi creeze un cont nou. Contul nou este creat cu drepturi limitate, acesta neavand acces la nici o resursa care apartine de institutia sa pana in momentul cand un reprezentant al institutiei nu ii valideaza contul.\\
+ ----INSERT PICTURE HERE---\\
+Aceasta metoda de autentificare se bazeaza pe o  configurare initiala a unor utilizatori cu drepturi elevate, reprezentantii departamentelor, carora li se ofera capacitatea de a verifica noii utilizatori care se inregistreaza pe platforma utiliand domeniul departamentului in cauza.Fiind pe o parte un mod in plus prin care se limiteaza accesul utilizatorilor la anumite resurse pana cand identitatea acestora este confirmata, este pe de alta parte un pas necesar care nu prezinta momentan un sistem de automatizare a verificarii identitatii utilizatorilor, eliminand astfel nevoia unei configurari initiale a platformei.
+
+\subsection{Verificarea actiunilor utilizatorilor}
+In cadrul aplicatiei, accesul la fiecare entitate este protejata prin implementarea unor liste de acces care definesc permisiunile de scriere si de citire asupra respectivei entitati.Acest lucru se asigura ca initial, fiecare utilizator are drept de scriere si de citire doar asupra resurselor create de acesta pe platforma, ulterior acesta avand posibilitatea de a acorda sau a primi acces de scriere sau citire asupra altor resurse aflate pe platforma.\\
+	--INSERT PICTURE HERE---\\
+De asemenea, este implementat si un sistem de roluri care restrictioneaza si acestea la randul lor accesul la diferite functionalitati ale aplicatiei, astfel spre exemplu, un utilizator cu rol de reprezentant al unei institutii nu va putea accesa paginile referitoare la crearea sau editarea unei misini de audit.
+In plus, pentru o conformitate si pentru o evidenta sporita asupra actiunilor utilizatorilor asupra resurselor de pe platforma este implementat un sistem de auditare al entitatilor, toate operatiile de creare, modificare si stergere fiind salvate.
+
+\subsection{Gestionarea misinilor de audit public}
+
+
