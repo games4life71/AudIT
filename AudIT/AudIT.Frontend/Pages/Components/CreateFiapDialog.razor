@@ -1,5 +1,6 @@
 ﻿@using Frontend.Contracts.Abstract_Services.FiapService
 @using Frontend.EntityDtos.Fiap
+@using Frontend.EntityViewModels.Fiap
 
 
 @inject NotificationService _notificationService
@@ -81,7 +82,7 @@
 
 
     //
-    [Parameter] public EventCallback<BaseCreateFiapDto> OnFiapDialogClose { get; set; }
+    [Parameter] public EventCallback<BaseObjActionFiapViewmodel> OnFiapDialogClose { get; set; }
 
     [Parameter] public Guid AuditMissionId { get; set; }
 
@@ -120,6 +121,8 @@
         else
         {
             _notificationService.Notify(NotificationSeverity.Error, "Error", "Fiap creation failed");
+            //create a new
+            await OnFiapDialogClose.InvokeAsync(response.DtoResponse);
             _dialogService.Close(null);
         }
 

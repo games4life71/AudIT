@@ -1,4 +1,5 @@
-﻿using Frontend.EntityDtos.Misc;
+﻿using Frontend.EntityDtos.Activity;
+using Frontend.EntityDtos.Misc;
 using Frontend.EntityViewModels.Activity;
 
 namespace Frontend.Contracts.Abstract_Services.ActivityService;
@@ -12,5 +13,8 @@ public interface IActivityService
 
     public Task<BaseDTOResponse<ActivityWithDepartViewModel>> GetActivitiesByObjectiveActionIdAsync(Guid objectiveActionId);
 
+    public Task<BaseDTOResponse<ActivityWithDepartViewModel>> CreateActivityAsync(CreateActivityDto createActivityViewModel);
+
+    public Task<BaseResponse> DeleteActivityAsync(Guid id);
 
 }

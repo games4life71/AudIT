@@ -1,0 +1,105 @@
+﻿
+@* @page "/create-activity" *@
+@using Frontend.Contracts.Abstract_Services.ActivityService
+@using Frontend.EntityDtos.Activity
+@using Frontend.EntityViewModels.Activity
+@using Frontend.Services.AuthentificationServices
+
+@inject DialogService _dialogService
+@inject NotificationService _notificationService
+@inject IActivityService _activityService
+@inject CustomAuthStateProvider _authStateProvider
+<RadzenCard Variant="Variant.Outlined">
+
+    <RadzenSteps>
+        <Steps>
+            <RadzenStepsItem Text="Name">
+                <RadzenRow JustifyContent="JustifyContent.Center">
+                    <RadzenStack Orientation="Orientation.Vertical">
+                        <RadzenLabel Text="Name:"></RadzenLabel>
+                        <RadzenTextBox @bind-Value="@_createActivityDto.Name" Name="forName" Placeholder="Name..."></RadzenTextBox>
+                    </RadzenStack>
+                </RadzenRow>
+            </RadzenStepsItem>
+            <RadzenStepsItem Text="Activity Type">
+                <RadzenRow JustifyContent="JustifyContent.Center">
+                    <RadzenStack Orientation="Orientation.Vertical">
+                        <RadzenStack Orientation="Orientation.Horizontal">
+                            <RadzenLabel Text="Type:"></RadzenLabel>
+                            <RadzenText  Text="@_selectedActivityType"></RadzenText>
+                        </RadzenStack>
+                        <RadzenListBox @bind-Value="@_selectedActivityType" Data="@_activityTypes"/>
+                        <RadzenButton Click="@CreateActivity" ButtonType="ButtonType.Submit" Text="Create" ButtonStyle="ButtonStyle.Success"></RadzenButton>
+                        <RadzenButton Text="Cancel" ButtonStyle="ButtonStyle.Dark"></RadzenButton>
+                    </RadzenStack>
+                </RadzenRow>
+            </RadzenStepsItem>
+        </Steps>
+    </RadzenSteps>
+
+</RadzenCard>
+
+
+@code
+{
+
+    private List<string> _activityTypes = Enum.GetNames(typeof(ActivityType)).ToList();
+    private string _selectedActivityType = String.Empty;
+    private string _selectedName = String.Empty;
+    private CreateActivityDto _createActivityDto = new CreateActivityDto();
+
+    [Parameter] public EventCallback<ActivityWithDepartViewModel> OnActivityCreated { get; set; }
+
+    [Parameter] public Guid ObjectiveActionId { get; set; }
+
+    [Parameter] public Guid AuditMissionId { get; set; }
+
+    [Parameter] public Guid DepartmentId { get; set; }
+
+
+
+
+
+
+    private async Task CreateActivity()
+    {
+        if (_createActivityDto.Name == String.Empty)
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Name is required", "Please enter a name for the activity");
+            return;
+        }
+
+
+        if (_selectedActivityType == String.Empty)
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Activity type is required", "Please select an activity type");
+            return;
+        }
+
+        //get the activity type corresponding to the selected activity type
+        _createActivityDto.Type = (ActivityType)Enum.Parse(typeof(ActivityType), _selectedActivityType);
+        _createActivityDto.ObjectiveActionId = ObjectiveActionId;
+        _createActivityDto.AuditMissionId = AuditMissionId;
+        _createActivityDto.DepartmentId = DepartmentId;
+
+        //get the user id
+
+        var userId = await _authStateProvider.GetUserIdFromTokenAsync();
+
+        _createActivityDto.UserId = userId.Item1;
+
+        var result = await _activityService.CreateActivityAsync(_createActivityDto);
+
+        if (result.Success)
+        {
+            _notificationService.Notify(NotificationSeverity.Success, "Activity created", "The activity has been created successfully");
+        }
+
+        else
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Activity not created", "The activity could not be created");
+        }
+    }
+
+
+}

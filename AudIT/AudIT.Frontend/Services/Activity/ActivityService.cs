@@ -1,4 +1,6 @@
-﻿using Frontend.Contracts.Abstract_Services.ActivityService;
+﻿using System.Net.Http.Json;
+using Frontend.Contracts.Abstract_Services.ActivityService;
+using Frontend.EntityDtos.Activity;
 using Frontend.EntityDtos.Misc;
 using Frontend.EntityViewModels.Activity;
 using Newtonsoft.Json;
@@ -81,5 +83,60 @@ public class ActivityService(HttpClient httpClient) : IActivityService
         }
 
         return new BaseDTOResponse<ActivityWithDepartViewModel>(response.ReasonPhrase);
+    }
+
+    public async Task<BaseDTOResponse<ActivityWithDepartViewModel>> CreateActivityAsync(
+        CreateActivityDto createActivityViewModel)
+    {
+        var response =
+            await httpClient.PostAsJsonAsync($"{IActivityService.ApiPath}/add-activity", createActivityViewModel);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var responseContent = response.Content.ReadAsStringAsync().Result;
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<ActivityWithDepartViewModel>>(responseContent);
+            if (result != null) return result;
+        }
+        else
+        {
+            return new BaseDTOResponse<ActivityWithDepartViewModel>
+            {
+                Success = false,
+                Message = "An error occurred while creating activity"
+            };
+        }
+
+        return new BaseDTOResponse<ActivityWithDepartViewModel>
+        {
+            Success = false,
+            Message = "An error occurred while creating activity"
+        };
+    }
+
+    public async Task<BaseResponse> DeleteActivityAsync(Guid id)
+    {
+        var response = await httpClient.DeleteAsync($"{IActivityService.ApiPath}/delete-activity/{id}");
+
+
+        if (response.IsSuccessStatusCode)
+        {
+            var responseContent = response.Content.ReadAsStringAsync().Result;
+            var result = JsonConvert.DeserializeObject<BaseResponse>(responseContent);
+            if (result != null) return result;
+        }
+        else
+        {
+            return new BaseResponse
+            {
+                Success = false,
+                Message = "An error occurred while deleting activity"
+            };
+        }
+
+        return new BaseResponse
+        {
+            Success = false,
+            Message = "An error occurred while deleting activity"
+        };
     }
 }

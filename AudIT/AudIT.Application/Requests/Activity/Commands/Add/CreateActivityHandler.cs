@@ -15,9 +15,9 @@ public class CreateActivityHandler(
     IAuditMissionRepository _auditMissionRepository,
     IMapper mapper
 )
-    : IRequestHandler<CreateActivityCommand, BaseDTOResponse<BaseActivityDto>>
+    : IRequestHandler<CreateActivityCommand, BaseDTOResponse<ActivityWithDepartmentDto>>
 {
-    public async Task<BaseDTOResponse<BaseActivityDto>> Handle(CreateActivityCommand request,
+    public async Task<BaseDTOResponse<ActivityWithDepartmentDto>> Handle(CreateActivityCommand request,
         CancellationToken cancellationToken)
     {
         try
@@ -26,18 +26,18 @@ public class CreateActivityHandler(
             var department = await _departmentRepository.FindByIdAsync(request.DepartmentId);
 
             if (!department.IsSuccess)
-                return new BaseDTOResponse<BaseActivityDto>($"Department with id {request.DepartmentId} not found",
+                return new BaseDTOResponse<ActivityWithDepartmentDto>($"Department with id {request.DepartmentId} not found",
                     false);
             var auditMission = await _auditMissionRepository.FindByIdAsync(request.AuditMissionId);
             if (!auditMission.IsSuccess)
-                return new BaseDTOResponse<BaseActivityDto>(
+                return new BaseDTOResponse<ActivityWithDepartmentDto>(
                     $"Audit Mission with id {request.AuditMissionId} not found", false);
 
 
             var user = await _userManager.FindByIdAsync(request.UserId.ToString());
 
             if (user == null)
-                return new BaseDTOResponse<BaseActivityDto>($"User with id {request.UserId} not found", false);
+                return new BaseDTOResponse<ActivityWithDepartmentDto>($"User with id {request.UserId} not found", false);
 
             var newActivity = AudiT.Domain.Entities.Activity.Create(
                 request.Name,
@@ -52,21 +52,21 @@ public class CreateActivityHandler(
 
             if (!newActivity.IsSuccess || newActivity.Value == null)
             {
-                return new BaseDTOResponse<BaseActivityDto>("Failed to create activity", false);
+                return new BaseDTOResponse<ActivityWithDepartmentDto>("Failed to create activity", false);
             }
 
 
             var result = await _activityRepository.AddAsync(newActivity.Value);
             if (!result.IsSuccess)
             {
-                return new BaseDTOResponse<BaseActivityDto>("Failed to create activity", false);
+                return new BaseDTOResponse<ActivityWithDepartmentDto>("Failed to create activity", false);
             }
 
-            return new BaseDTOResponse<BaseActivityDto>(mapper.Map<BaseActivityDto>(result.Value));
+            return new BaseDTOResponse<ActivityWithDepartmentDto>(mapper.Map<ActivityWithDepartmentDto>(result.Value));
         }
         catch (Exception e)
         {
-            return new BaseDTOResponse<BaseActivityDto>(e.Message, false);
+            return new BaseDTOResponse<ActivityWithDepartmentDto>(e.Message, false);
         }
     }
 }

@@ -5,7 +5,7 @@ using MediatR;
 
 namespace AudIT.Applicationa.Requests.Activity.Commands.Add;
 
-public class CreateActivityCommand:IRequest<BaseDTOResponse<BaseActivityDto>>
+public class CreateActivityCommand:IRequest<BaseDTOResponse<ActivityWithDepartmentDto>>
 {
     public string Name { get; set; }
 

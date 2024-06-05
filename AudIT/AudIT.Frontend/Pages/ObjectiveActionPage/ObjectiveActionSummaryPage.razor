@@ -1,6 +1,7 @@
 ﻿@page "/objective-action/{ObjectiveActionId}"
 @using Frontend.Contracts.Abstract_Services.ActionRiskService
 @using Frontend.Contracts.Abstract_Services.ActivityService
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.DepartmentService
 @using Frontend.Contracts.Abstract_Services.FiapService
 @using Frontend.Contracts.Abstract_Services.ObjectiveActionService
@@ -15,6 +16,7 @@
 @using Frontend.Pages.Components
 @using Havit.Linq
 
+@inject IAuditMissionService _auditMissionService
 @inject IDepartmentService _departmentService
 @inject IActivityService _activityService
 @inject NavigationManager NavigationManager
@@ -105,7 +107,7 @@
     <RadzenCard Variant="Variant.Outlined">
         <RadzenStack Orientation="Orientation.Vertical">
             <RadzenText TextStyle="TextStyle.DisplayH5" Text="Action Risks"></RadzenText>
-            <RadzenDataGrid @ref="@actionDataGrid" Data="@_objectiveActionViewModel.actionRisks" TItem="ActionRiskViewModel">
+            <RadzenDataGrid AllowColumnResize="true" AllowSorting="true" @ref="@actionDataGrid" Data="@_objectiveActionViewModel.actionRisks" TItem="ActionRiskViewModel">
                 <Columns>
                     <RadzenDataGridColumn Title="Risk Name" Property="name"></RadzenDataGridColumn>
                     <RadzenDataGridColumn Title="Impact" Property="impact"></RadzenDataGridColumn>
@@ -133,7 +135,7 @@
         <RadzenCard Variant="Variant.Outlined">
             <RadzenStack Orientation="Orientation.Vertical">
                 <RadzenText TextStyle="TextStyle.DisplayH5" Text="Associated FIAPS"></RadzenText>
-                <RadzenDataGrid @ref="@fiapDataGrid" Data="@_fiaps" TItem="BaseObjActionFiapViewmodel">
+                <RadzenDataGrid AllowColumnResize="true" AllowSorting="true" @ref="@fiapDataGrid" Data="@_fiaps" TItem="BaseObjActionFiapViewmodel">
                     <Columns>
                         <RadzenDataGridColumn Filterable="true" Sortable="true" Title="Name" Property="Name"></RadzenDataGridColumn>
                         <RadzenDataGridColumn Filterable="true" Sortable="true"Title="Start" Property="AuditedPeriodStart"></RadzenDataGridColumn>
@@ -163,7 +165,7 @@
     <RadzenCard Variant="Variant.Outlined">
         <RadzenStack Orientation="Orientation.Vertical">
             <RadzenText TextStyle="TextStyle.DisplayH5" Text="Associated Activities"></RadzenText>
-            <RadzenDataGrid AllowFiltering="true" AllowSorting="true" Data="@_activities" TItem="ActivityWithDepartViewModel">
+            <RadzenDataGrid AllowColumnResize="true" AllowSorting="true" Data="@_activities" TItem="ActivityWithDepartViewModel">
                 <Columns>
                     <RadzenDataGridColumn Title="Name" Property="Name"></RadzenDataGridColumn>
                     <RadzenDataGridColumn Title=" Department Name" Property="Department.Name"></RadzenDataGridColumn>
@@ -210,14 +212,11 @@
     private List<BaseObjActionFiapViewmodel> _fiaps = [];
 
 
-
-
     List<Test> _tests = [];
 
 
     private async Task FetchCurrentObj()
     {
-
         if (!string.IsNullOrEmpty(_objectiveActionViewModel.objectiveId))
         {
             var objective = await _objectiveService.GetObjectiveWithActionsByIdAsync(Guid.Parse(_objectiveActionViewModel.objectiveId));
@@ -291,7 +290,6 @@
         {
             _objectiveActionViewModel = result.DtoResponse;
             StateHasChanged();
-
         }
     }
 
@@ -367,7 +365,6 @@
                 { "UpdateFiapDto", fiap },
                 {
                     "OnFiapEditDialogClose", new EventCallback<BaseObjActionFiapViewmodel>(this, OnEditFiapDialogClose)
-
                 }
             }, new DialogOptions()
             {
@@ -375,7 +372,6 @@
                 Height = "750px",
                 Draggable = false,
                 Resizable = false
-
             }
         );
 
@@ -386,15 +382,11 @@
     {
         var fiap = _fiaps.FirstOrDefault(f => f.Id == editedFiap.Id);
 
-        fiap=editedFiap;
+        fiap = editedFiap;
 
-       StateHasChanged();
+        StateHasChanged();
         fiapDataGrid.Reload();
-
-
     }
-
-
 
     private async Task DeleteFiap(BaseObjActionFiapViewmodel fiap)
     {
@@ -451,14 +443,35 @@
         throw new NotImplementedException();
     }
 
-    private Task DeleteActivity(ActivityWithDepartViewModel activity)
+    private async  Task DeleteActivity(ActivityWithDepartViewModel activity)
     {
-        throw new NotImplementedException();
+        var confirm = await DialogService.Confirm(
+            "Are you sure you want to delete this activity?",
+            "Delete Activity",
+            new ConfirmOptions()
+                { OkButtonText = "Yes",
+                    CancelButtonText = "No" });
+
+        if (confirm.Value)
+        {
+            var deleteResult =await _activityService.DeleteActivityAsync(activity.Id);
+
+            if (deleteResult.Success)
+            {
+                _activities.Remove(activity);
+                _NotificationService.Notify(NotificationSeverity.Success, "Activity deleted successfully");
+                await InvokeAsync(StateHasChanged);
+            }
+            else
+            {
+                _NotificationService.Notify(NotificationSeverity.Error, "Failed to delete activity");
+            }
+
+        }
     }
 
     private async void AddNewFiapNavigate()
-    {   
-        
+    {
         var auditMission = Guid.Parse(_currentObjective.auditMissionId);
         // var objNAme = objective.DtoResponse.name;
         try
@@ -470,8 +483,7 @@
                     { "ObjectiveActionId", Guid.Parse(ObjectiveActionId) },
                     { "AuditMissionId", auditMission },
                     {
-                        "OnFiapDialogClose", new EventCallback<BaseCreateFiapDto>(this, OnCreateFiapDialogClose)
-
+                        "OnFiapDialogClose", new EventCallback<BaseObjActionFiapViewmodel>(this, OnCreateFiapDialogClose)
                     }
                 }, new DialogOptions()
                 {
@@ -479,45 +491,62 @@
                     Height = "750px",
                     Draggable = false,
                     Resizable = false
-
                 }
             );
-
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
             throw;
         }
-
     }
 
-    private async Task OnCreateFiapDialogClose(BaseCreateFiapDto newFiap)
+    private async Task OnCreateFiapDialogClose(BaseObjActionFiapViewmodel newFiap)
     {
-        var fiap = new BaseObjActionFiapViewmodel
-        {
-            Name = newFiap.Name,
-            AuditedPeriodStart = newFiap.AuditedPeriodStart,
-            AuditedPeriodEnd = newFiap.AuditedPeriodEnd,
-            Problem = newFiap.Problem,
-            Cause = newFiap.Cause,
-            Recommendation = newFiap.Recommendation
-        };
-
-        _fiaps.Add(fiap);
-        var newFiaps = _fiaps;
-        _fiaps = newFiaps;
+        _fiaps.Add(newFiap);
 
         await fiapDataGrid.Reload();
 
         await InvokeAsync(StateHasChanged);
     }
 
-    private void AddNewActivityNavigate(MouseEventArgs obj)
+    private async  void AddNewActivityNavigate(MouseEventArgs obj)
     {
-        throw new NotImplementedException();
+        var auditMission = await _auditMissionService.GetAuditMissionById(Guid.Parse(_currentObjective.auditMissionId));
+        Guid DepartmentId = Guid.Empty;
+        if (auditMission.Success)
+        {
+            DepartmentId = auditMission.DtoResponse.DepartmentId;
+        }
+
+
+        DialogService.Open
+            <CreateActivityDialog>(
+                "Create New Activity",
+                new Dictionary
+                    <string, object>()
+                    {
+                        { "ObjectiveActionId", Guid.Parse(ObjectiveActionId) },
+                        { "AuditMissionId", Guid.Parse(_currentObjective.auditMissionId) },
+                        { "DepartmentId", DepartmentId },
+                        {
+                            "OnActivityCreated", new EventCallback<ActivityWithDepartViewModel>(this, OnActivityCreated)
+                        }
+                    }, new DialogOptions()
+                {
+                    Width = "700px",
+                    Height = "500px",
+                    Draggable = false,
+                    Resizable = false
+                }
+            );
     }
 
+    private void OnActivityCreated(ActivityWithDepartViewModel newActivity)
+    {
+        _activities.Add(newActivity);
+        StateHasChanged();
+    }
     private void AddNewActionRisk(MouseEventArgs obj)
     {
         var newActionRisk = new ActionRiskViewModel();

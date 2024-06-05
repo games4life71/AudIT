@@ -1,5 +1,6 @@
 ﻿using AudIT.Applicationa.Requests.Activity.Commands.Add;
 using AudIT.Applicationa.Requests.Activity.Commands.AttachDocument;
+using AudIT.Applicationa.Requests.Activity.Commands.Delete;
 using AudIT.Applicationa.Requests.Activity.Commands.RemoveDocument;
 using AudIT.Applicationa.Requests.Activity.Commands.Update;
 using AudIT.Applicationa.Requests.Activity.Queries;
@@ -13,6 +14,20 @@ namespace AudIT.API.Controllers.Activity;
 [ApiController]
 public class ActivityController : BaseController
 {
+    [HttpDelete]
+    [Route("delete-activity/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteActivity(Guid id)
+    {
+        var result = await Mediator.Send(new DeleteActivityCommand(id));
+
+        if (!result.Success)
+            return BadRequest(result.Message);
+
+        return Ok(result);
+    }
+
+
     [HttpPost]
     [Route("add-activity")]
     [ProducesResponseType(StatusCodes.Status200OK)]
