@@ -30,51 +30,59 @@
     </RadzenStack>
 
     <RadzenRow>
-        <RadzenDataGrid AllowFiltering="true" AllowPaging="true"
-                        Data="@_objectiveFullViewModels" TItem="ObjectiveFullViewModel" ExpandMode="DataGridExpandMode.Multiple">
-            <Template Context="objective">
-                <RadzenTabs>
-                    <Tabs>
-                        <RadzenTabsItem Text="Objective Actions">
-                            <RadzenDataGrid AllowSorting="true" Data="@objective.objectiveActions">
-                                <Columns>
-                                    <RadzenDataGridColumn Title="Objective Action Name" Property="name"/>
-                                    <RadzenDataGridColumn Sortable="true" Title="Last Modified Date" Property="lastModifiedDate"/>
-                                    <RadzenDataGridColumn Title="Action Risks Details" Sortable="false" Filterable="false">
-                                        <Template Context="objectiveAction">
-                                            <RadzenButton Style="display: flex; align-self: center; justify-content: center ;"
-                                                          ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="info"
-                                                          Text="More details " Click="@(() => OpenActionRiskDialog(objectiveAction))">
-                                            </RadzenButton>
-                                        </Template>
-                                    </RadzenDataGridColumn>
-                                    <RadzenDataGridColumn Frozen="true" Title="Selected in auditing" Property="selected"></RadzenDataGridColumn>
-                                    <RadzenDataGridColumn Width="15%" Frozen="true" Sortable="false" Filterable="false" Title="">
-                                        <Template Context="objectiveAction">
-                                            <RadzenButton Shade="Shade.Lighter" Icon="info" Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Text="More details " Click="@(() => NavigateObjAction(objectiveAction))"></RadzenButton>
-                                        </Template>
-                                    </RadzenDataGridColumn>
-                                </Columns>
+        <RadzenCard Variant="Variant.Outlined" >
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenDataGrid AllowFiltering="true" AllowPaging="true"
+                            Data="@_objectiveFullViewModels" TItem="ObjectiveFullViewModel" ExpandMode="DataGridExpandMode.Multiple">
+                <Template Context="objective">
+                    <RadzenTabs>
+                        <Tabs>
+                            <RadzenTabsItem Text="Objective Actions">
+                                <RadzenStack Orientation="Orientation.Vertical">
+                                    <RadzenDataGrid AllowSorting="true" Data="@objective.objectiveActions">
+                                        <Columns>
+                                            <RadzenDataGridColumn Title="Objective Action Name" Property="name"/>
+                                            <RadzenDataGridColumn Sortable="true" Title="Last Modified Date" Property="lastModifiedDate"/>
+                                            <RadzenDataGridColumn Title="Action Risks Details" Sortable="false" Filterable="false">
+                                                <Template Context="objectiveAction">
+                                                    <RadzenButton Style="display: flex; align-self: center; justify-content: center ;"
+                                                                  ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="info"
+                                                                  Text="More details " Click="@(() => OpenActionRiskDialog(objectiveAction))">
+                                                    </RadzenButton>
+                                                </Template>
+                                            </RadzenDataGridColumn>
+                                            <RadzenDataGridColumn Frozen="true" Title="Selected in auditing" Property="selected"></RadzenDataGridColumn>
+                                            <RadzenDataGridColumn Width="15%" Frozen="true" Sortable="false" Filterable="false" Title="">
+                                                <Template Context="objectiveAction">
+                                                    <RadzenButton Shade="Shade.Lighter" Icon="info" Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Text="More details " Click="@(() => NavigateObjAction(objectiveAction))"></RadzenButton>
+                                                </Template>
+                                            </RadzenDataGridColumn>
+                                        </Columns>
 
-                            </RadzenDataGrid>
-                        </RadzenTabsItem>
-                        <RadzenTabsItem Text="Options" Icon="build">
+                                    </RadzenDataGrid>
+                                    <RadzenButton Click="@NavigateAddObjAction" ButtonStyle="ButtonStyle.Dark" Text="Add new Objective Action"></RadzenButton>
+                                </RadzenStack>
+                            </RadzenTabsItem>
+                            <RadzenTabsItem Text="Options" Icon="build">
 
-                            <RadzenRow>
-                                <RadzenButton Icon="bookmark" Click="@(() => _navigationManager.NavigateTo($"risks/{objective.id}"))" Text="Configure Risks"></RadzenButton>
-                                <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="assignment" Click="@(() => OpenEditNameForm(objective))" Text="Edit Name"></RadzenButton>
-                                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="@(() => DeleteObjective(objective))" Text="Delete Objective"></RadzenButton>
-                            </RadzenRow>
-                        </RadzenTabsItem>
-                    </Tabs>
-                </RadzenTabs>
-            </Template>
+                                <RadzenRow>
+                                    <RadzenButton Icon="bookmark" Click="@(() => _navigationManager.NavigateTo($"risks/{objective.id}"))" Text="Configure Risks"></RadzenButton>
+                                    <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="assignment" Click="@(() => OpenEditNameForm(objective))" Text="Edit Name"></RadzenButton>
+                                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="@(() => DeleteObjective(objective))" Text="Delete Objective"></RadzenButton>
+                                </RadzenRow>
+                            </RadzenTabsItem>
+                        </Tabs>
+                    </RadzenTabs>
+                </Template>
 
-            <Columns>
-                <RadzenDataGridColumn Property="name" Title="Objective Name"></RadzenDataGridColumn>
+                <Columns>
+                    <RadzenDataGridColumn Property="name" Title="Objective Name"></RadzenDataGridColumn>
 
-            </Columns>
-        </RadzenDataGrid>
+                </Columns>
+            </RadzenDataGrid>
+            <RadzenButton Click="@NavigateAddObjective" ButtonStyle="ButtonStyle.Dark" Text="Add Objective "></RadzenButton>
+        </RadzenStack>
+        </RadzenCard>
     </RadzenRow>
 }
 
@@ -253,5 +261,15 @@
         // Show a notification with the error message
         _notificationService.Notify(NotificationSeverity.Error, "Error", message, 3000);
         StateHasChanged();
+    }
+
+    private void NavigateAddObjective(MouseEventArgs obj)
+    {
+        _navigationManager.NavigateTo($"/create-objective");
+    }
+
+    private void NavigateAddObjAction(MouseEventArgs obj)
+    {
+        _navigationManager.NavigateTo($"/create-objective-action");
     }
 }
