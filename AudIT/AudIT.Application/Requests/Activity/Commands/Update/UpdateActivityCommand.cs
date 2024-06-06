@@ -5,7 +5,7 @@ using MediatR;
 
 namespace AudIT.Applicationa.Requests.Activity.Commands.Update;
 
-public class UpdateActivityCommand : IRequest<BaseDTOResponse<BaseActivityDto>>
+public class UpdateActivityCommand : IRequest<BaseDTOResponse<ActivityWithDepartmentDto>>
 {
     public Guid Id { get; set; }
 

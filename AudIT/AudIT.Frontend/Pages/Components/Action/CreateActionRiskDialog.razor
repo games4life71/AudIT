@@ -39,7 +39,7 @@
 @code {
     [Parameter] public string objectiveActionId { get; set; }
 
-    [Parameter] public EventCallback<ActionRiskViewModel> OnDialogClose { get; set; }
+    [Parameter] public EventCallback<ActionRiskViewModel> OnCreateActionRisk { get; set; }
 
     private CreateActionRiskDto ActionRisk = new CreateActionRiskDto();
 
@@ -58,7 +58,7 @@
             newActionRisk.impact = ActionRisk.Impact;
 
             _notificationService.Notify(NotificationSeverity.Success, "Success", "Action Risk created successfully");
-            await OnDialogClose.InvokeAsync(newActionRisk);
+            await OnCreateActionRisk.InvokeAsync(newActionRisk);
         }
 
         //reset the form

@@ -12,9 +12,9 @@ public class UpdateActivityHandler(
     IObjectiveActionRepository objectiveActionRepository,
     IDepartmentRepository departmentRepository,
     IMapper mapper
-) : IRequestHandler<UpdateActivityCommand, BaseDTOResponse<BaseActivityDto>>
+) : IRequestHandler<UpdateActivityCommand, BaseDTOResponse<ActivityWithDepartmentDto>>
 {
-    public async Task<BaseDTOResponse<BaseActivityDto>> Handle(UpdateActivityCommand request,
+    public async Task<BaseDTOResponse<ActivityWithDepartmentDto>> Handle(UpdateActivityCommand request,
         CancellationToken cancellationToken)
     {
         try
@@ -29,7 +29,7 @@ public class UpdateActivityHandler(
 
             if (!department.IsSuccess)
             {
-                return new BaseDTOResponse<BaseActivityDto>
+                return new BaseDTOResponse<ActivityWithDepartmentDto>
                 {
                     Success = false,
                     Message = $"Failed to find department with id {request.DepartmentId}"
@@ -38,7 +38,7 @@ public class UpdateActivityHandler(
 
             if (!auditMission.IsSuccess)
             {
-                return new BaseDTOResponse<BaseActivityDto>
+                return new BaseDTOResponse<ActivityWithDepartmentDto>
                 {
                     Success = false,
                     Message = $"Failed to find audit mission with id {request.AuditMissionId}"
@@ -47,7 +47,7 @@ public class UpdateActivityHandler(
 
             if (!objectiveAction.IsSuccess)
             {
-                return new BaseDTOResponse<BaseActivityDto>
+                return new BaseDTOResponse<ActivityWithDepartmentDto>
                 {
                     Success = false,
                     Message = $"Failed to find objective action with id {request.ObjectiveActionId}"
@@ -56,7 +56,7 @@ public class UpdateActivityHandler(
 
             if (!activity.IsSuccess)
             {
-                return new BaseDTOResponse<BaseActivityDto>
+                return new BaseDTOResponse<ActivityWithDepartmentDto>
                 {
                     Success = false,
                     Message = $"Failed to find activity with id {request.Id}"
@@ -78,23 +78,23 @@ public class UpdateActivityHandler(
 
             if (!result.IsSuccess)
             {
-                return new BaseDTOResponse<BaseActivityDto>
+                return new BaseDTOResponse<ActivityWithDepartmentDto>
                 {
                     Success = false,
                     Message = $"Failed to update activity with id {request.Id}"
                 };
             }
 
-            return new BaseDTOResponse<BaseActivityDto>
+            return new BaseDTOResponse<ActivityWithDepartmentDto>
             {
                 Success = true,
-                DtoResponse = mapper.Map<BaseActivityDto>(activity.Value),
+                DtoResponse = mapper.Map<ActivityWithDepartmentDto>(activity.Value),
                 Message = $"Activity with id {request.Id} updated successfully"
             };
         }
         catch (Exception e)
         {
-            return new BaseDTOResponse<BaseActivityDto>
+            return new BaseDTOResponse<ActivityWithDepartmentDto>
             {
                 Success = false,
                 Message = $"An error occurred : {e.Message}"

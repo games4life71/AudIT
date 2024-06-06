@@ -5,12 +5,13 @@
 @using Frontend.EntityViewModels.ActionRisk
 @using Frontend.EntityViewModels.ObjectiveAction
 @using Frontend.Pages.Components
+@using Frontend.Pages.Components.Action
 
 @inject DialogService _dialogService
 @inject NavigationManager _navigationManager
 @inject IObjectiveActionService _objectiveActionService
 @inject IActionRiskService _actionRiskService
-
+@inject NotificationService _notificationService
 @if (_objectiveActionViewModel != null)
 {
     <RadzenStack Orientation="Orientation.Horizontal">
@@ -173,9 +174,10 @@ else
 
             if (response.Success)
             {
+                _notificationService.Notify(NotificationSeverity.Success, "Action Risk Removed", "Action Risk has been removed successfully");
                 _objectiveActionViewModel.actionRisks.Remove(actionRisk);
                 await _dataGrid.Reload();
-                StateHasChanged();
+                // StateHasChanged();
             }
         }
 

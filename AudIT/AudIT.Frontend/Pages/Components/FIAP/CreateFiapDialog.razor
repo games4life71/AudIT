@@ -116,14 +116,16 @@
         {
             _notificationService.Notify(NotificationSeverity.Success, "Success", "Fiap created successfully");
             _dialogService.Close(null);
+            await OnFiapDialogClose.InvokeAsync(response.DtoResponse);
         }
 
         else
         {
             _notificationService.Notify(NotificationSeverity.Error, "Error", "Fiap creation failed");
             //create a new
-            await OnFiapDialogClose.InvokeAsync(response.DtoResponse);
             _dialogService.Close(null);
+
+
         }
 
     }

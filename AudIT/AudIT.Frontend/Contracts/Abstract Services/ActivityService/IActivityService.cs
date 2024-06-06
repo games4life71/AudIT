@@ -17,4 +17,6 @@ public interface IActivityService
 
     public Task<BaseResponse> DeleteActivityAsync(Guid id);
 
+    public Task<BaseDTOResponse<ActivityWithDepartViewModel>> UpdateActivityAsync(UpdateActivityDto updateActivityViewModel);
+
 }

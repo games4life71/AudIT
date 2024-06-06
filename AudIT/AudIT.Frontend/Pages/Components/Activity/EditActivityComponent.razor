@@ -1,0 +1,85 @@
+﻿@page "/edit-activity"
+@using Frontend.Contracts.Abstract_Services.ActivityService
+@using Frontend.EntityDtos.Activity
+@using Frontend.EntityViewModels.Activity
+
+@inject IActivityService _activityService
+@inject NotificationService _notificationService
+@inject DialogService _dialogService
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenStack Orientation="Orientation.Vertical">
+        @* <RadzenTemplateForm Data="@Activity" TItem="ActivityWithDepartViewModel" Submit="@UpdateActivity"> *@
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenLabel Text="Name:"></RadzenLabel>
+            <RadzenTextBox @bind-Value="@Activity.Name" Name="forName" ></RadzenTextBox>
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Vertical">
+
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenLabel Text="Type:"></RadzenLabel>
+                <RadzenText Text="@_selectedActivityType"></RadzenText>
+            </RadzenStack>
+            <RadzenListBox @bind-Value="@_selectedActivityType" Data="@_activityTypes"/>
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+            <RadzenButton Click="@UpdateActivity" Text="Edit" ButtonStyle="ButtonStyle.Warning"></RadzenButton>
+            <RadzenButton Text="Cancel" ButtonStyle="ButtonStyle.Dark"></RadzenButton>
+
+        </RadzenStack>
+        @* </RadzenTemplateForm> *@
+
+    </RadzenStack>
+
+</RadzenCard>
+
+
+@code {
+    [Parameter] public ActivityWithDepartViewModel Activity { get; set; }
+
+    [Parameter] public Guid ObjectiveActionId { get; set; }
+
+    [Parameter] public Guid AuditMissionId { get; set; }
+
+    [Parameter] public Guid DepartmentId { get; set; }
+
+    [Parameter] public EventCallback<ActivityWithDepartViewModel> OnActivityUpdated { get; set; }
+
+
+    private string _selectedName = String.Empty;
+    private List<string> _activityTypes = Enum.GetNames(typeof(ActivityType)).ToList();
+    private string _selectedActivityType = String.Empty;
+
+    private async Task UpdateActivity()
+    {
+        //create a new udpate activity dto
+        if (_selectedActivityType == String.Empty)
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Activity Type Required", "Please select an activity type");
+            return;
+        }
+
+        var activityType = (ActivityType)Enum.Parse(typeof(ActivityType), _selectedActivityType);
+
+        var updateActivityDto = new UpdateActivityDto(
+            Activity.Id,
+            Activity.Name,
+            activityType,
+            DepartmentId,
+            AuditMissionId,
+            ObjectiveActionId
+        );
+
+
+        var result = await _activityService.UpdateActivityAsync(updateActivityDto);
+
+        if (result.Success)
+        {
+            //display success message
+            _notificationService.Notify(NotificationSeverity.Success, "Activity Updated Successfully", "Activity has been updated successfully");
+            _dialogService.Close();
+            await OnActivityUpdated.InvokeAsync(result.DtoResponse);
+        }
+    }
+
+}

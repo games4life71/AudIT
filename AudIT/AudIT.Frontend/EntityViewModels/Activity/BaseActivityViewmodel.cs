@@ -2,17 +2,17 @@
 
 public class BaseActivityViewmodel
 {
-    public Guid Id { get; private set; }
+    public Guid Id { get;  set; }
 
-    public string Name { get; private set; }
+    public string Name { get;  set; }
 
-    public ActivityType Type { get; private set; }
+    public ActivityType Type { get; set; }
 
-    public Guid DepartmentId { get; private set; }
+    public Guid DepartmentId { get; set; }
 
 
-    public Guid? ObjectiveActionId { get; private set; }
-    public string UserId { get; private set; }
+    public Guid? ObjectiveActionId { get;  set; }
+    public string UserId { get; set; }
     //the user who created the activity
 
     public BaseActivityViewmodel(Guid id, string name, ActivityType type, Guid departmentId, string userId,

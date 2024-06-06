@@ -139,4 +139,27 @@ public class ActivityService(HttpClient httpClient) : IActivityService
             Message = "An error occurred while deleting activity"
         };
     }
+
+    public async Task<BaseDTOResponse<ActivityWithDepartViewModel>> UpdateActivityAsync(
+        UpdateActivityDto updateActivityViewModel)
+    {
+        var response =
+            await httpClient.PutAsJsonAsync($"{IActivityService.ApiPath}/update-activity", updateActivityViewModel);
+
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<ActivityWithDepartViewModel>>(content.Result);
+
+            if (result != null) return result;
+        }
+
+        return new BaseDTOResponse<ActivityWithDepartViewModel>
+        {
+            Success = false,
+            Message = "An error occurred while updating activity"
+        };
+    }
 }

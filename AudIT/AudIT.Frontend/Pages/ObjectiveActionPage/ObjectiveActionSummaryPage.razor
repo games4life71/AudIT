@@ -14,6 +14,9 @@
 @using Frontend.EntityViewModels.Objective
 @using Frontend.EntityViewModels.ObjectiveAction
 @using Frontend.Pages.Components
+@using Frontend.Pages.Components.Action
+@using Frontend.Pages.Components.Activity
+@using Frontend.Pages.Components.FIAP
 @using Havit.Linq
 
 @inject IAuditMissionService _auditMissionService
@@ -165,7 +168,7 @@
     <RadzenCard Variant="Variant.Outlined">
         <RadzenStack Orientation="Orientation.Vertical">
             <RadzenText TextStyle="TextStyle.DisplayH5" Text="Associated Activities"></RadzenText>
-            <RadzenDataGrid AllowColumnResize="true" AllowSorting="true" Data="@_activities" TItem="ActivityWithDepartViewModel">
+            <RadzenDataGrid @ref="@activitiesDataGrid" AllowColumnResize="true" AllowSorting="true" Data="@_activities" TItem="ActivityWithDepartViewModel">
                 <Columns>
                     <RadzenDataGridColumn Title="Name" Property="Name"></RadzenDataGridColumn>
                     <RadzenDataGridColumn Title=" Department Name" Property="Department.Name"></RadzenDataGridColumn>
@@ -188,7 +191,7 @@
 </RadzenRow>
 
 <RadzenRow class=rz-mt-4>
-
+    <RadzenButton Text="Add new mock" Click="@AddNewMockRisk"></RadzenButton>
     <RadzenStack JustifyContent="JustifyContent.Start" Orientation="Orientation.Horizontal">
         <RadzenButton Click="@NavigateBack" Text="Back" ButtonStyle="ButtonStyle.Secondary" Icon="arrow_back"></RadzenButton>
     </RadzenStack>
@@ -204,7 +207,7 @@
 
     private RadzenDataGrid<ActionRiskViewModel> actionDataGrid;
     private RadzenDataGrid<BaseObjActionFiapViewmodel> fiapDataGrid;
-
+    private RadzenDataGrid<ActivityWithDepartViewModel> activitiesDataGrid;
     private List<ActivityWithDepartViewModel> _activities = [];
 
 
@@ -300,7 +303,7 @@
             new Dictionary<string, object>()
             {
                 { "ActionRisk", actionRisk },
-                { "OnDialogClose", new EventCallback<ActionRiskViewModel>(this, OnDialogClose) }
+                { "OnEditActionRisk", new EventCallback<ActionRiskViewModel>(this, OnDialogClose) }
             }, new DialogOptions()
             {
                 Width = "700px",
@@ -313,7 +316,7 @@
         return Task.CompletedTask;
     }
 
-    private void OnDialogClose(ActionRiskViewModel updatedActionRisk)
+    private async Task OnDialogClose(ActionRiskViewModel updatedActionRisk)
     {
         var actionRisk = _objectiveActionViewModel.actionRisks.FirstOrDefault(x => x.id == updatedActionRisk.id);
         if (actionRisk != null)
@@ -323,6 +326,18 @@
             actionRisk.probability = updatedActionRisk.probability;
             actionRisk.impact = updatedActionRisk.impact;
         }
+
+
+        await actionDataGrid.Reload();
+        StateHasChanged();
+    }
+
+    private async Task AddNewMockRisk()
+    {
+        _objectiveActionViewModel.actionRisks.Add(
+            new ActionRiskViewModel(new Guid().ToString(), "name", 5, 5, 3, "objectiveActionId"));
+
+        await actionDataGrid.Reload();
     }
 
     private async Task DeleteRisk(ActionRiskViewModel actionRisk)
@@ -438,39 +453,85 @@
         _tooltipService.OpenOnTheTop(obj, "Export", new TooltipOptions() { Position = TooltipPosition.Top, Duration = 2000 });
     }
 
-    private Task OpenActivityEdit(ActivityWithDepartViewModel activity)
+    private async Task OpenActivityEdit(ActivityWithDepartViewModel activity)
     {
-        throw new NotImplementedException();
+        var auditMission = await _auditMissionService.GetAuditMissionById(Guid.Parse(_currentObjective.auditMissionId));
+        Guid DepartmentId = Guid.Empty;
+        if (auditMission.Success)
+        {
+            DepartmentId = auditMission.DtoResponse.DepartmentId;
+        }
+
+        DialogService.Open
+            <EditActivityComponent>(
+                "Edit New Activity",
+                new Dictionary
+                    <string, object>()
+                    {
+                        { "ObjectiveActionId", Guid.Parse(ObjectiveActionId) },
+                        { "AuditMissionId", Guid.Parse(_currentObjective.auditMissionId) },
+                        { "Activity", activity },
+                        { "DepartmentId", DepartmentId },
+                        {
+                            "OnActivityUpdated", new EventCallback<ActivityWithDepartViewModel>(this, OnActivityEdit)
+                        }
+                    }, new DialogOptions()
+                {
+                    Width = "700px",
+                    Height = "500px",
+                    Draggable = false,
+                    Resizable = false
+                }
+            );
     }
 
-    private async  Task DeleteActivity(ActivityWithDepartViewModel activity)
+    private async Task OnActivityEdit(ActivityWithDepartViewModel updatedActivity)
+    {
+        //add the updated activity to the list of activities
+        var activity = _activities.FirstOrDefault(x => x.Id == updatedActivity.Id);
+
+        if (activity != null)
+        {
+            activity.Name = updatedActivity.Name;
+            activity.Type = updatedActivity.Type;
+            activity.DepartmentId = updatedActivity.DepartmentId;
+            activity.Department = updatedActivity.Department;
+        }
+
+       await  actionDataGrid.Reload();
+    }
+
+    private async Task DeleteActivity(ActivityWithDepartViewModel activity)
     {
         var confirm = await DialogService.Confirm(
             "Are you sure you want to delete this activity?",
             "Delete Activity",
             new ConfirmOptions()
-                { OkButtonText = "Yes",
-                    CancelButtonText = "No" });
+            {
+                OkButtonText = "Yes",
+                CancelButtonText = "No"
+            });
 
         if (confirm.Value)
         {
-            var deleteResult =await _activityService.DeleteActivityAsync(activity.Id);
+            var deleteResult = await _activityService.DeleteActivityAsync(activity.Id);
 
             if (deleteResult.Success)
             {
-                _activities.Remove(activity);
-                _NotificationService.Notify(NotificationSeverity.Success, "Activity deleted successfully");
-                await InvokeAsync(StateHasChanged);
+                // _activities.Remove(activity);
+                _activities = _activities.Where(x => x.Id != activity.Id).ToList();
+                // _NotificationService.Notify(NotificationSeverity.Success, "Activity deleted successfully");
+                await actionDataGrid.Reload();
+                // StateHasChanged();
             }
             else
             {
                 _NotificationService.Notify(NotificationSeverity.Error, "Failed to delete activity");
             }
-
         }
     }
 
-    private async void AddNewFiapNavigate()
+    private  Task AddNewFiapNavigate()
     {
         var auditMission = Guid.Parse(_currentObjective.auditMissionId);
         // var objNAme = objective.DtoResponse.name;
@@ -493,24 +554,27 @@
                     Resizable = false
                 }
             );
+
         }
+
         catch (Exception e)
         {
             Console.WriteLine(e);
             throw;
         }
+        return Task.CompletedTask;
     }
 
     private async Task OnCreateFiapDialogClose(BaseObjActionFiapViewmodel newFiap)
     {
         _fiaps.Add(newFiap);
-
+        StateHasChanged();
         await fiapDataGrid.Reload();
 
-        await InvokeAsync(StateHasChanged);
+        // await InvokeAsync(StateHasChanged);
     }
 
-    private async  void AddNewActivityNavigate(MouseEventArgs obj)
+    private async void AddNewActivityNavigate(MouseEventArgs obj)
     {
         var auditMission = await _auditMissionService.GetAuditMissionById(Guid.Parse(_currentObjective.auditMissionId));
         Guid DepartmentId = Guid.Empty;
@@ -542,10 +606,11 @@
             );
     }
 
-    private void OnActivityCreated(ActivityWithDepartViewModel newActivity)
+    private async Task OnActivityCreated(ActivityWithDepartViewModel newActivity)
     {
         _activities.Add(newActivity);
-        StateHasChanged();
+        await activitiesDataGrid.Reload();
+        // StateHasChanged();
     }
 
     private void AddNewActionRisk(MouseEventArgs obj)
@@ -561,8 +626,8 @@
                     {
                         { "ObjectiveActionId", ObjectiveActionId },
                         {
-                            "OnDialogClose", new EventCallback
-                                <ActionRiskViewModel>(this, OnDialogClose)
+                            "OnCreateActionRisk", new EventCallback
+                                <ActionRiskViewModel>(this, OnCreateDialogClose)
                         }
                     }, new DialogOptions()
                 {
@@ -574,7 +639,7 @@
             );
     }
 
-    private async void OnCreateDialogClose(ActionRiskViewModel newActionRisk)
+    private async Task OnCreateDialogClose(ActionRiskViewModel newActionRisk)
     {
         _objectiveActionViewModel.actionRisks.Add(newActionRisk);
         await actionDataGrid.Reload();

@@ -93,11 +93,15 @@
         if (result.Success)
         {
             _notificationService.Notify(NotificationSeverity.Success, "Activity created", "The activity has been created successfully");
+            await OnActivityCreated.InvokeAsync(result.DtoResponse);
+            //close the dialog
+            _dialogService.Close();
         }
 
         else
         {
             _notificationService.Notify(NotificationSeverity.Error, "Activity not created", "The activity could not be created");
+
         }
     }
 
