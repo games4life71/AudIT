@@ -47,6 +47,7 @@
             {
                 <RadzenPanelMenuItem class="rz-my-4" Text="Home" Path="/" Icon="home"/>
                 <RadzenPanelMenuItem Icon="chrome_reader_mode" Text="Audit Missions">
+                    <RadzenPanelMenuItem class="rz-my-2" Text="Current Mission" Path=@($"/audit-mission/{_currentUserAuditMission}") Icon="favorite"/>
                     <RadzenPanelMenuItem class="rz-my-2" Text="Create Mission" Path="/create-mission" Icon="add"/>
                     <RadzenPanelMenuItem class="rz-my-2" Text="List Missions" Path="/audit-missions" Icon="list"/>
                     <RadzenPanelMenuItem class="rz-my-2" Text="Search Audit Mission" Icon="search">
@@ -64,6 +65,7 @@
                 <RadzenPanelMenuItem class="rz-my-4" Icon="all_out" Text="Objectives">
                     <RadzenPanelMenuItem class="rz-my-2" Text="Create Objective" Path="/create-objective" Icon="add"/>
                     <RadzenPanelMenuItem class="rz-my-2" Text="List Objectives" Path="/objectives" Icon="list"/>
+                    <RadzenPanelMenuItem class="rz-my-2" Text="Create Objective Action" Path="/create-objective-action" Icon="add"/>
                     <RadzenPanelMenuItem class="rz-my-2" Text="Search Objective" Icon="search">
 
                         <RadzenStack Orientation="Orientation.Vertical">

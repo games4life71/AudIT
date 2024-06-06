@@ -103,7 +103,7 @@ else
             new Dictionary<string, object>()
             {
                 { "ActionRisk", actionRisk },
-                { "OnDialogClose", new EventCallback<ActionRiskViewModel>(this, OnDialogClose) }
+                { "OnEditActionRisk", new EventCallback<ActionRiskViewModel>(this, OnDialogClose) }
             }, new DialogOptions()
             {
                 Width = "700px",
@@ -138,7 +138,7 @@ else
             new Dictionary<string, object>()
             {
                 { "ObjectiveActionId", objectiveActionId },
-                { "OnDialogClose", new EventCallback<ActionRiskViewModel>(this, OnCreateDialogClose) }
+                { "OnCreateActionRisk", new EventCallback<ActionRiskViewModel>(this, OnCreateDialogClose) }
             }, new DialogOptions()
             {
                 Width = "700px",

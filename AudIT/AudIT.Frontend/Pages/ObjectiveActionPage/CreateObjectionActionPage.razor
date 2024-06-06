@@ -1,0 +1,284 @@
+﻿@page "/create-objective-action"
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.ObjectiveActionService
+@using Frontend.Contracts.Abstract_Services.ObjectiveService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityDtos.Objective
+@using Frontend.EntityDtos.ObjectiveAction
+@using Frontend.EntityViewModels.Objective
+
+
+@inject DialogService _dialogService
+@inject IObjectiveService _objectiveService
+@inject IObjectiveActionService _objectiveActionService
+@inject IAuditMissionService _auditMissionService
+@inject NotificationService _notificationService
+
+<RadzenCard Variant="Variant.Outlined">
+
+    <RadzenRow>
+        @*Add new objective action to an objective steps*@
+        <RadzenColumn>
+            <RadzenSteps>
+                <Steps>
+                    <RadzenStepsItem Title="Audit Mission">
+                        <RadzenStack Orientation="Orientation.Vertical">
+                            <RadzenLabel Text="Select Audit Mission" Component="forAuditMission"></RadzenLabel>
+                            <RadzenDropDownDataGrid Name="forAuditMission"
+                                                    TValue="Guid"
+                                                    TextProperty="Name"
+                                                    AllowSorting="true"
+                                                    ValueChanged="@(args => SelectedAuditMission(args))"
+                                                    ValueProperty="Id"
+                                                    Placeholder="Audit Mission..."
+                                                    Data="@_auditMissions"/>
+                        </RadzenStack>
+
+
+                    </RadzenStepsItem>
+                    @*Select the objective*@
+                    <RadzenStepsItem Title="Objective">
+                        <RadzenStack Orientation="Orientation.Vertical">
+                            <RadzenLabel Text="Select Objective" Component="forObjective"></RadzenLabel>
+                            <RadzenDropDownDataGrid Name="forObjective"
+                                                    Disabled="@AuditMissionSelected()"
+                                                    Placeholder="Objective..."
+                                                    TValue="Guid"
+                                                    TextProperty="Name"
+                                                    AllowSorting="true"
+                                                    ValueChanged="@(args => SelectedObjective(args))"
+                                                    ValueProperty="Id"
+                                                    Data="@_objectives"/>
+                        </RadzenStack>
+
+                        @code
+                        {
+                            public bool AuditMissionSelected()
+                            {
+                                return _selectedAuditMissionId == Guid.Empty;
+                            }
+                        }
+
+                    </RadzenStepsItem>
+                    <RadzenStepsItem Title="Name">
+                        <RadzenStack Orientation="Orientation.Vertical">
+                            <RadzenLabel Text="Name"></RadzenLabel>
+                            <RadzenTextBox @bind-Value="@selectedName" Placeholder="Objective Action Name..."></RadzenTextBox>
+                        </RadzenStack>
+                    </RadzenStepsItem>
+                </Steps>
+
+            </RadzenSteps>
+            <RadzenRow>
+                <RadzenStack Orientation="Orientation.Vertical">
+                    <RadzenText Text="Summary" TextStyle="TextStyle.H5"></RadzenText>
+                    <RadzenText Text="@($"Name: {selectedName}")"></RadzenText>
+                    <RadzenText Text="@($"Audit Mission Name: {GetAuditMissionName()}")"></RadzenText>
+                    <RadzenText Text="@($"Objective Name: {GetObjectiveName()}")"></RadzenText>
+                </RadzenStack>
+            </RadzenRow>
+            <RadzenStack JustifyContent="JustifyContent.End" Orientation="Orientation.Horizontal">
+                <RadzenButton Click="@AddNewObjAction" Icon="add" Text="Add" ButtonStyle="ButtonStyle.Warning"></RadzenButton>
+            </RadzenStack>
+
+            @code
+            {
+                public string GetObjectiveName()
+                {
+                    var objectiveName = _objectives.FirstOrDefault(x => x.Id == selectedObjectiveId)?.Name;
+                    if (objectiveName != null) return objectiveName;
+
+                    return "No Objective Selected";
+                }
+
+                public string GetAuditMissionName()
+                {
+                    var auditMissionName = _auditMissions.FirstOrDefault(x => x.Id == _selectedAuditMissionId)?.Name;
+                    if (auditMissionName != null) return auditMissionName;
+
+                    return "No Audit Mission Selected";
+                }
+
+
+            }
+
+        </RadzenColumn>
+
+        @*Summary of Added Objective Action*@
+        <RadzenColumn>
+            <RadzenCard Variant="Variant.Outlined">
+                <RadzenStack Orientation="Orientation.Vertical">
+                    <RadzenText Text="Added Objective Actions:" TextStyle="TextStyle.DisplayH5"></RadzenText>
+                    <RadzenDataList Data="@_createdObjectiveActions" TItem="CreateObjectiveActionDto">
+                        <Template Context="objectiveAction">
+                            <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
+                                <RadzenText TextStyle="TextStyle.DisplayH6" Text="@objectiveAction.Name"></RadzenText>
+                                <RadzenButton Click="@(() => DeleteObjAction(objectiveAction))" Icon="delete" ButtonStyle="ButtonStyle.Danger"></RadzenButton>
+                            </RadzenStack>
+                        </Template>
+                    </RadzenDataList>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+                    <RadzenButton Click="@SaveChanges" Text="Save Changes" ButtonStyle="ButtonStyle.Success" Icon="save"></RadzenButton>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+
+
+</RadzenCard>
+
+
+@code {
+
+
+    private List<BaseAuditMissionDto> _auditMissions = [];
+    private List<BaseObjectiveViewModel> _objectives = [];
+
+    private List<CreateObjectiveActionDto> _createdObjectiveActions = [];
+
+    private Guid _selectedAuditMissionId = Guid.Empty;
+    private Guid selectedObjectiveId = Guid.Empty;
+    private string selectedName = string.Empty;
+
+    private CreateObjectiveActionDto _createObjectiveActionDto;
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        await FetchAuditMissions();
+    }
+
+}
+
+@functions
+{
+
+    private async Task FetchAuditMissions()
+    {
+        var auditMissions = await _auditMissionService.GetAuditMissionByOwnerId();
+        if (auditMissions.Success)
+        {
+            _auditMissions = auditMissions.DtoResponses;
+        }
+    }
+
+    private async Task SelectedAuditMission(Guid id)
+    {
+        _selectedAuditMissionId = id;
+        //TODO get the objectives of the selected audit mission and display them in the datagrid
+        //fetch the objectives
+
+        var response = await _objectiveService.GetObjectivesByAuditMissionIdAsync(_selectedAuditMissionId);
+
+        if (response.Success)
+        {
+            _objectives = response.DtoResponses;
+        }
+
+
+        StateHasChanged();
+
+
+        //refresh the datagrid
+    }
+
+    private Task SelectedObjective(Guid objectiveId)
+    {
+        selectedObjectiveId = objectiveId;
+        return Task.CompletedTask;
+    }
+
+    private async Task AddNewObjAction()
+    {
+        if (selectedName == string.Empty)
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Name is required");
+        }
+
+        else if (_selectedAuditMissionId == Guid.Empty)
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Audit Mission is required");
+        }
+        else if (selectedObjectiveId == Guid.Empty)
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Objective is required");
+        }
+        else
+        {
+            _createObjectiveActionDto = new CreateObjectiveActionDto
+            {
+                Name = selectedName,
+                ObjectiveId = selectedObjectiveId
+            };
+
+            var responseConfirm = await _dialogService.Confirm("", "Are you sure you want to add this Objective Action?", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+            if (!responseConfirm.Value)
+            {
+                return;
+            }
+
+
+
+            //add it to the list
+            _createdObjectiveActions.Add(_createObjectiveActionDto);
+            selectedName = string.Empty;
+            _selectedAuditMissionId = Guid.Empty;
+            selectedObjectiveId = Guid.Empty;
+
+
+            _createObjectiveActionDto = new CreateObjectiveActionDto();
+
+            StateHasChanged();
+        }
+    }
+
+    private async void SaveChanges()
+    {
+        if (_createdObjectiveActions.Count == 0)
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "No Objective Actions to save");
+            return;
+        }
+
+        var responseConfirm = await _dialogService.Confirm("", "Are you sure you want to save changes?", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+
+        if (!responseConfirm.Value)
+        {
+            return;
+        }
+
+        bool failed = false;
+
+        foreach (var objectiveAction in _createdObjectiveActions)
+        {
+            var response = await _objectiveActionService.CreateObjectiveActionAsync(objectiveAction);
+
+            if (!response.Success)
+            {
+                failed = true;
+            }
+        }
+
+        _createdObjectiveActions.Clear();
+        StateHasChanged();
+
+        if (!failed)
+        {
+            _notificationService.Notify(NotificationSeverity.Success, "Objective Actions Added Successfully");
+        }
+        else
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Failed to add Objective Actions");
+        }
+    }
+
+    private Task DeleteObjAction(CreateObjectiveActionDto value)
+    {
+        _createdObjectiveActions.Remove(value);
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+}

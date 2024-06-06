@@ -7,10 +7,11 @@ public class CreateObjectiveActionDto
     public Guid ObjectiveId { get; set; }
 
 
-    public CreateObjectiveActionDto()
-    {
-        // Name = string.Empty;
-        Name = "";
-            ObjectiveId = Guid.Empty;
-    }
+
+    // public CreateObjectiveActionDto()
+    // {
+    //     // Name = string.Empty;
+    //     Name = "";
+    //         ObjectiveId = Guid.Empty;
+    // }
 }

@@ -19,7 +19,6 @@
                 <RadzenCard>
                     <RadzenStack Orientation="Orientation.Vertical">
 
-
                         <RadzenLabel Component="forName" Text="Choose a name for new objective:"/>
                         <RadzenTextBox Value="@_selectedObjectiveName" ValueChanged="@((value) => CheckValidName(value))" Name="forName" Placeholder="Objective name..."></RadzenTextBox>
                         <RadzenText TextStyle="TextStyle.Subtitle1" Visible="@(!validObjName)" Text="Audit Mission Name must only contain letter and digits"></RadzenText>
