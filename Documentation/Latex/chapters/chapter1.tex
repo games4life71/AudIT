@@ -33,6 +33,9 @@ In cadrul aplicatiei, accesul la fiecare entitate este protejata prin implementa
 De asemenea, este implementat si un sistem de roluri care restrictioneaza si acestea la randul lor accesul la diferite functionalitati ale aplicatiei, astfel spre exemplu, un utilizator cu rol de reprezentant al unei institutii nu va putea accesa paginile referitoare la crearea sau editarea unei misini de audit.
 In plus, pentru o conformitate si pentru o evidenta sporita asupra actiunilor utilizatorilor asupra resurselor de pe platforma este implementat un sistem de auditare al entitatilor, toate operatiile de creare, modificare si stergere fiind salvate.
 
+\subsection{Pagina de start}
+Pagina de start este locul implicit unde un utilizator este redirectionat atunci cand autentificarea sa pe aplicatie este cu succes. Aceasta ii prezinta auditorului ultimele modificari la resursele la care are acces, o lista de notificari pe care acesta le-a primit din partea reprezentantilor institutiilor la care auditorul are misiuni de audit in desfasurare cat si diferite butoane de navigare catre pagini cheie din aplicatie, astfel oferind o interactiune mai usoara cu platforma AudIT.
+
 \subsection{Gestionarea misinilor de audit public}
 In cadrul procesului de audit public, o gestioneare eficienta a misiunilor, atat curente cat si din trecut, este esentiala pentru o experienta cat mai naturala si intuitiva a utilizatorului pe platforma.\\
 Crearea unei noi misiuni de audit este similara cu crearea unui nou proiect, auditorul specificand numele noii misiuni de audit, institutia respectiv departamenul asupra caruia se realizeaza noua misiune de audit. \\
@@ -40,9 +43,29 @@ Dupa crearea noii misiuni, auditorul este redirectionat catre o pagina in care a
 ---INSERT PICTURE HERE ---\\
 De asemenea, informatiile afisate in acest tabel pot fi sortate alfabetic dupa numele misiunii de audit, dupa starea in care fiecare dintre acestea se afla, dupa departamentul asupra caruia se desfasoara misiunea  sau dupa data ultimei modificari a acesteia.
 
-\subsection{Prelucarea pasilor unei misiuni de audit}
-Pentru o reproducere cat mai precisa si cooerenta a stagiilor prin care o misiune de audit trece, platforma permite setarea unui status al fiecarei misiuni de audit, astfel auditorul avand posibilitatea de a-si marca in detaliu progresul pana la momentul curent asupra misiunii de audit.De asemenea, fiecare pas major dintr-o misiune de audit prezinta functionalitati specifice, care vor fi explicate sumar in aceasta subsectiune.
+\subsection{Pagina rezumat misiune de audit}
 
+Pagina de rezumat a unei misiuni de audit are ca scop informarea auditorului asupra unei viziuni de ansamblu asupra misiunii de audit respective. Aceasta contine urmatoarele informatii:\\
+\begin{itemize}
+	
+	\item in partea de sus a paginii, auditorului ii este prezentat sub forma unui lant de pasi, statusul curent al misiunii, acesta fiind primul lucru pe care privirea utilizatorului il vede;
+	
+	\item o scurta descriere asupra parametrilor misiunii de audit,cum ar fi nume, data ultimii modificari, numele departamentului dar si statusul actual al misiunii. Utilizatorul are optiune de a edita acesti parametri si a salva modificarile aduse;\\
+	---INSERT PICTURE HERE-- \\
+	
+	\item in partea dreapta a paginii sunt prezente patru chenare care prezinta cele mai recente modificari si actualizari in materie de : obiective, documente atasate misiunii, fise de identificare a problemei cat si activitati recente asociate misiunii de audit  .Utilizatorul are posibilitatea de a naviga apasand pe numele intrarii din lista catre pagina dedicata acesteia, sau la apasarea butonului de 'See more' sa fie redirectionat catre pagina dedicata tututor entitatilor de acel fel;\\
+---INSERT PICTURE HERE-- \\
+	\item in partea dreapta jos, auditorul are posibilitatea de a selecta misiunea de audit ca fiind misiunea curenta, astfel orice actiune pe care acesta o sa o faca pe platforma o sa ia ca optiune preselectata misiunea selectata de acesta;\\
+	---INSERT PICTURE HERE-- \\
+	
+	
+	
+\end{itemize}
+
+
+\subsection{Prelucarea pasilor unei misiuni de audit}
+
+Pentru o reproducere cat mai precisa si cooerenta a stagiilor prin care o misiune de audit trece, platforma permite setarea unui status al fiecarei misiuni de audit, astfel auditorul avand posibilitatea de a-si marca in detaliu progresul pana la momentul curent asupra misiunii de audit.De asemenea, fiecare pas major dintr-o misiune de audit prezinta functionalitati specifice, care vor fi explicate sumar in aceasta subsectiune.
 \subsection*{Pregatirea misiunii de audit}
 Pregatirea misiunii de audit este etapa initiala in care auditorul creeaza misiunea, consulta misiunile anterioare efectuate la acelasi departament, se elaboreaza un plan de audit, se stabilesc obiectivele, actiunile specifice fiecarui obiectiv respectiv riscurile specifice fiecarei actiuni si se intocmesc o serie de documente oficiale, pentru a tine evidenta activitatilor ulterioare pe care auditorul le va realiza in aceasta misiune de audit.
 
@@ -72,7 +95,7 @@ Stabilirea obiectivelor de auditat, fiind un pas relativ important in procesul d
 Aplicatia ofera auditorului acces la un istoric de misiuni de audit public, in care acesta poate filtra doar misiunile de audit asupra departamentului la care se desfasoara si misiunea de audit curenta, astfel avand posibilitatea de analiza a riscurilor ce deja au fost descoperite, ajutandu-l 
 astfel pe acesta sa stabileasca noi riscuri relevante, corecte si in conformitate cu situatia actuala.
 
-\subsection{Identificarea si Evaluarea riscurilor}
+\subsection{Identificarea si evaluarea riscurilor}
 Platforma AudIT pune la dispozitia utilizatorului un mecanism de stabilire a riscurilor, acestia avand posibilitatea de a atasa noi riscuri identificate la o actiune, de a edita valorile riscurilor deja prezente sau de a sterge un risc din tabel in cazul in care acesta nu mai este conform sau o greseala in definirea acestuia a fost depistata.\\
 Aceasta functionalitate este implementata prin intermediul unui tabel paginat cu doar 5 riscuri pe pagina, fiecare linie afisand informatii relevante despre risc, cum ar fi probabilitatea, impactul, scorul final (riscul propriu zis) dar si o scurta descriere a acestuia.\\
 ---INSERT PIC HERE --- \\
@@ -103,7 +126,35 @@ De asemenea, in partea de jos a fiecarui tabel, utilzatorul are optiunea de a ad
 form in care utilizatorul poate completa campurile pentru a initializa o noua intrare in tabel.\\
 
 --INSERT PIC HERE--\\
+
+\subsection{Salvarea documentelor necesare pe platforma}
+
+Inventarierea si accesarea documentelor necesare pentru desfasurarea unei misiuni de audit public este o etapa esentiala pentru asigurarea transparentei si eficientei procesului de audit public.\\
+Platforma AudIT ofera aceste functionalitati utilizatorilor acesteia, astfel incat atat un auditor cat si membri ai departamentelor auditate care au acces la misiunea de audit, sa poata incarca si salveze pe platforma orice tip de document ce nu depaseste o anumita marime in dimensiune prestabilita.\\
+La incarcarea unui astfel de document, auditorul are posibilitatea de a alege intre tipul documentului incarcat: document standard(un fisier de sine statator deja completat) sau document sablon(un fisier care necesita completarea acestuia inainte sau ulterior salvarii acestuia pe platforma).\\
+
+---INSERT PIC HERE --- \\
+
+
+
+
+ \subsection{Accesarea documentelor necesare pe platforma}
  
+ Dupa crearea unui document si salvarea acestuia pe platforma, utilizatorii au optiunea de a vizualiza documentele elaborate de acestia respectiv cele la care li s-a oferit accesul.\\
+ Afisarea documentelor se face prin intermediul unui tabel, unde sunt afisate informatii cum ar fi: numele documentului, tipul documentului, misiunea de audit de care apartine, starea in care acesta se afla, ultima data la care acesta a fost modificat si numele departamentului caruia ii este adresat (in cazul documentelor sablon).\\
+ De asemenea, intrarile din tabel pot fi filtrate si sortate dupa diferite criterii, spre exemplu : alfabetic dupa numele sau tipul documentului, dupa starea in care acesta se afla sau dupa numele misiunii de audit de care acesta apartine.\\
+ 
+ ---INSERT PIC HERE---\\
+ 
+ 
+ \subsection{Completarea documentelor tip sablon}
+ 
+	Una dintre sarcinile de baza ale auditorului, dar si un punct nevralgic al sistemului de audit public despre care am discutat anterior, il constituie nevoie de a inventaria si de a completa numeroase documente de tip sablon. Avand in vedere faptul ca numarul acestor documente este uneori de ordinul zecilor intr-o misiune de audit, o functionalitate care ar permite auditorului sa completeze in mediul digital acest tip de documente ar fi bine venita.\\
+	Platforma AudIT ofera posibilitatea utilizatorilor sa completeze si sa editeze direct in aplicatie documentele de tip sablon salvate de acestia. Functionalitatea este implementata prin utilizarea unui simplu 
+	MarkDown editor, in care documentul sablon este incarcat, editat, iar la finalizarea procesului, schimbarile facute sunt salvate.\\
+	
+	--INSERT PIC HERE ---\\
+  
  
 
 
