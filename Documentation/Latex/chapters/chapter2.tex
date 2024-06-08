@@ -16,7 +16,7 @@ Acestea fiind zise, proiectul este impartit in doua mari componente (client si s
 
 \section{Arhitectura serverului}
 
-\subsection*{Arhitectura monolith}
+\subsection*{Arhitectura \textit{monolith}}
 
 Arhitectura generala a serverului este una de tip \textit{monolith} traditional, impartita pe module, cu dependente slabe intre ele, care comunica intre prin intermediul unor contracte (interfete) bine definte.\\
 Alegerea acestui tip de arhitectura a fost motivata de mai multe avantaje cheie ale acesteia: 
@@ -56,19 +56,69 @@ Adoptarea acestui tip de arhitectura impreuna cu cea de tip \textit{monolith} in
 	
 	\item flexibilitate din punct de vedere al schimbarii tehnologiilor exterioare, stratul de logica interna este independent de ceea ce se intampla in exteriorul sau;
 	
-	\item tesarea componentelor se poate face atat individual cat si in relatie cu alte module, astfel eliminand nevoia de testare a intregii aplicatii;
+	\item testarea componentelor se poate face atat individual cat si in relatie cu alte module, astfel eliminand nevoia de testare a intregii aplicatii;
 	
 	\item stratul de logica interna este independent de baza de date folosita, asftel serverul de stocare al datelor poate fi schimbat cu usurinta;
 
 \end{itemize} 
+Modul in care arhitectura de tip \textit{Clean Code} a fost implementata in aceste proiect consta in separarea straturilor aplicatiei, astfel incat avem:
+
+\begin{itemize}
+	\item  \textit{Core Layer} fiind structura principala ce confera logica interna a aplicatiei.Acesta cuprinde \textit{Domain} unde sunt modelate entitatile aplicatiei respectiv \textit{Application} unde este definita toata logica interna a serverului,
+	de la declaratiile abstracte ale interfetelor la definerea serviciilor proprii de care se vol folosi ulterior straturile externe ale arhitecturii;
+	
+	\item \textit{API Layer} este partea structurala care defineste \textit{endpoint-urile} aplicatiei prin diferite \textit{controllere}, expunand astfel functionalitatile aplicatiei la internet;
+	
+  	\item \textit{UI Layer} defineste structura de prezentare a aplicatiei si este formata din parte de \textit{Frontend} a aplicatiei;
+  
+ 	 \item \textit{Infrastructure Layer} in care gasim logica ce se ocupa de comunicarea cu serviciile externe cum ar fi baza de date, AWS sau servicii de identitate;
+ 	 
+\end{itemize}
 
 \subsection*{\textit{Design pattern-uri} utilizate}
+
+\textit{Design pattern-urile}, potrivit definitiei, sunt solutii generale si reutilizabile asupra problemelor comune ce pot aparea in decursul dezvoltarii unei aplicatii software.\\
+Utilizare lor conduce la o buna mentananta a codului scris, posbilitatea de a reutiliza module deja scrise, imbunatateste comunicare si legaturile dintre module si incurajeaza un stil de cod cat mai elegant si usor de inteles.\\
+In implementarea aplicatiei au fost folosite \textit{desing pattern-uri} din diferite categorii astfel incat in aceasta subsectiune se vor discuta cateva exemple utilizate.
+
+\subsection*{\textit{Optional pattern}}
+Acesta este un model de proiectare care ajuta la gestionarea valorilor care pot sau nu fi prezente, astfel avand valoarea \textit{null}. \textit{Pattern-ul} se asigura ca este eliminata valoarea \textit{null}, care de cele mai multe ori este o sursa comuna in erori la rularea codului (\textit{runtime}).\\
+Solutia prezentata de acest model este crearea unei clase \textit{template} care incapsuleaza valoarea propriu zisa a entitatii pe care o construim. Spre exemplu, in cazul in care vrem sa cream o noua entitate de tipul \textit{User} dar la \textit{runtime} apare o eroare, executia programului nu se va opri, iar valoarea entitatii va fi incapsulata intr-un tip   \textit{Result\textless User\textgreater}
+
+ cu parametrul \textit{Succes} setat pe fals, indicand astfel ca procesul de creare a esuat.\\
+
+--INSERT PIC HERE --\\
+
+\subsection*{\textit{Mediator pattern}}
+Acest \textit{design pattern} este unul de tip comportamental si se asigura ca nu exista dependinte haotice intre entitatile/clasele din codul scris. Modelul restrictioneaza comunicarea directa intre obiecte si le obliga sa interactioneaze doar prin intermediul unui \textit{mediator}.\\
+Acest model este implementat prin utilizarea unei interfate sau clase abstracte care stie toate referintele la componentele care vor sa comunice.In acest mod, in loc sa trimita solicitari directe, un obiect comunica prin intermediul mediatorului, acesta stiind unde sa redirectioneaze cererea.\\
+
+
+--INSERT PIC HERE --
+
+	
+\subsection*{\textit{Command pattern}}	
+Acest \textit{design pattern} este de asemenea unul de tip comportamental si se utilizeaza partial de \textit{design pattern-ul Mediator}, transformand astfel o comanda, spre exemplu o cerere de creare a unei noi entitati, intr-un obiect independent, acesta ulterior fiind trimis catre mediator si executat in \textit{handler-ul} corespunzator acestuia, de obicei numit \textit{receiver}.\\
+In contextul dezvoltarii partii de server a aplicatiei AudIT, acesta este utiliat, impreuna cu modelul Mediator pentru a delega orice comanda (\textit{request}) primita catre obiectul care stie sa o execute. In acest mod, se elimina dependinte stranse intre obiecte, promovand un cod cat mai bine organizat si elegant.\\
+
+--INSERT PIC HERE -- \\
+
+
+\subsection*{\textit{Repository pattern}}
+
+Folosit in special in dezvoltarea aplicatiilor web, acest \textit{design pattern} separa logica interna a aplicatiei de accesul direct la date (baza de date).Acesta se utilizeaza de interfate pentru a crea un strat separator intre declararea abstracta a acestor constracte si implementarea concreta a functiilor care acceseaza datele la nivel de baza.\\
+Prin acest model, comunicarea dintre module se realizeaza prin intermediul contractului foarte bine stabilit, astfel eliminand posibilitatea ca un modul abstract sa acceseze direct un modul de acces de date.\\
+
+--INSERT PIC HERE --\\
 
 \subsection*{Tehnologii utilizate}
 
 
 \section{Arhitectura interfatei grafice}
 
-
+adasd
 \section{Stocarea datelor}
 
+\section{Aspecte de securitate}
+
+adasd
