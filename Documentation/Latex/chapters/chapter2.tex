@@ -91,7 +91,7 @@ Solutia prezentata de acest model este crearea unei clase \textit{template} care
 
 \subsection*{\textit{Mediator pattern}}
 Acest \textit{design pattern} este unul de tip comportamental si se asigura ca nu exista dependinte haotice intre entitatile/clasele din codul scris. Modelul restrictioneaza comunicarea directa intre obiecte si le obliga sa interactioneaze doar prin intermediul unui \textit{mediator}.\\
-Acest model este implementat prin utilizarea unei interfate sau clase abstracte care stie toate referintele la componentele care vor sa comunice.In acest mod, in loc sa trimita solicitari directe, un obiect comunica prin intermediul mediatorului, acesta stiind unde sa redirectioneaze cererea.\\
+Acest model este implementat prin utilizarea unei interfate sau clase abstracte care stie toate referintele la componentele care vor sa comunice. In acest mod, in loc sa trimita solicitari directe, un obiect comunica prin intermediul mediatorului, acesta stiind unde sa redirectioneaze cererea primita.\\
 
 
 --INSERT PIC HERE --
@@ -106,18 +106,66 @@ In contextul dezvoltarii partii de server a aplicatiei AudIT, acesta este utilia
 
 \subsection*{\textit{Repository pattern}}
 
-Folosit in special in dezvoltarea aplicatiilor web, acest \textit{design pattern} separa logica interna a aplicatiei de accesul direct la date (baza de date).Acesta se utilizeaza de interfate pentru a crea un strat separator intre declararea abstracta a acestor constracte si implementarea concreta a functiilor care acceseaza datele la nivel de baza.\\
+Folosit in special in dezvoltarea aplicatiilor web, acest \textit{design pattern} separa logica interna a aplicatiei de accesul direct la date (baza de date). Acesta se utilizeaza de interfate pentru a crea un strat separator intre declararea abstracta a acestor constracte si implementarea concreta a functiilor care acceseaza datele la nivel de baza.\\
 Prin acest model, comunicarea dintre module se realizeaza prin intermediul contractului foarte bine stabilit, astfel eliminand posibilitatea ca un modul abstract sa acceseze direct un modul de acces de date.\\
 
 --INSERT PIC HERE --\\
 
 \subsection*{Tehnologii utilizate}
-
+In dezvoltarea partii de server s-a utilizat \textit{framework-ul } ASP.NET Core impreuna cu limbajul C\#.\\
+Alegerea facuta se bazeaza pe faptul ca \textit{framework-ul} este unul de tip \textit{open-source}, dezvoltat in principal de Microsoft, un actor important pe piata actuala IT,\textit{framework-ul} oferind functionalitati robuste si eficiente pentru dezvoltarea aplicatiilor web, acestea putand fi rulate pe Windows, Linux cat si MacOS.\\
+De asemenea, C\# este un limbaj de programare multi-paradigma \textit{high-end} matur, care ofera diverse functionalitati si solutii foarte bine puse la punct atat din punct de vedere al eficientei cat si al sustenabilitatii codului.\\
+Mai mult de atat, integrarea celor doua tehnologii cu alte servicii Microsoft este una foarte usor de realizat, acest lucru aducand un motiv in plus in alegerea facuta, pe langa ecosistemul bogat din care acestea fac parte, oferind suport pentru o gama larga de biblioteci si unelte deja integrate in functionalitatile limbajului si a \textit{framework-ului}.\\
+In plus, s-au utilizat diferite biblioteci pentru dezvoltarea anumitor servicii, cum ar fi :
+\begin{itemize}
+	\item  AWSSDK.Core pentru integrarea serviciilor AWS de trimiterea a unui email sau de stocare a datelor si a fisierelor in S3 Bucket;
+	
+	\item  MediatR care ofera functionalitatile \textit{design pattern-ului} Mediator;
+	
+	\item ASP.NET Identity, serviciu pentru integrarea functionalitatilor de autentificare si autorizare in aplicatie, facilitand accesul si autorizarea utilizatorilor pe platforma;
+	
+	
+	\item AutoMapper este o bibilioteca externa utilizata pentru a transforma diferitele tipuri de obiecte intre ele, eliminand astfel codul \textit{boilerplate} necesar pentru a copia datele de la  o entitate la alta;
+	
+	\item OpenXML este o biblioteca \textit{open-source} care permite manipularea fisierelor Office de tipul .XLSX sau .DOCS. Este integrata pentru a oferi utilizatorilor functionalitatea de a putea edita sau exporta pe platforma documente oficiale tip sablon;
+	
+\end{itemize}
+   
 
 \section{Arhitectura interfatei grafice}
 
-adasd
+
+
+
 \section{Stocarea datelor}
+
+ \subsection*{Baza de date MySQL}
+	MySQL este un sistem de gestionare a bazelor de date relationare open-source si reprezinta alegerea pentru care am optat a fi folosita pentru stocarea datelor in acest proiect.Acest sistem este una dintre cele mai populare solutii cand vine vorba de stocare intr-un mod relational al datelor, astfel incat acesta ofera diferite beneficii: 
+	\begin{itemize}
+		
+		\item simplitatea cand vine vorba de utilizarea acestuia, folosindu-se de un dialect comun in interogarile sale, este foate usor de utilizat;
+		
+		\item securitatea datelor oferita de MySQL prin integrarea unui sistem solid de privilegii si de restrictionarea a accesului bazat pe roluri;
+		
+		\item flexibilitatea si functionalitatile pe care acesta le ofera sporesc productivitatea dezvoltarii aplicatiilor;
+	\end{itemize} 
+ 
+ \subsection*{Entity Framework Core}
+Entity Framework Core este o tehnologie dezvoltata de Microsoft in cadrul \textit{framework-ului} .NET Core care permite dezvoltatorilor sa interactioneze cu entitatile si tabelele din baza de date prin intermediul obiectelor, eliminand astfel necesitatea de a scrie interogari clasice pentru a comunica facil cu baza de date si cu obiectele sale.\\
+Aceasta tehnologie dispune de o serie de caracteristici si functionalitati care o fac o alegere cruciala in ceea ce priveste comunicarea intr-un mod eficient cu baza de date:
+\begin{itemize}
+	
+	\item sistemul de \textit{migratii} similar unui \textit{version-control} al versiunii bazei de date si a relatiilor acesteia, permite dezvoltatorilor sa tina evidenta versiunii bazei de date, eventual existand posibilitatea in cazul unor erori sa se intoarca la ultima versiune stabila;
+	
+	\item \textit{code-first} este functionalitatea ce permite actualizarea modelului din baza de date pe baza schimbarilor din codul scris si a modificarilor din entitatile declare in codul sursa;
+	
+	\item suportul pentru majoritatea bazelor de date existente in momentul de fata, primind constant actualizari;
+	
+	\item performanta interogarilor, astfel incat sistemul este optimizat sa colecteze intr-un mod eficient rezultatele interogarilor;
+	 
+\end{itemize}
+
+
 
 \section{Aspecte de securitate}
 
