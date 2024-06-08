@@ -1,14 +1,74 @@
-\chapter{Titlul celui de-al doilea capitol}
-Facilisi nullam vehicula ipsum a arcu. Purus semper eget duis at tellus at. Adipiscing tristique risus nec feugiat. Eu volutpat odio facilisis mauris sit. Porta nibh venenatis cras sed. Penatibus et magnis dis parturient. Sollicitudin aliquam ultrices sagittis orci a. Senectus et netus et malesuada fames ac turpis egestas integer. Cras tincidunt lobortis feugiat vivamus at augue eget arcu dictum. Leo vel fringilla est ullamcorper eget nulla facilisi etiam dignissim. Nulla aliquet enim tortor at auctor urna nunc id cursus. Elit duis tristique sollicitudin nibh. Sagittis nisl rhoncus mattis rhoncus urna neque viverra. Convallis posuere morbi leo urna molestie at. Quisque egestas diam in arcu cursus euismod.
+\chapter{Arhitectura platformei}
+Fiind pus in fata cu provocarea de a elabora o platforma web destinata atat auditorilor publici cat si reprentatilor institutiilor din administratia publica, a fost nevoie de o arhitectura dinamica, modulara si usor de marit in cazul adaugarii a noi functionalitati.\\
+De asemenea, un numar mare de functionalitati necesita implementarea si a diferite \textit{design pattern-uri}, care se asigura ca modulule definite comunica intr-un mod cat mai eficient intre ele si promoveaza reutilizarea codului deja scris.\\
+Acest capitol incearca sa descrie motivatia pentru alegerile facute in materie de tehnologii folosite pentru a dezvolta componentele cheie ale aplicatiei: frontend, backend stocarea datelor si cateva aspecte legate de securitatea de baza a platformei; cat si o comparatie sumara intre potentialii competetitori ai alegerilor facute.
 
-\section{Titlul secțiunii 1}
+\section {Arhitectura generala}
+Arhitectura generala a fost gandita de la inceput intr-un mod care permite adaugarea de noi functionalitati in aplicatie fara a deteriora structura sau functionalitatile deja implementate.\\
+Acestea fiind zise, proiectul este impartit in doua mari componente (client si server)  care comunica intre ele prin intermediul \textit{request-urilor HTTPS} ,si anume:
 
-A diam sollicitudin tempor id eu nisl. Hac habitasse platea dictumst vestibulum. Integer enim neque volutpat ac tincidunt. Facilisi nullam vehicula ipsum a arcu cursus vitae congue. Vel turpis nunc eget lorem. Vestibulum mattis ullamcorper velit sed ullamcorper morbi tincidunt ornare. Nunc sed blandit libero volutpat. Sit amet luctus venenatis lectus magna fringilla urna porttitor. Hac habitasse platea dictumst quisque sagittis purus. Sed faucibus turpis in eu mi bibendum neque egestas. Vel orci porta non pulvinar neque laoreet suspendisse interdum consectetur. Erat nam at lectus urna duis convallis convallis tellus id. Tristique sollicitudin nibh sit amet commodo nulla facilisi nullam vehicula. Etiam dignissim diam quis enim lobortis scelerisque. Nunc congue nisi vitae suscipit tellus mauris a diam maecenas. Lacus viverra vitae congue eu consequat ac felis donec. Mauris sit amet massa vitae tortor condimentum. Mauris augue neque gravida in. Lorem ipsum dolor sit amet. Arcu dui vivamus arcu felis bibendum ut tristique et.
+\begin{itemize}
+	
+	\item componenta de server, este alcatuita din diferite \textit{endpoint-uri}  Web API care ofera functionalitati clientilor sai, aceasta comunicand si cu mediul de stocare al datelor, o baza de date MySQL;
+	
+	\item componenta client, sau interfata grafica a platformei, este o aplicatie web interactiva de tipul SPA (\textit{Single page application}), oferind functionalitatile descrise prin intermediul \textit{request-urilor} catre server, urmand ca mai apoi sa fie afisate pe pagina web prin intermediul \textit{WebAssembly};
+\end{itemize}  
 
-\section{Titlul secțiunii 2}
+\section{Arhitectura serverului}
 
-Sit amet mauris commodo quis imperdiet massa tincidunt nunc pulvinar. Ligula ullamcorper malesuada proin libero nunc consequat interdum. Mauris a diam maecenas sed enim ut. Ut sem nulla pharetra diam sit amet nisl suscipit adipiscing. Leo duis ut diam quam nulla. Neque ornare aenean euismod elementum. Vitae sapien pellentesque habitant morbi tristique senectus. Lectus magna fringilla urna porttitor rhoncus dolor purus non enim. Egestas sed sed risus pretium quam vulputate dignissim suspendisse in. At quis risus sed vulputate odio ut enim. Hac habitasse platea dictumst quisque sagittis. Lectus vestibulum mattis ullamcorper velit sed. Massa vitae tortor condimentum lacinia quis vel eros donec ac. Vulputate dignissim suspendisse in est ante. Sed faucibus turpis in eu mi bibendum neque. Enim eu turpis egestas pretium aenean pharetra magna. Tellus mauris a diam maecenas.
+\subsection*{Arhitectura monolith}
 
-\section{Titlul secțiunii 3}
+Arhitectura generala a serverului este una de tip \textit{monolith} traditional, impartita pe module, cu dependente slabe intre ele, care comunica intre prin intermediul unor contracte (interfete) bine definte.\\
+Alegerea acestui tip de arhitectura a fost motivata de mai multe avantaje cheie ale acesteia: 
+\begin{itemize}
+	\item simplitatea dezvoltarii in cadrul arhitecturii de tip monolith permite lucrul pe o singura baza de cod , ceea ce simplica major procesul de dezvoltare, testare si de depistare a erorilor, fiind esentiala in fazele de inceput al unui proiect;
+	
+	\item  performanta sporita in cadrul unui aplicatii care raspunde \textit{request-urilor}, astfel un singur \textit{API} poate raspunde la toate cererile, eliminand nevoia de a activa si alte \textit{API-uri} externe pentru indeplinirea sarcinii, ca in cazul arhitecturii de micro-servicii;
+	
+	\item usurinta testarii de tip \textit{unit-testing} cat si \textit{integration-testing} intrucat toate modulele sunt in acelasi loc;
+	
+	\item  depistarea erorilor si rezolvarea lor este mult mai rapida;
+\end{itemize}
+Ca in orice alegere pe care o facem, trebuie sa punem in balanta avantajele si dezavantajele pe care aceasta le ofera si sa le comparam strict cu nevoile si problemele pe care incercam sa le rezolvam. Privind in ansamblu si pe termen lung, arhitectura de tip \textit{monolith} prezinta si ea unele dezavantaje : 
 
-Faucibus ornare suspendisse sed nisi lacus sed. Mi in nulla posuere sollicitudin aliquam ultrices. Lacus suspendisse faucibus interdum posuere lorem ipsum dolor sit amet. Odio tempor orci dapibus ultrices in iaculis nunc sed augue. Congue eu consequat ac felis donec et odio. Enim ut sem viverra aliquet eget sit amet. Sit amet consectetur adipiscing elit duis tristique sollicitudin. Quis blandit turpis cursus in. Cras fermentum odio eu feugiat pretium nibh ipsum consequat nisl. Non curabitur gravida arcu ac tortor dignissim convallis aenean. Porta non pulvinar neque laoreet suspendisse interdum consectetur libero id. Lacus viverra vitae congue eu consequat ac felis. Vulputate dignissim suspendisse in est ante in nibh mauris. Amet mauris commodo quis imperdiet massa. Varius sit amet mattis vulputate enim nulla aliquet. Pellentesque diam volutpat commodo sed egestas egestas. Amet est placerat in egestas erat imperdiet sed euismod. Scelerisque varius morbi enim nunc faucibus a pellentesque sit. Ut sem viverra aliquet eget sit amet tellus cras. Sem integer vitae justo eget magna fermentum iaculis eu.
+\begin{itemize}
+
+ \item dezvoltarea incetinita in momentul in care functionalitatile pe care dorim sa le implementam cresc ca si numar, intrucat toate modulele sunt comasate intr-un singur loc;
+ 
+ \item \textit{scalabilitate redusa} datorita stransei legaturi dintre componentele prezente in aplicatie;
+ 
+ \item 	orice schimbare adusa in materie de noi functionalitati necesita lansarii intregii aplicatii, nu doar a unui singur modul;
+
+\end{itemize}
+
+Pentru a diminua efectele negative pe care aceste dezavantaje le au asupra intregului proces de dezvoltare a aplicatiei, am incercat implementarea diferitelor solutii in materie de arhitectura, \textit{desing pattern-uri} cretionale, arhitecturale cat si a numeroase practici bune comune in scrierea si mentenanta codului.
+
+\subsection*{Arhitectura \textit{Clean Code}}
+Arhitectura \textit{Clean Code } este bazata pe ideea principala precum ca stratul de logica interna (\textit{business layer}) este situat central in diagrama circulara, astfel acesta este protejat de schimbari externe. Aceasta proprietate poate fi reformulata astfel incat se defineste \textbf{Regula Dependintei} care presupune ca dependintele pot sa fie orientate doar inspre interiorul cercului, astfel niciunul din modulele interioare nu ar trebui sa fie legat in orice fel de un modul exterior acestuia.\\
+
+---INSERT PIC HERE --- \\
+
+Adoptarea acestui tip de arhitectura impreuna cu cea de tip \textit{monolith} include mai multe beneficii cum ar fi:
+
+\begin{itemize}
+
+	\item mentenanta sporita datorata faptului ca modulele sau straturile principale ale aplicatiei si logica ce le faciliteaza comnunicarea eficienta sunt separate, incurajand astfel si o intelegere mai detaliata si simplificata a intregului sistem;
+	
+	\item flexibilitate din punct de vedere al schimbarii tehnologiilor exterioare, stratul de logica interna este independent de ceea ce se intampla in exteriorul sau;
+	
+	\item tesarea componentelor se poate face atat individual cat si in relatie cu alte module, astfel eliminand nevoia de testare a intregii aplicatii;
+	
+	\item stratul de logica interna este independent de baza de date folosita, asftel serverul de stocare al datelor poate fi schimbat cu usurinta;
+
+\end{itemize} 
+
+\subsection*{\textit{Design pattern-uri} utilizate}
+
+\subsection*{Tehnologii utilizate}
+
+
+\section{Arhitectura interfatei grafice}
+
+
+\section{Stocarea datelor}
+
