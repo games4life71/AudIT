@@ -133,8 +133,27 @@ In plus, s-au utilizat diferite biblioteci pentru dezvoltarea anumitor servicii,
    
 
 \section{Arhitectura interfatei grafice}
+Interfata grafica dezvoltata in acest proiect este realizata in \textit{framework-ul} .NET Blazor, mai exact o aplicatie de tipul \textit{WASM (Web Assembly)} care ruleaza in \textit{browser-ul} utilizatorului. Alegerea a fost facuta intrucat acest nou model arhitectural permite rularea codului direct in \textit{browser}, nemaifiind nevoie de librarii sau extensii suplimentare necesare.\\
 
+\subsection*{Web assembly} 
+Cum ne putem da seama si din numele pe care aceasta tehnologie o poarta, este vorba despre \textit{byte-code} (cod-masina) care este executat de \textit{engine-ul} JavaScript direct in \textit{browser}.\\
+\textit{Wasm} nu este un limbaj, ci mai degraba produsul compilarii codului scris intr-un limbaj de programare in cod-masina executabil. Majoritatea limbajelor de programare moderne  suporta compilarea codului direct intr-un fisier  binar de tip .wasm . Dupa o compilare cu succes, fisierele binare .wasm sunt incarcate in \textit{browser} unde sunt executate de catre motorul JavaScript specific intr-o instanta virtuala izolata si securizata.\\
+---INSERT PIC HERE -- \\
+Un avantaj cheie al utilizarii acestei tehnologii il constituie viteza si eficienta de care da dovada. Codul ruleaza cat se poate de aproape de limitarile \textit{hardware} ale computer-ului, astfel rezultand in performante crescute si un nivel al utilizarii memoriei mai mic.\\
+Pe de alta parte, exista si dezavantaje in utilizarea acestuia, intrucat momentan nu este implementat un sistem de \textit{garbage collector} care sa elimine din memorie functiile si instantele care nu mai sunt folosite in firul executiei.
 
+\subsection*{.NET Blazor}
+Pentru dezvoltarea paginilor web, s-a utilizat tehnologia .NET Blazor, un \textit{framework} relativ nou aparut, dar care promite performante crescute alaturi de un mediu de lucru bine pus la punct si eficient din punct de vedere al productivitatii dezvolarii interfatelor interactive si bogate.\\
+Paginile web create in acest mod combina codul C\# cu HTML pentru a crea componente reutilizabile ce sunt  afisate si actualizate in DOM-ul virtual din \textit{browser}.\\
+
+--INSERT PIC HERE-- \\
+
+O functionalitate foarte importanta pe care o ofera, este utilizarea asa ziselor componente, parti fundamentale care impreuna alcatuiesc pagina web afisata utilizatorului. O componenta poate fi vazuta ca o piesa esentiala de puzzle care contribuie la afisarea finala a unei pagini web, piesa de puzzle care la randul sau poate fi creata din mai multe astfel de componente, si asa mai departe.
+Un avantaj pe care Blazor il ofera dezvoltatorilor este acela ca elimina pe cat posibil utilizarea de functii si \textit{script-uri }JavaScript in crearea paginilor web. Blazor se foloseste de cod scris in C\# impreuna cu HTML si CSS pentru a elabora pagini si componente web interactive si fluide.\\
+
+\subsection*{Radzen Components}
+De asemenea, pentru o stilizare si o reutilizare a componentelor, s-a folosit libraria Radzen Components pentru a folosi controale si componente cum ar fi : tabele, butoane stilizate, teme grafice de inalta calitate, \textit{form-uri} si multe altele.\\
+ Libraria Radzen Components este una de tip \textit{open-source} si ofera suport dedicat din partea comunitatii active, impreuna cu documentatie detaliata asupra tuturor functionalitatilor oferite.
 
 
 \section{Stocarea datelor}

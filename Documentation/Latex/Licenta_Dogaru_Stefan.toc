@@ -28,6 +28,6 @@
 \contentsline {section}{\numberline {2.1}Arhitectura generala}{17}{section.2.1}%
 \contentsline {section}{\numberline {2.2}Arhitectura serverului}{18}{section.2.2}%
 \contentsline {section}{\numberline {2.3}Arhitectura interfatei grafice}{23}{section.2.3}%
-\contentsline {section}{\numberline {2.4}Stocarea datelor}{23}{section.2.4}%
-\contentsline {section}{\numberline {2.5}Aspecte de securitate}{24}{section.2.5}%
-\contentsline {chapter}{Concluzii}{25}{chapter*.20}%
+\contentsline {section}{\numberline {2.4}Stocarea datelor}{24}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Aspecte de securitate}{25}{section.2.5}%
+\contentsline {chapter}{Concluzii}{26}{chapter*.23}%
