@@ -187,5 +187,52 @@ Aceasta tehnologie dispune de o serie de caracteristici si functionalitati care 
 
 
 \section{Aspecte de securitate}
+Simpla dezvoltare a unei aplicatii web ce ofera utilizatorului numeroase functionalitati nu este suficienta daca aceasta aplicatie nu dispune de un set de reguli si aspecte ce  fac experienta utilizatorilor pe platforma una cat mai sigura, in care le este asigurata integritatea, confidentialitatea cat si disponibilitatea datelor si actiunilor acestora.\\
+In dezvoltarea platformei AudIT s-a incercat utilizarea a cat mai multor standarde in ceea ce priveste securitatea actiunilor pe care un potential utilizator poate sa le faca in aplicatie, precum si a datelor si informatiilor cu care acesta lucreaza.
 
-adasd
+\subsection*{Autentificarea actiunilor}
+
+Atat pe partea de server cat si in cea de client, sunt implementate functionalitati ce previn utilizarea \textit{endpoint-urilor} si accesarea paginilor web cand un utilizator nu este autentificat pe aplicatie. Mai mult de atat, accesul la anumite functionalitati este restrictionat doar unor categorii de utilizatori, cu un rol specific, astfel un utilizator cu rolul de reprezentant al unei institutii nu va putea accesa paginile specifice crearii si actualizarii unei misiuni de audit, intrucat rolul pe care acesta il detine nu are nivel de permisiune necesar pentru aceasta actiune.\\
+Modalitatea prin care este verificata prin atribuirea unui \textit{token} de tip JWT (\textit{JSON web token}) fiecarui utilizator in momentul in care acesta se autentifica pe platforma, ulterior la fiecare actiune (\textit{request}) facut de acesta, fiind trimis si acest \textit{token}.\\
+
+
+--INSERT PIC HERE --- \\
+
+\textbf{Stocarea} acestui \textit{token} de acces se face intr-o maniera securizata in \textit{browser-ul} clientului sub forma unui \textit{cookie http-only}, care previne citirea acestuia de orice \textit{script} sau librarie externa din \textit{browser}, fiind utilizat doar in componenta unui \textit{request} prin HTTP, astfel protejand aplicatie si utilizatorii sai impotriva atacurilor de tip XSS(\textit{cross-site-scripting}).\\
+
+--INSERT PIC HERE --
+
+Pentru verificarea rolurilor si \textit{claim-urilor} pe care un utilizator le detine, este creat un \textit{endpoint} special, securizat astfel incat sa poata fi accesat doar daca in componenta \textit{request-ului} este prezent acel \textit{cookie}, care ofera informatii despre rolurile si \textit{claim-urile} specifice utilizatorului care a facut cererea. Pe baza acestora, i se permite sau i se interzice accesul la anumite pagini si actiuni pe care acesta le doreste a face.
+
+
+\subsection*{Utilizarea HTTPS}
+
+Utilizarea HTTPS atat in partea de server, cat si in cea de client impune mai multe aspecte benefice in ceea ce priveste securitatea platformei:
+
+\begin{itemize}
+	
+	\item confidentialitatea datelor, https cripteaza informatia transmisa intre server si client, astfel se asigura de faptul ca sansele de interceptare si citire a  comunicatiei sunt aproape de zero;
+	
+	\item integritatea datelor este asigurata tot prin mecanismul de criptare a acestora, astfel asigurandu-se de faptul ca acestea ajung la destinatie neschimbate;
+	
+	\item autententificarea, https folosindu-se de certificate digitiale (SSL si TLS) pentru a verifica identitatea serverelor, reducand riscul unor atacuri malitioase; 
+	
+\end{itemize}
+
+
+\subsection*{Restrictionarea inregistrarii pe platforma}
+
+O alta modalitate prin care se mentine un nivel ridicat de securitate pe platforma o defineste restrictionarea utilizatorilor de a se inregistra pe platforma.\\
+La pasul de creare a unui cont nou, utilizatorilor le este  impusa folosirea unei adrese de email care contine domeniul unei institutii inregistrate si configurate pe platforma. Dupa crearea cu succes a unui cont nou, acesta nu are nici o permisiune, contul fiind nevoit a fi verificat de catre o persoana cu drepturi elevate (administratorul institutiei).\\ 
+Verificarea se face pe baza unui email primit de acesta in care se cere validarea identitatii noul cont creat, astfel minimizand riscul crearii a unor conturi false respectiv a unor false identitati.
+
+
+\section{Diagrame de context C4 }
+
+Diagramele de context C4 reprezinta un stadard in ceea ce priveste o vedere de ansamblu, dar care merge inspectata in detaliu pentru fiecare component al aplicatiei, astfel promovand o ierarhizarea si o intelegere a intreg sistemului mai buna.\\
+
+\subsection*{Nivelul 1}
+
+\subsection*{Nivelul 2}
+
+\subsection*{Nivelul 3}
