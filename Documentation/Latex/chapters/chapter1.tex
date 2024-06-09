@@ -66,7 +66,7 @@ Crearea unei noi misiuni de audit este similara cu crearea unui nou proiect, aud
 	\end{minipage}%
 	\begin{minipage}{.5\textwidth}
 		\centering
-		\includegraphics[width=.9\linewidth]{c1/pas1_creare_misiune.png}
+		\includegraphics[width=.9\linewidth]{c1/pas2_creare_misiune.png}
 		\caption{Selectarea institutiei}
 	
 	\end{minipage}
@@ -74,13 +74,17 @@ Crearea unei noi misiuni de audit este similara cu crearea unui nou proiect, aud
 
 	\centering
 	
-	\includegraphics[width=0.5\textwidth]{c1/login.png}
-	\caption{Autentificarea pe platforma}
-
+	\includegraphics[width=0.5\textwidth]{c1/pas3_creare_misiune.png}
+		\vspace{0.5 cm}
+	\caption{Selectarea departamentului}
+	
+	\includegraphics[width=0.5\textwidth]{c1/confirmare_misiune_creata.png}
+	\caption{Confirmare creare misiune de audit}
+	
 \end{figure}
 
 
-Dupa crearea noii misiuni, auditorul este redirectionat catre o pagina in care acesta poate vizualiza intr-un tabel toate misiunile de audit la care acesta are acces, cele create de el, dar si cele la care i-a fost oferit accesul.Afisarea intrarilor din tabel este una de tip paginata cu un numar de 7 misiuni pe pagina, astfel incat atentia utilizatorului sa fie concentrata doar pe aceste misiuni, in acest fel eliminand posibilitatea de a nu gasi informatia pe care acesa o cauta datorita unui numar prea mare de linii si informatii.
+Dupa crearea noii misiuni, auditorul este redirectionat catre o pagina in care acesta poate vizualiza intr-un tabel toate misiunile de audit la care acesta are acces, cele create de el, dar si cele la care i-a fost oferit accesul.Afisarea intrarilor din tabel este una de tip paginata cu un numar de sapte misiuni pe pagina, astfel incat atentia utilizatorului sa fie concentrata doar pe aceste misiuni, in acest fel eliminand posibilitatea de a nu gasi informatia pe care acesa o cauta datorita unui numar prea mare de linii si informatii.
 	\vspace{0.5 cm}
 \begin{figure}[h]
 	\centering
@@ -96,16 +100,32 @@ Pagina de rezumat a unei misiuni de audit are ca scop informarea auditorului asu
 \begin{itemize}
 	
 	\item in partea de sus a paginii, auditorului ii este prezentat sub forma unui lant de pasi, statusul curent al misiunii, acesta fiind primul lucru pe care privirea utilizatorului il vede;
+		
+		\begin{figure}[h]
+		\centering
+		
+		\includegraphics[width=0.9\textwidth]{c1/lant_summary.png}
+		\caption{Informatii sumare despre misiunea de audit}
+	\end{figure}
+	\item o scurta descriere asupra parametrilor misiunii de audit,cum ar fi nume, data ultimii modificari, numele departamentului dar si statusul actual al misiunii. Utilizatorul are optiune de a edita acesti parametri si a salva modificarile aduse;
 	
-	\item o scurta descriere asupra parametrilor misiunii de audit,cum ar fi nume, data ultimii modificari, numele departamentului dar si statusul actual al misiunii. Utilizatorul are optiune de a edita acesti parametri si a salva modificarile aduse;\\
-	---INSERT PICTURE HERE-- \\
+		\vspace{0.5 cm}
+	\begin{figure}[h]
+		\centering
+		
+		\includegraphics[width=0.5\textwidth]{c1/status_misiune}
+		\caption{Informatii sumare despre misiunea de audit}
+	\end{figure}
 	
-	\item in partea dreapta a paginii sunt prezente patru chenare care prezinta cele mai recente modificari si actualizari in materie de : obiective, documente atasate misiunii, fise de identificare a problemei cat si activitati recente asociate misiunii de audit  .Utilizatorul are posibilitatea de a naviga apasand pe numele intrarii din lista catre pagina dedicata acesteia, sau la apasarea butonului de 'See more' sa fie redirectionat catre pagina dedicata tututor entitatilor de acel fel;\\
----INSERT PICTURE HERE-- \\
+	\item in partea dreapta a paginii sunt prezente patru chenare care prezinta cele mai recente modificari si actualizari in materie de : obiective, documente atasate misiunii, fise de identificare a problemei cat si activitati recente asociate misiunii de audit  .Utilizatorul are posibilitatea de a naviga apasand pe numele intrarii din lista catre pagina dedicata acesteia, sau la apasarea butonului de 'See more' sa fie redirectionat catre pagina dedicata tututor entitatilor de acel fel;
+	\begin{figure}[h]
+		\centering
+		
+		\includegraphics[width=0.7\textwidth]{c1/chenar_recent}
+		\caption{Informatii sumare despre modificarile recente}
+	\end{figure}
 	\item in partea dreapta jos, auditorul are posibilitatea de a selecta misiunea de audit ca fiind misiunea curenta, astfel orice actiune pe care acesta o sa o faca pe platforma o sa ia ca optiune preselectata misiunea selectata de acesta;\\
-	---INSERT PICTURE HERE-- \\
-	d
-	
+		
 	
 \end{itemize}
 
@@ -132,10 +152,23 @@ Urmarirea recomandarilor este pasul final dintr-o misine de audit in care sunt m
 
 Stabilirea obiectivelor de auditat are loc in faza initiala a pasului pregatirii misiunii de audit, pas in care auditorul stabileste obiectivele principale care vor fi auditate in cele ce urmeaza. Fiecare obiectiv este compus din mai multe actiuni specifice iar acestea contin la randul lor o serie de riscuri identificate. Aceste riscuri identificate de catre auditor sunt ierarhizate pe baza unei formule de calcul care ia in considerare probabilitatea actiunii de a se intampla, impactul pe care aceasta il va avea si riscul final rezultat al inmultirii celor doua.\\
 Platforma web AudIT ofera aceste functionalitati utilizatorului, astfel incat acesta sa respecte in detaliu toti pasii legislativi ai procedurii de audit public. Auditorul poate forma obiective noi si sa le ataseze la misiunea de audit corespunzatoare.\\
----INSERT PICTURE HERE---\\
+
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.8\textwidth]{c1/creare_obiectiv_1}
+	\caption{Primul pas in crearea unui nou obiectiv	}
+\end{figure}
+
 De asemenea, acesta are posibiliatea de a atasa direct din meniul de creare al unui obiectiv, actiuni specifice obiectibului respectiv, precum si documente necesare sau ajutatore actiunii, astfel usurand semnificativ procesul de inventariere prezent la acest pas.\\
-Tot acest proces  de creare a unui nou obiectiv este impartit pe mai multi pasi, astfel incat interactiunea utilizatorului cu aplicatia respectiv cu interfata grafica a acesteia sa fie una cat mai naturala si intuitiva.\\
----INSERT PICTURE HERE---
+Tot acest proces  de creare a unui nou obiectiv este impartit pe mai multi pasi, astfel incat interactiunea utilizatorului cu aplicatia respectiv cu interfata grafica a acesteia sa fie una cat mai naturala si intuitiva.
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.9\textwidth]{c1/creare_obiectiv}
+	\caption{Atasarea actiunilor specifice unui obiectiv}
+\end{figure}
 
 \subsection{Vizualizarea si accesarea ricurilor din misiuni anterioare}
 Stabilirea obiectivelor de auditat, fiind un pas relativ important in procesul de audit public, o identificare cat mai precisa si corecta a riscurilor actiunilor acestora este cruciala pentu o buna desfasurare dar si pentru rezultate optime ale misiunii de audit.\\
@@ -144,19 +177,47 @@ astfel pe acesta sa stabileasca noi riscuri relevante, corecte si in conformitat
 
 \subsection{Identificarea si evaluarea riscurilor}
 Platforma AudIT pune la dispozitia utilizatorului un mecanism de stabilire a riscurilor, acestia avand posibilitatea de a atasa noi riscuri identificate la o actiune, de a edita valorile riscurilor deja prezente sau de a sterge un risc din tabel in cazul in care acesta nu mai este conform sau o greseala in definirea acestuia a fost depistata.\\
-Aceasta functionalitate este implementata prin intermediul unui tabel paginat cu doar 5 riscuri pe pagina, fiecare linie afisand informatii relevante despre risc, cum ar fi probabilitatea, impactul, scorul final (riscul propriu zis) dar si o scurta descriere a acestuia.\\
----INSERT PIC HERE --- \\
+Aceasta functionalitate este implementata prin intermediul unui tabel paginat, fiecare linie afisand informatii relevante despre risc, cum ar fi probabilitatea, impactul, scorul final (riscul propriu zis) dar si o scurta descriere a acestuia.
+
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.9\textwidth]{c1/tabel_riscuri}
+	\caption{Informatii sumare despre riscurile}
+\end{figure}
+
 De asemenea, in partea de jos a tabelului este afisat si numarul total de riscuri atasate actiunii respective, cat si scorul total al tuturor riscurilor, scor care il va ajuta ulterior pe auditor in stabilirea selectarii sau nu a obiectivul in auditare.
 
 \subsection{Vizualizarea obiectivelor}
 
 Ulterior crearii unui nou obiectiv al misiunii de audit, utilizatorul este redirectionat catre o pagina in care acesta poate viziona prin intermediul unui tabel toate obiectivele deja stabilite pentru misiunea respectiva de audit intr-un format cat mai intuitiv, usor de folosit si inteles .\\
-Auditorul poate vizualiza toate actiunile specifice obiectivului pe care il analizeaza, avand in plus si informatii asupra numelui, data ulitimii modificari/accesari a acesteia, daca este selectat sau nu in procesul de auditare sau optiunea de a inspecta toate riscurile identificate pana la momentul curent, prin apasarea butonului 'More details' din dreptul coloanei 'Action Risks Details'.\\
---INSERT PICTURE HERE --\\
+Auditorul poate vizualiza toate actiunile specifice obiectivului pe care il analizeaza, avand in plus si informatii asupra numelui, data ulitimii modificari/accesari a acesteia, daca este selectat sau nu in procesul de auditare sau optiunea de a inspecta toate riscurile identificate pana la momentul curent, prin apasarea butonului 'More details' din dreptul coloanei 'Action Risks Details'.
+
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=1\textwidth]{c1/tabel_obiective}
+	\caption{Informatii despre obiectivele misiunii de audit}
+\end{figure}
+
+
+
 De asemenea, utilizatorul poate naviga prin apasarea butonului 'More details' din dreptul ultimii coloane catre pagina dedicata detaliilor actiunii, in care acesta poate gasi mai multe amanunte referitoare la actiunea selectata.
 
+
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.9\textwidth]{c1/optiuni_suplimentare}
+	\caption{Optiuni suplimentare gestionare obiectiv}
+\end{figure}
+
+
 \subsection{Pagina detalii actiune}
-Pagina ofera auditorului o imagine de ansamblu asupra actiunii selectata, astfel acesta poate accesa si vizualiza detalii despre actiune cum ar fi:\\
+Pagina ofera auditorului o imagine de ansamblu asupra actiunii selectate, astfel acesta poate accesa si vizualiza detalii despre actiune cum ar fi:\\
 \begin{itemize}
 	\item un scurt rezumat al acesteia care contine numele, daca este sau nu selectata in procesul de audit, o lista de Controale Interne Asteptate respectiv o lista de Controale Interne Existente;
 	
@@ -168,11 +229,27 @@ Pagina ofera auditorului o imagine de ansamblu asupra actiunii selectata, astfel
 	
 \end{itemize}
 
---INSERT PIC HERE ---\\
-De asemenea, in partea de jos a fiecarui tabel, utilzatorul are optiunea de a adauga o noua entitate prin apasarea butonului 'Add new'.La apasarea acestuia, se deschide un dialog de tip 
-form in care utilizatorul poate completa campurile pentru a initializa o noua intrare in tabel.\\
 
---INSERT PIC HERE--\\
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.9\textwidth]{c1/obiectiv_summary}
+	\caption{Informatii despre obiectivul selectat}
+\end{figure}
+
+
+De asemenea, in partea de jos a fiecarui tabel, utilzatorul are optiunea de a adauga o noua entitate prin apasarea butonului 'Add new'.La apasarea acestuia, se deschide un dialog de tip 
+form in care utilizatorul poate completa campurile pentru a initializa o noua intrare in tabel.
+
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.9\textwidth]{c1/obiectiv_summary2.png}
+	\caption{Informatii FIAP si Activitati}
+\end{figure}
+
 
 \subsection{Salvarea documentelor necesare pe platforma}
 
@@ -223,9 +300,32 @@ La incarcarea unui astfel de document, auditorul are posibilitatea de a alege in
 		\item sectiunea de configurare, unde un utilizator cu drepturi elevate poate configura institutiile respectiv departamentele inregistrate pe platforma, adaugand, editand sau eliminand instante dintre acestea;
 		
 		
+		
+		
+
 	\end{itemize}
-	
+\newpage
+   De asemenea, bara de navigare se actualizeaza in functie de statusul de autentificare si rolul pe care utilizatorul il are.
+   \begin{figure}[h]
+   	\centering
+   	\begin{minipage}{.5\textwidth}
+   		\centering
+   		\includegraphics[width=.9\linewidth]{c1/navbar_logat}
+   		\caption{Utilizator autentificat}
+   		
+   	\end{minipage}%
+   	\begin{minipage}{.5\textwidth}
+   		\centering
+   		\includegraphics[width=.9\linewidth]{c1/navbar_nelogat.png}
+   		\caption{Utilizator neautentificat}
+   		
+   	\end{minipage}
+   	
+   	
+   \end{figure}
+
 	\subsection{Gestionarea accesului la resurse partajate}
+	
 	 O componenta cheie in desfasurarea corecta a unei misiuni de audit este colaborarea intre partile participante la misiunea de audit.\\
 		Functionalitatea de acordare a accesului la resurse, contribuie la o colaborare cat mai stransa intre membrii partipanti la misiunea de audit, astfel un auditor poate acorda acces de scriere sau citire la diferite resurse create de acesta.\\
 		In plus, o lista completa a accesului primit sau oferit se poate vizualiza de catre utilizator pe o pagina dedicata, unde sub forma unui tabel sunt prezentate informatii specifice cum ar fi numele si tipul resursei si email-ul utilizatorului caruia i s-a oferit  acces
@@ -260,12 +360,28 @@ La incarcarea unui astfel de document, auditorul are posibilitatea de a alege in
 		\item un meniu de ajutor unde utilizatorul poate accesa informatii ajutatoare in vederea utilizarii anumitor functionalitati din aplicatie;
 		
 	\end{itemize}
---INSERT PICTURE HERE --- \\ 
-Pe de alta parte, solutia descrisa prezinta si anumite dezavantaje care constau in modul in care aceasta a fost implementata, unul dintre acestea fiind limitarea strict la utilizarea acesteia numai pe sistemul de operare Windows, marginind in acest mod alte sisteme de operare prezente.
-De asemenea, din punctul meu de vedere, aspectul grafic si interfata pe care aceasta solutie o prezinta nu este una foarte intuitiva si poate induce in eroare utilizatorii in anumite situatii.\\
-
---INSERT PIC HERE --- \\
 	
+	\vspace{1cm}
+	\begin{figure}[h]
+		\centering
+		
+		\includegraphics[width=0.9\textwidth]{c1/auditpro1}
+		\caption{Tabel din aplicatia Audit Pro}
+	\end{figure}
+	
+	
+	
+Pe de alta parte, solutia descrisa prezinta si anumite dezavantaje care constau in modul in care aceasta a fost implementata, unul dintre acestea fiind limitarea strict la utilizarea acesteia numai pe sistemul de operare Windows, marginind in acest mod alte sisteme de operare prezente.
+De asemenea, din punctul meu de vedere, aspectul grafic si interfata pe care aceasta solutie o prezinta nu este una foarte intuitiva si poate induce in eroare utilizatorii in anumite situatii.
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.9\textwidth]{c1/auditpro2}
+	\caption{Tabel din aplicatia Audit Pro}
+\end{figure}
+
+	\newpage
 	\subsection*{Site Audit Pro }
 	
 	Chiar daca numele este similar cu solutia prezentat similar, este vorba despre un alt proiect, de aceasta data o platforma web cu suport si pentru aplicatie mobila care prezinta solutii pentru auditul in sectorul privat, cel al companiilor.
@@ -278,6 +394,12 @@ De asemenea, din punctul meu de vedere, aspectul grafic si interfata pe care ace
 		
 		\item organizarea proiectelor si resurselor in directoare, facilitand astfel o navigare mai eficienta ;
 	\end{itemize}
-	---INSERT PIC HERE --- \\
+	\begin{figure}[h]
+		\centering
+		
+		\includegraphics[width=0.6\textwidth]{c1/auditpro3}
+		\caption{Tabel din platforma Site Audit Pro}
+	\end{figure}
+	
 	Cu toate acestea, un dezavantaj pe care aceasta solutie il ofera este acela ca procedurile pe care acesta este construit, nu se muleaza si nu corespund in cea mai mare parte cu cele din sistemul de audit public din Romania, utilizatorii trebuind astfel sa se adapteze si sa incerce pe cat posibil sa personalizeze si sa modifice functionalitatile oferite de acestia.
 	
