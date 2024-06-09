@@ -196,7 +196,6 @@ Atat pe partea de server cat si in cea de client, sunt implementate functionalit
 Modalitatea prin care este verificata prin atribuirea unui \textit{token} de tip JWT (\textit{JSON web token}) fiecarui utilizator in momentul in care acesta se autentifica pe platforma, ulterior la fiecare actiune (\textit{request}) facut de acesta, fiind trimis si acest \textit{token}.\\
 
 
---INSERT PIC HERE --- \\
 
 \textbf{Stocarea} acestui \textit{token} de acces se face intr-o maniera securizata in \textit{browser-ul} clientului sub forma unui \textit{cookie http-only}, care previne citirea acestuia de orice \textit{script} sau librarie externa din \textit{browser}, fiind utilizat doar in componenta unui \textit{request} prin HTTP, astfel protejand aplicatie si utilizatorii sai impotriva atacurilor de tip XSS(\textit{cross-site-scripting}).\\
 
