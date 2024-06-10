@@ -28,15 +28,15 @@
 \contentsline {chapter}{\numberline {2}Arhitectura platformei}{26}{chapter.2}%
 \contentsline {section}{\numberline {2.1}Arhitectura generala}{26}{section.2.1}%
 \contentsline {section}{\numberline {2.2}Arhitectura serverului}{27}{section.2.2}%
-\contentsline {section}{\numberline {2.3}Arhitectura interfatei grafice}{32}{section.2.3}%
-\contentsline {section}{\numberline {2.4}Stocarea datelor}{33}{section.2.4}%
-\contentsline {section}{\numberline {2.5}Aspecte de securitate}{34}{section.2.5}%
-\contentsline {section}{\numberline {2.6}Diagrame de context C4 }{36}{section.2.6}%
-\contentsline {chapter}{\numberline {3}Scenarii de utilizare }{37}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Crearea misiunilor de audit}{37}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Identificare si evaluarea riscuri}{38}{section.3.2}%
-\contentsline {section}{\numberline {3.3}Sistemul de export}{38}{section.3.3}%
-\contentsline {chapter}{Concluzii}{39}{chapter*.31}%
-\contentsline {section}{\numberline {3.4}Concluzii asupra solutiei propuse}{39}{section.3.4}%
-\contentsline {section}{\numberline {3.5}Directii viitoare}{39}{section.3.5}%
-\contentsline {chapter}{Bibliografie}{41}{chapter*.36}%
+\contentsline {section}{\numberline {2.3}Arhitectura interfatei grafice}{33}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Stocarea datelor}{36}{section.2.4}%
+\contentsline {section}{\numberline {2.5}Aspecte de securitate}{39}{section.2.5}%
+\contentsline {section}{\numberline {2.6}Diagrame de context C4 }{42}{section.2.6}%
+\contentsline {chapter}{\numberline {3}Scenarii de utilizare }{45}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Crearea misiunilor de audit}{45}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Identificare si evaluarea riscuri}{46}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Sistemul de export}{46}{section.3.3}%
+\contentsline {chapter}{Concluzii}{47}{chapter*.32}%
+\contentsline {section}{\numberline {3.4}Concluzii asupra solutiei propuse}{47}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Directii viitoare}{47}{section.3.5}%
+\contentsline {chapter}{Bibliografie}{49}{chapter*.37}%

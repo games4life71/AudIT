@@ -44,9 +44,14 @@ Ca in orice alegere pe care o facem, trebuie sa punem in balanta avantajele si d
 Pentru a diminua efectele negative pe care aceste dezavantaje le au asupra intregului proces de dezvoltare a aplicatiei, am incercat implementarea diferitelor solutii in materie de arhitectura, \textit{desing pattern-uri} cretionale, arhitecturale cat si a numeroase practici bune comune in scrierea si mentenanta codului.
 
 \subsection*{Arhitectura \textit{Clean Code}}
-Arhitectura \textit{Clean Code } este bazata pe ideea principala precum ca stratul de logica interna (\textit{business layer}) este situat central in diagrama circulara, astfel acesta este protejat de schimbari externe. Aceasta proprietate poate fi reformulata astfel incat se defineste \textbf{Regula Dependintei} care presupune ca dependintele pot sa fie orientate doar inspre interiorul cercului, astfel niciunul din modulele interioare nu ar trebui sa fie legat in orice fel de un modul exterior acestuia.\\
+Arhitectura \textit{Clean Code } este bazata pe ideea principala precum ca stratul de logica interna (\textit{business layer}) este situat central in diagrama circulara, astfel acesta este protejat de schimbari externe. Aceasta proprietate poate fi reformulata astfel incat se defineste \textbf{Regula Dependintei} care presupune ca dependintele pot sa fie orientate doar inspre interiorul cercului, astfel niciunul din modulele interioare nu ar trebui sa fie legat in orice fel de un modul exterior acestuia.
 
----INSERT PIC HERE --- \\
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.6\textwidth]{c2/clean_architecture.png}
+	\caption{Structura arhitecturii \textit{Clean code}}
+\end{figure}
 
 Adoptarea acestui tip de arhitectura impreuna cu cea de tip \textit{monolith} include mai multe beneficii cum ar fi:
 
@@ -87,21 +92,48 @@ Solutia prezentata de acest model este crearea unei clase \textit{template} care
 
  cu parametrul \textit{Succes} setat pe fals, indicand astfel ca procesul de creare a esuat.\\
 
---INSERT PIC HERE --\\
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.8\textwidth]{c2/optional_patterns}
+	\caption{Exemplu de clasa care implementeaza Optional Pattern}
+\end{figure}
 
 \subsection*{\textit{Mediator pattern}}
 Acest \textit{design pattern} este unul de tip comportamental si se asigura ca nu exista dependinte haotice intre entitatile/clasele din codul scris. Modelul restrictioneaza comunicarea directa intre obiecte si le obliga sa interactioneaze doar prin intermediul unui \textit{mediator}.\\
-Acest model este implementat prin utilizarea unei interfate sau clase abstracte care stie toate referintele la componentele care vor sa comunice. In acest mod, in loc sa trimita solicitari directe, un obiect comunica prin intermediul mediatorului, acesta stiind unde sa redirectioneaze cererea primita.\\
+Acest model este implementat prin utilizarea unei interfate sau clase abstracte care stie toate referintele la componentele care vor sa comunice. In acest mod, in loc sa trimita solicitari directe, un obiect comunica prin intermediul mediatorului, acesta stiind unde sa redirectioneaze cererea primita.
 
 
---INSERT PIC HERE --
-
+\begin{figure}[h]
+	\centering
 	
+	\includegraphics[width=0.6\textwidth]{c2/mediator_pattern}
+	\caption{Ilustratie \textit{mediator pattern}}
+\end{figure}
+
+	\newpage
 \subsection*{\textit{Command pattern}}	
+
 Acest \textit{design pattern} este de asemenea unul de tip comportamental si se utilizeaza partial de \textit{design pattern-ul Mediator}, transformand astfel o comanda, spre exemplu o cerere de creare a unei noi entitati, intr-un obiect independent, acesta ulterior fiind trimis catre mediator si executat in \textit{handler-ul} corespunzator acestuia, de obicei numit \textit{receiver}.\\
 In contextul dezvoltarii partii de server a aplicatiei AudIT, acesta este utiliat, impreuna cu modelul Mediator pentru a delega orice comanda (\textit{request}) primita catre obiectul care stie sa o execute. In acest mod, se elimina dependinte stranse intre obiecte, promovand un cod cat mai bine organizat si elegant.\\
 
---INSERT PIC HERE -- \\
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.7\textwidth]{c2/command_pattern1}
+	\caption{Exemplu clasa de tip \textit{Command}}
+\end{figure}
+
+
+
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.7\textwidth]{c2/command_pattern2}
+	\caption{Exemplu clasa de tip \textit{Handler/Receiver}}
+\end{figure}
 
 
 \subsection*{\textit{Repository pattern}}
@@ -109,7 +141,15 @@ In contextul dezvoltarii partii de server a aplicatiei AudIT, acesta este utilia
 Folosit in special in dezvoltarea aplicatiilor web, acest \textit{design pattern} separa logica interna a aplicatiei de accesul direct la date (baza de date). Acesta se utilizeaza de interfate pentru a crea un strat separator intre declararea abstracta a acestor constracte si implementarea concreta a functiilor care acceseaza datele la nivel de baza.\\
 Prin acest model, comunicarea dintre module se realizeaza prin intermediul contractului foarte bine stabilit, astfel eliminand posibilitatea ca un modul abstract sa acceseze direct un modul de acces de date.\\
 
---INSERT PIC HERE --\\
+
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.8\textwidth]{c2/repository_pattern}
+	\caption{Diagrama \textit{repository pattern}}
+\end{figure}
+
 
 \subsection*{Tehnologii utilizate}
 In dezvoltarea partii de server s-a utilizat \textit{framework-ul } ASP.NET Core impreuna cu limbajul C\#.\\
@@ -135,10 +175,19 @@ In plus, s-au utilizat diferite biblioteci pentru dezvoltarea anumitor servicii,
 \section{Arhitectura interfatei grafice}
 Interfata grafica dezvoltata in acest proiect este realizata in \textit{framework-ul} .NET Blazor, mai exact o aplicatie de tipul \textit{WASM (Web Assembly)} care ruleaza in \textit{browser-ul} utilizatorului. Alegerea a fost facuta intrucat acest nou model arhitectural permite rularea codului direct in \textit{browser}, nemaifiind nevoie de librarii sau extensii suplimentare necesare.\\
 
+\newpage
 \subsection*{Web assembly} 
 Cum ne putem da seama si din numele pe care aceasta tehnologie o poarta, este vorba despre \textit{byte-code} (cod-masina) care este executat de \textit{engine-ul} JavaScript direct in \textit{browser}.\\
 \textit{Wasm} nu este un limbaj, ci mai degraba produsul compilarii codului scris intr-un limbaj de programare in cod-masina executabil. Majoritatea limbajelor de programare moderne  suporta compilarea codului direct intr-un fisier  binar de tip .wasm . Dupa o compilare cu succes, fisierele binare .wasm sunt incarcate in \textit{browser} unde sunt executate de catre motorul JavaScript specific intr-o instanta virtuala izolata si securizata.\\
----INSERT PIC HERE -- \\
+
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.7\textwidth]{c2/wasm}
+	\caption{Diagrama mod functionare \textit{Web Assembly}}
+\end{figure}
+
 Un avantaj cheie al utilizarii acestei tehnologii il constituie viteza si eficienta de care da dovada. Codul ruleaza cat se poate de aproape de limitarile \textit{hardware} ale computer-ului, astfel rezultand in performante crescute si un nivel al utilizarii memoriei mai mic.\\
 Pe de alta parte, exista si dezavantaje in utilizarea acestuia, intrucat momentan nu este implementat un sistem de \textit{garbage collector} care sa elimine din memorie functiile si instantele care nu mai sunt folosite in firul executiei.
 
@@ -146,7 +195,13 @@ Pe de alta parte, exista si dezavantaje in utilizarea acestuia, intrucat momenta
 Pentru dezvoltarea paginilor web, s-a utilizat tehnologia .NET Blazor, un \textit{framework} relativ nou aparut, dar care promite performante crescute alaturi de un mediu de lucru bine pus la punct si eficient din punct de vedere al productivitatii dezvolarii interfatelor interactive si bogate.\\
 Paginile web create in acest mod combina codul C\# cu HTML pentru a crea componente reutilizabile ce sunt  afisate si actualizate in DOM-ul virtual din \textit{browser}.\\
 
---INSERT PIC HERE-- \\
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.7\textwidth]{c2/blazor}
+	\caption{Diagrama mod functionare \textit{Web Assembly}}
+\end{figure}
 
 O functionalitate foarte importanta pe care o ofera, este utilizarea asa ziselor componente, parti fundamentale care impreuna alcatuiesc pagina web afisata utilizatorului. O componenta poate fi vazuta ca o piesa esentiala de puzzle care contribuie la afisarea finala a unei pagini web, piesa de puzzle care la randul sau poate fi creata din mai multe astfel de componente, si asa mai departe.
 Un avantaj pe care Blazor il ofera dezvoltatorilor este acela ca elimina pe cat posibil utilizarea de functii si \textit{script-uri }JavaScript in crearea paginilor web. Blazor se foloseste de cod scris in C\# impreuna cu HTML si CSS pentru a elabora pagini si componente web interactive si fluide.\\
@@ -184,7 +239,47 @@ Aceasta tehnologie dispune de o serie de caracteristici si functionalitati care 
 	 
 \end{itemize}
 
+\subsection*{Structura bazei de date}
 
+Pentru autentificare si autorizarea activitatilor utilizatorilor, se utilizeaza biblioteca .NET Identity Core, care pune la dispozitia dezvoltatorilor o solutie deja implementata in materie de tabele si a relatiilor dintre ele, astfel incat dezvoltatorul sa se ocupe doar de logica utilizarii acestora.
+ 
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.7\textwidth]{c2/db1}
+	\caption{Structura tabele autentificare si autorizare}
+\end{figure}
+
+Pentru organizarea si dezvoltarea functionalitatilor in ceea ce priviste misiunile de audit, sunt o serie de tabele care gestioneaza misiunile de audit, obiectivele acesteia, recomandarile aduse cat si documentele asociate cu respectiva misiune de audit.
+
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.7\textwidth]{c2/db2}
+	\caption{Structura tabele gestiune misiuni de audit}
+\end{figure}
+
+\newpage
+Pentru gestionarea institutiilor si a departamentelor acestora, cat si a documentelor de baza ce apartin acestora se folosec urmatoarele tabele si relatiile dintre ele.
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.7\textwidth]{c2/db3}
+	\caption{Structura tabelelor de gestiune a institutiilor si a departamentelor}
+\end{figure}
+
+In cele din urma pentru oferirea functionalitatilor principale,cum ar fi gestionarea obiectivelor, a actiunilor acestora precum si a riscurilor si recomandarilor se utilizeaza urmatoarele tabele si relatii pe care acestea le prezinta.
+
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.7\textwidth]{c2/db4}
+	\caption{Structura tabelelor functionalitati principale}
+\end{figure}
 
 \section{Aspecte de securitate}
 Simpla dezvoltare a unei aplicatii web ce ofera utilizatorului numeroase functionalitati nu este suficienta daca aceasta aplicatie nu dispune de un set de reguli si aspecte ce  fac experienta utilizatorilor pe platforma una cat mai sigura, in care le este asigurata integritatea, confidentialitatea cat si disponibilitatea datelor si actiunilor acestora.\\
@@ -197,9 +292,15 @@ Modalitatea prin care este verificata prin atribuirea unui \textit{token} de tip
 
 
 
-\textbf{Stocarea} acestui \textit{token} de acces se face intr-o maniera securizata in \textit{browser-ul} clientului sub forma unui \textit{cookie http-only}, care previne citirea acestuia de orice \textit{script} sau librarie externa din \textit{browser}, fiind utilizat doar in componenta unui \textit{request} prin HTTP, astfel protejand aplicatie si utilizatorii sai impotriva atacurilor de tip XSS(\textit{cross-site-scripting}).\\
+\textbf{Stocarea} acestui \textit{token} de acces se face intr-o maniera securizata in \textit{browser-ul} clientului sub forma unui \textit{cookie http-only}, care previne citirea acestuia de orice \textit{script} sau librarie externa din \textit{browser}, fiind utilizat doar in componenta unui \textit{request} prin HTTP, astfel protejand aplicatie si utilizatorii sai impotriva atacurilor de tip XSS(\textit{cross-site-scripting}).
 
---INSERT PIC HERE --
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.7\textwidth]{c2/jwt.jpg}
+	\caption{Diagrama mod functionare \textit{Web Assembly}}
+\end{figure}
 
 Pentru verificarea rolurilor si \textit{claim-urilor} pe care un utilizator le detine, este creat un \textit{endpoint} special, securizat astfel incat sa poata fi accesat doar daca in componenta \textit{request-ului} este prezent acel \textit{cookie}, care ofera informatii despre rolurile si \textit{claim-urile} specifice utilizatorului care a facut cererea. Pe baza acestora, i se permite sau i se interzice accesul la anumite pagini si actiuni pe care acesta le doreste a face.
 
@@ -225,13 +326,41 @@ O alta modalitate prin care se mentine un nivel ridicat de securitate pe platfor
 La pasul de creare a unui cont nou, utilizatorilor le este  impusa folosirea unei adrese de email care contine domeniul unei institutii inregistrate si configurate pe platforma. Dupa crearea cu succes a unui cont nou, acesta nu are nici o permisiune, contul fiind nevoit a fi verificat de catre o persoana cu drepturi elevate (administratorul institutiei).\\ 
 Verificarea se face pe baza unui email primit de acesta in care se cere validarea identitatii noul cont creat, astfel minimizand riscul crearii a unor conturi false respectiv a unor false identitati.
 
-
+\newpage
 \section{Diagrame de context C4 }
 
 Diagramele de context C4 reprezinta un stadard in ceea ce priveste o vedere de ansamblu, dar care merge inspectata in detaliu pentru fiecare component al aplicatiei, astfel promovand o ierarhizarea si o intelegere a intreg sistemului mai buna.\\
 
-\subsection*{Nivelul 1}
 
+\subsection*{Nivelul 1}
+Primnul nivel al diagramelor de context ofera o viziune de ansamblu asupra sistemelor ce compun solutia descrisa.
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.6\textwidth]{c2/C4_level1}
+	\caption{Primul nivel diagrama C4}
+\end{figure}
+
+\newpage
 \subsection*{Nivelul 2}
+Al doilea nivel prezinta \textit{containerele} principale ale fiecaurui sistem din nivelul anterior, astfel oferind o viziune mai clara asupra arhitecturii generale a platformei si a functionalitatilor sale.
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.7\textwidth]{c2/C4_level2}
+	\caption{Al doile nivel din diagrama C4}
+\end{figure}
 
 \subsection*{Nivelul 3}
+Al treilea nivel ofera o viziune mult mai detaliata asupra componentelor ce apartin \textit{container-ului} de la nivelul secund, oferind abstractii cat mai apropiate de codul ce urmeaza a fi scris pentru a le implementa.
+
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=1\textwidth]{c2/C4_level3}
+	\caption{Nivelul trei din diagrama C4}
+\end{figure}
+
