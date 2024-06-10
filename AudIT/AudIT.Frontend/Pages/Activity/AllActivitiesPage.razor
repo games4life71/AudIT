@@ -1,0 +1,132 @@
+﻿@page "/activities"
+@using Frontend.Contracts.Abstract_Services.ActivityService
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityViewModels.Activity
+@using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
+
+@inject DialogService DialogService
+@inject ICurrentUserAuditMissionService _currentUserAuditMissionService
+@inject IActivityService _activityService
+@inject IAuditMissionService _auditMissionService
+@inject NotificationService notificationService
+@inject NavigationManager NavigationManager
+
+
+<RadzenStack Orientation="Orientation.Vertical">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenText TextStyle="TextStyle.H4" class="rz-mb-6" Text="@($"Activities for: {_auditMission.Name}")"></RadzenText>
+        <RadzenStack Orientation="Orientation.Horizontal">
+            @if (_auditMission.Id != Guid.Empty)
+            {
+                <RadzenLink Path="@($"/audit-mission/{_auditMission.Id}")">
+                    <RadzenText Text="@($"Selected Audit Mission: {_auditMission.Name}")"></RadzenText>
+                </RadzenLink>
+            }
+            else
+            {
+                <RadzenLink Path="@($"/audit-missions")">
+                    <RadzenText Text="Please select an audit mission "></RadzenText>
+                </RadzenLink>
+            }
+
+        </RadzenStack>
+
+    </RadzenStack>
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenDataGrid Data="_activities" TItem="BaseActivityViewmodel">
+                <Columns>
+                    <RadzenDataGridColumn Title="Name" Property="Name"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Title="Type" Property="Type"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn>
+                        <Template Context="activity">
+                            <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+                                <RadzenButton Click="@(() => NavigateToActivity(activity))" ButtonStyle="ButtonStyle.Info" Text="More Details..."/>
+                                <RadzenButton Click="@(() => DeleteActivity(activity))" ButtonStyle="ButtonStyle.Danger" Text="Delete" Icon="delete"/>
+                            </RadzenStack>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+            <RadzenButton Click="@NavigateAddActivity" ButtonStyle="ButtonStyle.Dark" Text="Add new Activity"></RadzenButton>
+        </RadzenStack>
+    </RadzenCard>
+
+</RadzenStack>
+
+
+@code {
+
+    private CurrentUserAuditMissionViewModel _currentUserAuditMission { get; set; } = new CurrentUserAuditMissionViewModel();
+
+    private BaseAuditMissionDto _auditMission { get; set; } = new BaseAuditMissionDto();
+
+    private List<BaseActivityViewmodel> _activities { get; set; } = [];
+
+}
+
+@functions
+{
+    protected async override Task OnInitializedAsync()
+    {
+        await GetCurrentUserAuditMissionAsync();
+        await GetActivitiesAsync();
+    }
+
+
+    public async Task GetCurrentUserAuditMissionAsync()
+    {
+        var result = await _currentUserAuditMissionService.GetCurrentUserAuditMissionAsync();
+
+        if (result is { Success: true, DtoResponse: not null }) _currentUserAuditMission = result.DtoResponse;
+        var auditMissionResult = await _auditMissionService.GetAuditMissionById(_currentUserAuditMission.AuditMissionId);
+
+        if (auditMissionResult is { Success: true, DtoResponse: not null }) _auditMission = auditMissionResult.DtoResponse;
+    }
+
+
+    public async Task GetActivitiesAsync()
+    {
+        var result = await _activityService.GetActivitiesByAuditMissionIdAsync(_currentUserAuditMission.AuditMissionId);
+
+        if (result is { Success: true, DtoResponses: not null }) _activities = result.DtoResponses;
+
+        else
+        {
+            notificationService.Notify(NotificationSeverity.Error, "Error", "An error occurred while loading activities");
+        }
+    }
+
+    private void NavigateToActivity(BaseActivityViewmodel activity)
+    {
+        NavigationManager.NavigateTo($"/activities/{activity.Id}");
+    }
+
+    private async Task DeleteActivity(BaseActivityViewmodel activity)
+    {
+        //display confirmation dialog
+        var result = await DialogService.Confirm("Are you sure you want to delete this activity?", "Delete Activity");
+
+        if (result.Value)
+        {
+            var deleteResult = await _activityService.DeleteActivityAsync(activity.Id);
+
+            if (deleteResult.Success)
+            {
+                notificationService.Notify(NotificationSeverity.Success, "Success", "Activity deleted successfully");
+                await GetActivitiesAsync();
+            }
+            else
+            {
+                notificationService.Notify(NotificationSeverity.Error, "Error", "An error occurred while deleting activity");
+            }
+        }
+    }
+
+    private void NavigateAddActivity(MouseEventArgs obj)
+    {
+        NavigationManager.NavigateTo($"/add-activity");
+    }
+}
