@@ -89,4 +89,22 @@ public class ObjectiveActionService(HttpClient httpClient) : IObjectiveActionSer
             Message = "An error occurred while fetching the data."
         };
     }
+
+    public async Task<BaseDTOResponse<ObjectiveActionViewModel>> GetObjectiveActionByObjectiveIdAsync(Guid id)
+    {
+        var resposne = await httpClient.GetAsync($"{IObjectiveActionService.ApiPath}/get-objective-actions/{id}");
+
+        if (resposne.IsSuccessStatusCode)
+        {
+            var content = await resposne.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<ObjectiveActionViewModel>>(content);
+            if (result != null) return result;
+        }
+
+        return new BaseDTOResponse<ObjectiveActionViewModel>
+        {
+            Success = false,
+            Message = "An error occurred while fetching the data."
+        };
+    }
 }

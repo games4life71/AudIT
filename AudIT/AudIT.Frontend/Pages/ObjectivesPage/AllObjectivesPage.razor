@@ -25,7 +25,17 @@
     <RadzenStack class="rz-mb-10" Gap="10px">
         <RadzenRow>
             <RadzenLabel Component="SelectAuditMission" Text="Select Audit Mission:"></RadzenLabel>
-            <RadzenDropDownDataGrid Value="@initialAuditMission" PageSize="5" Placeholder="Select..." TValue="Guid" TextProperty="Name" AllowSorting="true" ValueChanged="@(args => SelectedAuditMission(args))" ValueProperty="Id" Data="@_auditMissions" Name="SelectAuditMission"/>
+            <RadzenDropDownDataGrid
+                Value="@initialAuditMission"
+                PageSize="5"
+                Placeholder="Select..."
+                TValue="Guid"
+                TextProperty="Name"
+                AllowSorting="true"
+                ValueChanged="@(args => SelectedAuditMission(args))"
+                ValueProperty="Id"
+                Data="@_auditMissions"
+                Name="SelectAuditMission"/>
         </RadzenRow>
     </RadzenStack>
 

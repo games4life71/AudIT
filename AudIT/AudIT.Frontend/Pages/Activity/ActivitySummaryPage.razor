@@ -1,0 +1,301 @@
+﻿@page "/activities/{ActivityId}"
+@using Frontend.Contracts.Abstract_Services.ActivityService
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
+@using Frontend.Contracts.Abstract_Services.ObjectiveActionService
+@using Frontend.Contracts.Abstract_Services.ObjectiveService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityViewModels.Activity
+@using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
+@using Frontend.EntityViewModels.Objective
+@using Frontend.EntityViewModels.ObjectiveAction
+@using Frontend.Pages.Components.Activity
+@using Frontend.Services.AuthentificationServices
+
+@inject NotificationService  _NotificationService
+@inject DialogService DialogService
+@inject ICurrentUserAuditMissionService _currentUserAuditMissionService
+@inject CustomAuthStateProvider _customAuthStateProvider
+@inject IObjectiveService _objectiveService
+@inject IObjectiveActionService _objectiveActionService
+@inject IAuditMissionService _auditMissionService
+@inject IActivityService _activityService
+<RadzenStack Orientation="Orientation.Vertical">
+
+    @*Row to select the audit mission , objective and objective action *@
+    <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
+        <RadzenStack Orientation="Orientation.Horizontal">
+            <RadzenLabel Component="forObjective" Text="Objective:"/>
+            <RadzenDropDown Data="_objectives"
+                            Name="forObjective"
+                            TextProperty="Name"
+                            ValueProperty="Id"
+                            Placeholder="Select Objective"
+                            TValue="Guid"
+                            ValueChanged="@((value) => FetchObjectiveActionsAsync(value))"/>
+            <RadzenLabel Component="forActions" Text="Actions:"/>
+            <RadzenDropDown Data="_objectiveActions"
+                            TextProperty="Name"
+                            Name="forActions"
+                            Disabled="@IsObjectiveActionDisabled()"
+                            ValueProperty="id"
+                            Placeholder="Select Objective Action"
+                            TValue="string"
+                            ValueChanged="@((value) => FetchActivitiesAsync(value))"/>
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal">
+            @if(_auditMission.Id != Guid.Empty)
+            {
+                <RadzenLink Path="@($"/audit-mission/{_auditMission.Id}")">
+                    <RadzenText Text="@($"Selected Audit Mission: {_auditMission.Name}")"></RadzenText>
+                </RadzenLink>
+            }
+            else
+            {
+                <RadzenLink Path="@($"/audit-missions")">
+                    <RadzenText  Text="Please select an audit mission "></RadzenText>
+                </RadzenLink>
+            }
+
+        </RadzenStack>
+
+        @code{
+
+            private bool IsObjectiveActionDisabled()
+            {
+                return _objectiveActions.Count == 0;
+            }
+
+        }
+
+    </RadzenStack>
+    <RadzenCard Variant="Variant.Outlined">
+    <RadzenStack Orientation="Orientation.Vertical">
+
+
+        <RadzenDataGrid @ref="@activityDataGrid" TItem="ActivityWithDepartViewModel" Data="_activities">
+            <Columns>
+                <RadzenDataGridColumn Title="Name" Property="Name"></RadzenDataGridColumn>
+                <RadzenDataGridColumn Title=" Department Name" Property="Department.Name"></RadzenDataGridColumn>
+                <RadzenDataGridColumn Title="Type" Property="Type"></RadzenDataGridColumn>
+                <RadzenDataGridColumn>
+                    <Template Context="activity">
+                        <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+                            <RadzenButton ButtonStyle="ButtonStyle.Warning" Click="@(() => OpenActivityEdit(activity))" Icon="edit" Text="Edit"></RadzenButton>
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger" Click="@(() => DeleteActivity(activity))" Icon="delete" Text="Delete"></RadzenButton>
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+
+
+
+        </RadzenDataGrid>
+
+        <RadzenButton  Click="@AddNewActivityNavigate"  Icon="add" Text="Add new Activity" ButtonStyle="ButtonStyle.Dark"></RadzenButton>
+
+
+    </RadzenStack>
+    </RadzenCard>
+
+</RadzenStack>
+
+
+@code {
+
+    [Parameter] public string ActivityId { get; set; }
+
+    private RadzenDataGrid<ActivityWithDepartViewModel> activityDataGrid;
+    private Guid UserId { get; set; } = Guid.Empty;
+
+    private CurrentUserAuditMissionViewModel _currentUserAuditMission { get; set; } = new CurrentUserAuditMissionViewModel();
+
+    private List<BaseObjectiveViewModel> _objectives { get; set; } = [];
+
+    private List<ObjectiveActionViewModel> _objectiveActions { get; set; } = [];
+
+    private BaseAuditMissionDto _auditMission { get; set; } = new BaseAuditMissionDto();
+
+    private List<ActivityWithDepartViewModel> _activities { get; set; } = [];
+
+    private string _selectedObjectiveActionId { get; set; } = string.Empty;
+}
+
+
+@functions
+{
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await _customAuthStateProvider.GetUserIdFromTokenAsync();
+
+        if (user.Item2)
+        {
+            UserId = user.Item1;
+        }
+
+        await GetCurrentUserAuditMissionAsync();
+
+        await FetchObjectivesAsync();
+    }
+
+    public async Task GetCurrentUserAuditMissionAsync()
+    {
+        var result = await _currentUserAuditMissionService.GetCurrentUserAuditMissionAsync();
+
+        if (result is { Success: true, DtoResponse: not null }) _currentUserAuditMission = result.DtoResponse;
+
+        var auditMissionResult = await _auditMissionService.GetAuditMissionById(_currentUserAuditMission.AuditMissionId);
+
+        if (auditMissionResult is { Success: true, DtoResponse: not null }) _auditMission = auditMissionResult.DtoResponse;
+    }
+
+    public async Task FetchObjectivesAsync()
+    {
+        var result = await _objectiveService.GetObjectivesByAuditMissionIdAsync(_currentUserAuditMission.AuditMissionId);
+
+        if (result is { Success: true, DtoResponses: not null })
+        {
+            _objectives = result.DtoResponses;
+        }
+    }
+
+
+    private async Task FetchObjectiveActionsAsync(Guid value)
+    {
+        var result = await _objectiveActionService.GetObjectiveActionByObjectiveIdAsync(value);
+
+        if (result.Success)
+        {
+            _objectiveActions = result.DtoResponses;
+        }
+    }
+
+    private async Task FetchActivitiesAsync(string value)
+    {
+        _selectedObjectiveActionId = value;
+
+        var result = await _activityService.GetActivitiesByObjectiveActionIdAsync(Guid.Parse(value));
+
+        if (result.Success)
+        {
+            _activities = result.DtoResponses;
+        }
+    }
+
+    private async Task OpenActivityEdit(ActivityWithDepartViewModel activity)
+    {
+
+        DialogService.Open
+            <EditActivityComponent>(
+                "Edit New Activity",
+                new Dictionary
+                    <string, object>()
+                    {
+                        { "ObjectiveActionId", activity.ObjectiveActionId },
+                        { "AuditMissionId", _auditMission.Id },
+                        { "Activity", activity },
+                        { "DepartmentId", activity.DepartmentId },
+                        {
+                            "OnActivityUpdated", new EventCallback<ActivityWithDepartViewModel>(this, OnActivityEdit)
+                        }
+                    }, new DialogOptions()
+                {
+                    Width = "700px",
+                    Height = "500px",
+                    Draggable = false,
+                    Resizable = false
+                }
+            );
+    }
+
+    private async Task OnActivityEdit(ActivityWithDepartViewModel updatedActivity)
+    {
+        //add the updated activity to the list of activities
+        var activity = _activities.FirstOrDefault(x => x.Id == updatedActivity.Id);
+
+        if (activity != null)
+        {
+            activity.Name = updatedActivity.Name;
+            activity.Type = updatedActivity.Type;
+            activity.DepartmentId = updatedActivity.DepartmentId;
+            activity.Department = updatedActivity.Department;
+        }
+
+        await  activityDataGrid.Reload();
+    }
+
+    private async Task DeleteActivity(ActivityWithDepartViewModel activity)
+    {
+        var confirm = await DialogService.Confirm(
+            "Are you sure you want to delete this activity?",
+            "Delete Activity",
+            new ConfirmOptions()
+            {
+                OkButtonText = "Yes",
+                CancelButtonText = "No"
+            });
+
+        if (confirm.Value)
+        {
+            var deleteResult = await _activityService.DeleteActivityAsync(activity.Id);
+
+            if (deleteResult.Success)
+            {
+                // _activities.Remove(activity);
+                _activities = _activities.Where(x => x.Id != activity.Id).ToList();
+                // _NotificationService.Notify(NotificationSeverity.Success, "Activity deleted successfully");
+                await activityDataGrid.Reload();
+                // StateHasChanged();
+            }
+            else
+            {
+                _NotificationService.Notify(NotificationSeverity.Error, "Failed to delete activity");
+            }
+        }
+    }
+
+
+    private void AddNewActivityNavigate(MouseEventArgs obj)
+    {
+        // var auditMission = await _auditMissionService.GetAuditMissionById(Guid.Parse(_currentObjective.auditMissionId));
+        // Guid DepartmentId = Guid.Empty;
+        // if (auditMission.Success)
+        // {
+        //     DepartmentId = auditMission.DtoResponse.DepartmentId;
+        // }
+
+        if(_selectedObjectiveActionId == string.Empty)
+        {
+            _NotificationService.Notify(NotificationSeverity.Error, "Please select an objective action");
+            return;
+        }
+
+        DialogService.Open
+            <CreateActivityDialog>(
+                "Create New Activity",
+                new Dictionary
+                    <string, object>()
+                    {
+                        { "ObjectiveActionId", Guid.Parse(_selectedObjectiveActionId) },
+                        { "AuditMissionId", _auditMission.Id },
+                        { "DepartmentId", _auditMission.DepartmentId },
+                        {
+                            "OnActivityCreated", new EventCallback<ActivityWithDepartViewModel>(this, OnActivityCreated)
+                        }
+                    }, new DialogOptions()
+                {
+                    Width = "700px",
+                    Height = "500px",
+                    Draggable = false,
+                    Resizable = false
+                }
+            );
+    }
+
+    private async Task OnActivityCreated(ActivityWithDepartViewModel newActivity)
+    {
+        _activities.Add(newActivity);
+        await activityDataGrid.Reload();
+        // StateHasChanged();
+    }
+}
