@@ -1,0 +1,182 @@
+﻿@page "/objective/{ObjectiveId}"
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.ObjectiveService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityViewModels.Objective
+@using Frontend.Pages.Components.ObjectiveAction
+
+@using Frontend.EntityViewModels.ObjectiveAction
+@using Frontend.Pages.Components.Objective
+
+@inject NavigationManager _navigationManager
+@inject DialogService _dialogService
+@inject IObjectiveService _objectiveService
+@inject IAuditMissionService _auditMissionService
+@inject NotificationService _notificationService
+
+<RadzenStack Orientation="Orientation.Vertical">
+    <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
+        <RadzenText TextStyle="TextStyle.H4" class="rz-my-6" Text="@($"Summary for {_objective.name}")"></RadzenText>
+        <RadzenLink Path=@($"/audit-mission/{_auditMission.Id}")>
+            <RadzenText  TextStyle="TextStyle.DisplayH6" Text="@($"Audit mission: {_auditMission.Name}")"></RadzenText>
+        </RadzenLink>
+    </RadzenStack>
+    <RadzenCard Variant="Variant.Outlined">
+    <RadzenTabs RenderMode="TabRenderMode.Client" TabPosition="TabPosition.Top">
+        <Tabs>
+            <RadzenTabsItem  Icon="description" Text="Objective Actions">
+
+                <RadzenText Text="Objective Actions" class="rz-mb-6" TextStyle="TextStyle.DisplayH6"></RadzenText>
+                <RadzenDataGrid AllowSorting="true" Data="@_objective.objectiveActions">
+                    <Columns>
+                        <RadzenDataGridColumn Title="Objective Action Name" Property="name"/>
+                        <RadzenDataGridColumn Sortable="true" Title="Last Modified Date" Property="lastModifiedDate"/>
+                        <RadzenDataGridColumn Title="Action Risks Details" Sortable="false" Filterable="false">
+                            <Template Context="objectiveAction">
+                                <RadzenButton Style="display: flex; align-self: center; justify-content: center ;"
+                                              ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="info"
+                                              Text="More details " Click="@(() => OpenActionRiskDialog(objectiveAction))">
+                                </RadzenButton>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Frozen="true" Title="Selected in auditing" Property="selected"></RadzenDataGridColumn>
+                        <RadzenDataGridColumn Width="15%" Frozen="true" Sortable="false" Filterable="false" Title="">
+                            <Template Context="objectiveAction">
+                                <RadzenButton Shade="Shade.Lighter" Icon="info" Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Text="More details " Click="@(() => NavigateObjAction(objectiveAction))"></RadzenButton>
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+
+                </RadzenDataGrid>
+
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Configure" Icon="settings">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenButton Icon="bookmark" Click="@(() => _navigationManager.NavigateTo($"risks/{_objective.id}"))" Text="Configure Risks"></RadzenButton>
+                    <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="assignment" Click="@(() => OpenEditNameForm(_objective))" Text="Edit Name"></RadzenButton>
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="@(() => DeleteObjective(_objective))" Text="Delete Objective"></RadzenButton>
+
+                </RadzenStack>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+    </RadzenCard>
+</RadzenStack>
+
+@code {
+
+
+    [Parameter] public string ObjectiveId { get; set; }
+
+    private ObjectiveFullViewModel _objective { get; set; } = new ObjectiveFullViewModel();
+
+    private BaseAuditMissionDto _auditMission { get; set; } = new BaseAuditMissionDto();
+}
+
+
+@functions
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchObjectiveAsync();
+        if (_objective.auditMissionId != Guid.Empty.ToString()) await FetchAuditMissionAsync();
+    }
+
+
+    private async Task FetchObjectiveAsync()
+    {
+        var result = await _objectiveService.GetObjectiveWithActionsByIdAsync(Guid.Parse(ObjectiveId));
+
+        if (result.Success)
+        {
+            if (result.DtoResponse != null) _objective = result.DtoResponse;
+
+            StateHasChanged();
+        }
+    }
+
+    private async Task FetchAuditMissionAsync()
+    {
+        var result = await _auditMissionService.GetAuditMissionById(Guid.Parse(_objective.auditMissionId));
+
+        if (result.Success)
+        {
+            if (result.DtoResponse != null) _auditMission = result.DtoResponse;
+            StateHasChanged();
+        }
+    }
+
+
+    private async void OpenActionRiskDialog(ObjectiveActionViewModel objectiveAction)
+    {
+        //g
+        var actionRisks = objectiveAction.actionRisks;
+
+        await _dialogService.OpenAsync<ObjActionDialog>
+        ("Objective Action Risks", new Dictionary<string, object>()
+            {
+                { "ActionRisks", actionRisks },
+                { "ObjectiveActionId", objectiveAction.id }
+            },
+            new DialogOptions() { Width = "800px", Height = "512px", Resizable = true, Draggable = true });
+    }
+
+    private Task NavigateObjAction(ObjectiveActionViewModel objectiveAction)
+    {
+        _navigationManager.NavigateTo($"/objective-action/{objectiveAction.id}");
+        return Task.CompletedTask;
+    }
+
+    private async Task OpenEditNameForm(ObjectiveFullViewModel objective)
+    {
+        await _dialogService.OpenAsync<EditObjectiveNameDialog>
+        ("Edit Name", new Dictionary<string, object>()
+            {
+                { "Objective", objective },
+                { "OnNameEdited", new EventCallback<string>(this, HandleNameEdited) },
+                { "OnNameEditFailed", new EventCallback<string>(this, HandleNameEditFailed) }
+            },
+            new DialogOptions() { Width = "400px", Height = "200px", Resizable = false, Draggable = false });
+    }
+
+    private void HandleNameEdited(string message)
+    {
+        _notificationService.Notify(NotificationSeverity.Success, "Success", message, 3000);
+        StateHasChanged();
+    }
+
+    private void HandleNameEditFailed(string message)
+    {
+        // Show a notification with the error message
+        _notificationService.Notify(NotificationSeverity.Error, "Error", message, 3000);
+        StateHasChanged();
+    }
+
+    private async Task DeleteObjective(ObjectiveFullViewModel objective)
+    {
+        //open a dialog to confirm the deletion
+        var resultConfirm = await _dialogService.Confirm(
+            "Are you sure you want to delete the objective along with all dependencies ?", "Delete Objective", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+        if (resultConfirm == null || resultConfirm.Value == false)
+        {
+            return;
+        }
+
+        else
+        {
+            var result = await _objectiveService.DeleteObjectiveAsync(Guid.Parse(objective.id));
+
+            if (result.Success)
+            {
+                _notificationService.Notify(NotificationSeverity.Success, "Success", "Objective deleted successfully", 3000);
+                _navigationManager.NavigateTo($"/audit-mission/{_auditMission.Id}");
+            }
+            else
+            {
+                _notificationService.Notify(NotificationSeverity.Error, "Error", "Failed to delete the objective", 3000);
+            }
+        }
+    }
+
+}
