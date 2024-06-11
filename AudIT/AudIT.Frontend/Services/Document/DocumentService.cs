@@ -34,15 +34,38 @@ public class DocumentService(HttpClient httpClient) : IDocumentService
         return new BaseDTOResponse<BaseDocumentViewmodel>("Error while fetching recent documents");
     }
 
-    public Task<BaseDTOResponse<BaseTemplateDocViewModel>> UploadTemplateDocumentAsync(
+    public async Task<BaseDTOResponse<BaseTemplateDocViewModel>> UploadTemplateDocumentAsync(
         BaseCreateTemplateDocumentDto documentDto)
     {
-        // var content = new MultipartFormDataContent();
-        // foreach (var file in documentDto.Files)
-        // {
-        //     content.Add(new StreamContent(file.OpenReadStream()), "Files", file.Name);
-        // }
-        throw new NotImplementedException();
+        var content = new MultipartFormDataContent();
+
+        foreach (var file in documentDto.Files)
+        {
+            var fileContent = new StreamContent(file.OpenReadStream());
+
+            fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+            {
+                Name = "\"files\"",
+                FileName = $"\"{file.Name}\""
+            };
+
+            content.Add(fileContent);
+        }
+
+        content.Add(new StringContent("Version"), documentDto.Version);
+        content.Add(new StringContent(((int)documentDto.State).ToString()), "State");
+        content.Add(new StringContent(((int)documentDto.Type).ToString()), "Type");
+
+        var response = await httpClient.PostAsync($"{IDocumentService.ApiTemplatePath}/upload-template-documents",
+            content);
+
+
+        if (response.IsSuccessStatusCode)
+        {
+            return new BaseDTOResponse<BaseTemplateDocViewModel>("Document uploaded successfully", true);
+        }
+
+        return new BaseDTOResponse<BaseTemplateDocViewModel>("Error while uploading template document");
     }
 
     public async Task<BaseDTOResponse<BaseStandaloneDocViewModel>> UploadStandaloneDocumentAsync(

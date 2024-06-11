@@ -12,6 +12,7 @@ public interface IDocumentService
 {
     public const String ApiPathBaseDocument = "https://localhost:7248/api/v1/BaseDocument";
     public const String ApiStandalonePath = "https://localhost:7248/api/v1/StandaloneDocument";
+    public const String ApiTemplatePath = "https://localhost:7248/api/v1/TemplateDocument";
 
 
     public Task<BaseDTOResponse<BaseDocumentViewmodel>> GetRecentDocumentsAsync();

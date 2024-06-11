@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Claims;
+using System.Text;
 using System.Web;
 using AudIT.Applicationa.Requests.Document.StandaloneDocument.Commands.Download;
 using AudIT.Applicationa.Requests.Document.StandaloneDocument.Commands.Upload;
@@ -37,6 +38,10 @@ public class TemplateDocumentController : BaseController
                 command.Name = file.FileName.Split('.').First();
                 command.Version = uploadResult.Result.Item2;
 
+                var userId = this.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier);
+
+                command.OwnerId = Guid.Parse(userId.Value);
+
                 var result = await Mediator.Send(command);
 
                 if (!result.Success)
@@ -44,8 +49,9 @@ public class TemplateDocumentController : BaseController
                     return BadRequest(result.Message);
                 }
 
-                return Ok(result);
+
             }
+            return Ok("Document uploaded successfully");
         }
         catch (Exception e)
         {

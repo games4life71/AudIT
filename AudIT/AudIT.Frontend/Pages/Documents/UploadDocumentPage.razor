@@ -69,19 +69,21 @@
                         <RadzenNumeric TValue="int" @bind-Value="@documentVersion"></RadzenNumeric>
 
                         <RadzenLabel Text="Type" Component="type"></RadzenLabel>
-                        <RadzenDropDown TValue="string" Name="type" Data="_documentTypes"/>
+                        <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentTypeChanged" Data="@_documentTypes"/>
+
 
                         <RadzenLabel Text="State" Component="state"></RadzenLabel>
-                        <RadzenDropDown TValue="string" Name="state" Data="_documentStates"/>
+                        @* <RadzenListBox  bind-Value="@_selectedDocumentState" Name="state" Data="_documentStates"/> *@
+                        <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentStateChanged" Data="@_documentStates"/>
                     }
 
 
                     <RadzenLabel Text="Uplod Document"></RadzenLabel>
                     <RadzenUpload @ref="@uploadForm"
-                        Multiple="true"
-                        Icon="uploads"
-                        MaxFileCount="5"
-                        Change="@((args) => ChangeSelectedFiles(args))">
+                                  Multiple="true"
+                                  Icon="uploads"
+                                  MaxFileCount="5"
+                                  Change="@((args) => ChangeSelectedFiles(args))">
 
                     </RadzenUpload>
                 </RadzenStack>
@@ -90,7 +92,17 @@
             @code{
 
                 private bool templateDocumentSelected { get; set; } = false;
+                void OnDocumentTypeChanged(string newType)
+                {
+                    Console.WriteLine($"Selected activity type: {newType}");
+                    _selectedDocumentType = newType;
+                }
 
+                void OnDocumentStateChanged(string newState)
+                {
+                    Console.WriteLine($"Selected activity type: {newState}");
+                    _selectedDocumentState = newState;
+                }
             }
 
         </Steps>
@@ -98,9 +110,15 @@
 
     </RadzenSteps>
 
-    <RadzenButton Click="@UploadFiles" Text="Submit" ButtonStyle="ButtonStyle.Success"></RadzenButton>
-</RadzenStack>
+    <RadzenButton Click="@UploadFiles" IsBusy="isBusySubmit" Text="Submit" ButtonStyle="ButtonStyle.Success"></RadzenButton>
 
+    </RadzenStack>
+
+
+@code
+{
+    private bool isBusySubmit { get; set; } = false;
+}
 
 @code {
 
@@ -113,6 +131,10 @@
     private Guid _selectedInstitutionId { get; set; } = Guid.Empty;
     private Guid _selectedDepartmentId { get; set; } = Guid.Empty;
     private int documentVersion { get; set; } = 0;
+
+    private string _selectedDocumentType { get; set; } = String.Empty;
+    private string _selectedDocumentState { get; set; } = String.Empty;
+
 
     private RadzenUpload uploadForm;
 
@@ -159,17 +181,73 @@
 
     private async void UploadFiles(MouseEventArgs obj)
     {
-        if (!templateDocumentSelected)
+        try
         {
-            //upload a normal document
-            if (_selectedFiles.Count == 1)
+            if (!templateDocumentSelected)
             {
-                var command = new BaseCreateStandaloneDocument();
+                //upload a normal document
+                if (_selectedFiles.Count == 1)
+                {
+                    var command = new BaseCreateStandaloneDocument();
 
-                command.DepartmentId = _selectedDepartmentId;
-                command.UploadDocument = _selectedFiles.First();
+                    command.DepartmentId = _selectedDepartmentId;
+                    command.UploadDocument = _selectedFiles.First();
 
-                var result = await _documentService.UploadStandaloneDocumentAsync(command);
+                    var result = await _documentService.UploadStandaloneDocumentAsync(command);
+
+                    if (result.Success)
+                    {
+                        _notificationService.Notify(NotificationSeverity.Success, "Document uploaded successfully");
+                        //clear the selected files
+                        _selectedFiles.Clear();
+                        _selectedDepartmentId = Guid.Empty;
+                        _selectedInstitutionId = Guid.Empty;
+                        await uploadForm.ClearFiles();
+                    }
+                    else
+                    {
+                        _notificationService.Notify(NotificationSeverity.Error, "Document upload failed");
+                    }
+                }
+
+                else
+                {
+                    var command = new MultipleCreateStandaloneDocument();
+
+                    command.DepartmentId = _selectedDepartmentId;
+                    command.UploadDocuments = _selectedFiles;
+
+                    var result = await _documentService.UploadMultipleStandaloneDocsAsync(command);
+
+                    if (result.Success)
+                    {
+                        _notificationService.Notify(NotificationSeverity.Success, "Documents uploaded successfully");
+                        //clear the selected files
+                        _selectedFiles.Clear();
+                        _selectedDepartmentId = Guid.Empty;
+                        _selectedInstitutionId = Guid.Empty;
+                        await uploadForm.ClearFiles();
+                    }
+                    else
+                    {
+                        _notificationService.Notify(NotificationSeverity.Error, "Document upload failed");
+                    }
+                }
+            }
+            else
+            {
+                isBusySubmit = true;
+                var command = new BaseCreateTemplateDocumentDto();
+
+                command.Version = documentVersion.ToString();
+                //find the state in DocumentState enum
+                command.State = (DocumentState)Enum.Parse(typeof(DocumentState),_selectedDocumentState);
+                command.Type = (TemplateTypeStage)Enum.Parse(typeof(TemplateTypeStage),_selectedDocumentType);
+
+
+                command.Files = _selectedFiles;
+
+                var result = await _documentService.UploadTemplateDocumentAsync(command);
 
                 if (result.Success)
                 {
@@ -184,31 +262,14 @@
                 {
                     _notificationService.Notify(NotificationSeverity.Error, "Document upload failed");
                 }
+                isBusySubmit = false;
+                StateHasChanged();
             }
-
-            else
-            {
-                var command = new MultipleCreateStandaloneDocument();
-
-                command.DepartmentId = _selectedDepartmentId;
-                command.UploadDocuments = _selectedFiles;
-
-                var result = await _documentService.UploadMultipleStandaloneDocsAsync(command);
-
-                if (result.Success)
-                {
-                    _notificationService.Notify(NotificationSeverity.Success, "Documents uploaded successfully");
-                    //clear the selected files
-                    _selectedFiles.Clear();
-                    _selectedDepartmentId = Guid.Empty;
-                    _selectedInstitutionId = Guid.Empty;
-                   await uploadForm.ClearFiles();
-                }
-                else
-                {
-                    _notificationService.Notify(NotificationSeverity.Error, "Document upload failed");
-                }
-            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
         }
     }
 
