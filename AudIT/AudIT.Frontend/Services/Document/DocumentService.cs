@@ -1,7 +1,13 @@
 ﻿using System.Net;
+using System.Net.Http.Headers;
+using System.Text;
 using Frontend.Contracts.Abstract_Services.DocumentService;
+using Frontend.EntityDtos.Document.Standalone;
+using Frontend.EntityDtos.Document.Template;
 using Frontend.EntityDtos.Misc;
 using Frontend.EntityViewModels.Document;
+using Frontend.EntityViewModels.Documents.Standalone;
+using Frontend.EntityViewModels.Documents.Template;
 using Newtonsoft.Json;
 
 namespace Frontend.Services.Document;
@@ -26,5 +32,82 @@ public class DocumentService(HttpClient httpClient) : IDocumentService
         }
 
         return new BaseDTOResponse<BaseDocumentViewmodel>("Error while fetching recent documents");
+    }
+
+    public Task<BaseDTOResponse<BaseTemplateDocViewModel>> UploadTemplateDocumentAsync(
+        BaseCreateTemplateDocumentDto documentDto)
+    {
+        // var content = new MultipartFormDataContent();
+        // foreach (var file in documentDto.Files)
+        // {
+        //     content.Add(new StreamContent(file.OpenReadStream()), "Files", file.Name);
+        // }
+        throw new NotImplementedException();
+    }
+
+    public async Task<BaseDTOResponse<BaseStandaloneDocViewModel>> UploadStandaloneDocumentAsync(
+        BaseCreateStandaloneDocument documentDto)
+    {
+        var content = new MultipartFormDataContent();
+        var fileContent = new StreamContent(documentDto.UploadDocument.OpenReadStream());
+
+        fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+        {
+            Name = "\"UploadDocument\"",
+            FileName = $"\"{documentDto.UploadDocument.Name}\""
+        };
+
+        content.Add(fileContent);
+
+        //add the other form data
+
+        // content.Add(new StringContent(documentDto.OwnerId.ToString()), "OwnerId");
+        content.Add(new StringContent(documentDto.DepartmentId.ToString()), "DepartmentId");
+        content.Add(new StringContent(String.Empty), "Name");
+        content.Add(new StringContent(String.Empty), "Extension");
+
+
+        var response = await httpClient.PostAsync($"{IDocumentService.ApiStandalonePath}/create-standalone-document",
+            content);
+
+        if (response.IsSuccessStatusCode)
+        {
+            //parse
+            return new BaseDTOResponse<BaseStandaloneDocViewModel>("Document uploaded successfully", true);
+        }
+
+        return new BaseDTOResponse<BaseStandaloneDocViewModel>("Error while uploading standalone document");
+    }
+
+    public async Task<BaseDTOResponse<BaseStandaloneDocViewModel>> UploadMultipleStandaloneDocsAsync(
+        MultipleCreateStandaloneDocument documentDto)
+    {
+        var content = new MultipartFormDataContent();
+        foreach (var file in documentDto.UploadDocuments)
+        {
+            var fileContent = new StreamContent(file.OpenReadStream());
+
+            fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+            {
+                Name = "\"uploadDocuments\"",
+                FileName = $"\"{file.Name}\""
+            };
+
+            content.Add(fileContent);
+        }
+
+
+        content.Add(new StringContent(documentDto.DepartmentId.ToString()), "DepartmentId");
+        content.Add(new StringContent(""), "Name");
+
+        var response = await httpClient.PostAsync($"{IDocumentService.ApiStandalonePath}/upload-standalone-documents",
+            content);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return new BaseDTOResponse<BaseStandaloneDocViewModel>("Document uploaded successfully", true);
+        }
+
+        return new BaseDTOResponse<BaseStandaloneDocViewModel>("Error while uploading standalone document");
     }
 }

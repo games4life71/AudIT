@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Security.Claims;
+using System.Text;
 using System.Web;
 using AudIT.Applicationa.Requests.Document.Get.GetDocumentsByDepartmentID;
 using AudIT.Applicationa.Requests.Document.StandaloneDocument.Commands.Create;
@@ -31,6 +32,7 @@ public class StandaloneDocumentController : BaseController
             key.Append('.');
             key.Append(fileExtension);
             Console.WriteLine("THE KEY IS " + key.ToString());
+
             var uploadResult = Mediator.Send(new UploadStandDoc(uploadDocument, key.ToString()));
 
             if (!uploadResult.Result.Item1)
@@ -39,12 +41,12 @@ public class StandaloneDocumentController : BaseController
             }
 
             //proceed to save it to database if it was successful
-
+            var userId =  this.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
 
             var result = await Mediator.Send(new CreateStandDocumentCommand()
             {
                 Name = uploadDocument.FileName.Split('.').First(),
-                OwnerId = command.OwnerId,
+                OwnerId = Guid.Parse(userId.Value),
                 DepartmentId = command.DepartmentId,
                 Extension = fileExtension
             });
@@ -87,11 +89,12 @@ public class StandaloneDocumentController : BaseController
                     return BadRequest("Failed to upload document");
                 }
 
+                var userId =  this.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
                 //save it to database if it was successful
                 var result = await Mediator.Send(new CreateStandDocumentCommand()
                 {
                     Name = file.FileName.Split('.').First(),
-                    OwnerId = command.OwnerId,
+                    OwnerId = Guid.Parse(userId.Value),
                     DepartmentId = command.DepartmentId,
                     Extension = fileExtension
                 });
