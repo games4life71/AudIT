@@ -28,6 +28,8 @@ using Havit.Blazor.Components.Web;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Radzen;
+using Syncfusion;
+using Syncfusion.Blazor;
 
 namespace Frontend;
 
@@ -38,7 +40,9 @@ public static class ServiceRegistration
         services.AddTransient<CookieHandler>();
         services.AddHxServices();
         services.AddRadzenComponents();
-
+        services.AddSyncfusionBlazor();
+        //Register Syncfusion license
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXlfcnRcR2JcVUR1WUI=");
 
         services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
         services.AddScoped<IAuditMissionService, AuditMissionService>();

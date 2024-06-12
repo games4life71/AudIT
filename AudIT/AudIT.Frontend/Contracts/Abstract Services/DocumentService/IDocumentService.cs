@@ -3,6 +3,7 @@ using Frontend.EntityDtos.Document.Standalone;
 using Frontend.EntityDtos.Document.Template;
 using Frontend.EntityDtos.Misc;
 using Frontend.EntityViewModels.Document;
+using Frontend.EntityViewModels.Documents;
 using Frontend.EntityViewModels.Documents.Standalone;
 using Frontend.EntityViewModels.Documents.Template;
 
@@ -26,5 +27,13 @@ public interface IDocumentService
 
     public Task<BaseDTOResponse<BaseStandaloneDocViewModel>> UploadMultipleStandaloneDocsAsync(
         MultipleCreateStandaloneDocument documentDto);
+
+    public Task<Stream?> DownloadTemplateDocumentAsync(string documentName);
+
+
+    public Task<BaseDTOResponse<BaseDocumentViewModel>> GetDocumentsByUserIdAsync();
+
+    public Task<BaseResponse> DeleteDocumentAsync(Guid documentId);
+
 
 }

@@ -16,6 +16,8 @@
         <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
         <PackageReference Include="Radzen.Blazor" Version="4.31.5" />
+        <PackageReference Include="Syncfusion.Blazor.Themes" Version="26.1.35" />
+        <PackageReference Include="Syncfusion.Blazor.WordProcessor" Version="26.1.35" />
     </ItemGroup>
 
 </Project>

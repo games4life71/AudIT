@@ -3,6 +3,7 @@ using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
 using AudIT.Applicationa.Contracts.DocumentServices;
+using AudIT.Domain.Misc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
@@ -67,9 +68,39 @@ public class DocumentService(IConfiguration _configuration) : IDocumentManager
         }
     }
 
-    public async Task<(bool, string)> DeleteDocumentAsync(string key)
+    public async Task<(bool, string)> DeleteDocumentAsync(string key, DocumentType type)
     {
-        throw new NotImplementedException();
+        try
+        {
+            if (type == DocumentType.Standalone)
+            {
+                key = "standalone-documents/" + key;
+            }
+            else
+            {
+                key = "template-documents/" + key;
+            }
+
+            var request = new DeleteObjectRequest
+            {
+                BucketName = _bucketName,
+                Key = key
+            };
+
+            var response = await _client.DeleteObjectAsync(request);
+        }
+        catch (AmazonS3Exception e)
+        {
+            Console.WriteLine(e);
+            return (false, e.Message);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return (false, e.Message);
+        }
+
+        return (true, "Document deleted successfully");
     }
 
     public async Task<(bool, string)> UpdateDocumentAsync(string key, IFormFile file)
@@ -109,7 +140,7 @@ public class DocumentService(IConfiguration _configuration) : IDocumentManager
             };
 
             var uploadResponse = await _client.UploadPartAsync(uploadRequest);
-            
+
             uploadPartResponses.Add(uploadResponse);
             partNumber++;
         }

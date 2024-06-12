@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using AudIT.Applicationa.Requests.Document.Delete;
 using AudIT.Applicationa.Requests.Document.Get.GetDocumentsByUserId;
 using AudIT.Applicationa.Requests.Document.Get.GetRecentDocumentByUserId;
 using Microsoft.AspNetCore.Mvc;
@@ -45,6 +46,23 @@ public class BaseDocumentController : BaseController
             return BadRequest("User not found");
         }
         var result = await Mediator.Send(new GetRecentDocumentsByUserIdQuery(Guid.Parse(userId.Value)));
+
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
+
+    [HttpDelete]
+    [Route("delete-document/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> DeleteDocument(Guid id)
+    {
+        var result = await Mediator.Send(new DeleteDocumentCommand(id));
 
         if (!result.Success)
         {

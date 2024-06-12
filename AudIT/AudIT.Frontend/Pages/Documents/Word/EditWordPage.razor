@@ -1,0 +1,58 @@
+﻿@page "/edit-word"
+@inject  IDocumentService _documentService
+ @using Frontend.Contracts.Abstract_Services.DocumentService
+@using Syncfusion.Blazor.DocumentEditor
+<h3>EditWordPage</h3>
+<RadzenTextBox ValueChanged="@((value)=>FetchDocument(value))" Placeholder="document name" ></RadzenTextBox>
+
+
+
+<SfDocumentEditorContainer @ref="@container" Height="150%" >
+
+
+</SfDocumentEditorContainer >
+ <RadzenButton Text="Save" Click="@SaveDocument"></RadzenButton>
+
+
+
+
+@code {
+
+ private string documentName;
+ SfDocumentEditorContainer container;
+    protected override void OnInitialized()
+    {
+
+
+
+    }
+
+    private async void SaveDocument(MouseEventArgs obj)
+    {
+     var editor = container.DocumentEditor;
+     await editor.SaveAsync("sample.docx", FormatType.Docx);
+    }
+
+    private async  Task FetchDocument(string value)
+    {
+      var stream = await _documentService.DownloadTemplateDocumentAsync(value);
+      if (stream != null)
+      {
+       var extension = Path.GetExtension(value);
+
+       // Load the stream into the document editor
+
+       await container.DocumentEditor.OpenAsync(stream,ImportFormatType.Txt);
+
+      }
+      else
+      {
+       throw new Exception("Document not found");
+      }
+
+
+
+
+    }
+
+}

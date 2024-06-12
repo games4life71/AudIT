@@ -25,7 +25,9 @@ public class TemplateDocument:BaseDocument
         Guid ownerId,
         DocumentState state,
         TemplateTypeStage type,
-        string version) : base(name, extension, owner, ownerId)
+        string version,
+        DocumentType Doctype = DocumentType.Template
+        ) : base(name, extension,Doctype, owner, ownerId)
     {
         State = state;
         Type = type;

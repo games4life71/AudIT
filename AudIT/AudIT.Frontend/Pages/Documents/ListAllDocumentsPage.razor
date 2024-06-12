@@ -1,0 +1,143 @@
+﻿@page "/documents"
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
+@using Frontend.Contracts.Abstract_Services.DocumentService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
+@using Frontend.EntityViewModels.Document
+@using Frontend.EntityViewModels.Documents
+@inject  IDocumentService _documentService
+@inject NotificationService _notificationService
+@inject DialogService _dialogService
+@inject NavigationManager _navigationManager
+@inject ICurrentUserAuditMissionService _currentUserAuditMissionService
+@inject IAuditMissionService _auditMissionService
+
+<RadzenStack Orientation="Orientation.Vertical">
+    <RadzenCard Variant="Variant.Outlined">
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenText TextStyle="TextStyle.H4" class="rz-mb-6" Text="@($"Your saved documents")"></RadzenText>
+        <RadzenStack Orientation="Orientation.Horizontal">
+            @if (_auditMission.Id != Guid.Empty)
+            {
+                <RadzenLink Path="@($"/audit-mission/{_auditMission.Id}")">
+                    <RadzenText Text="@($"Selected Audit Mission: {_auditMission.Name}")"></RadzenText>
+                </RadzenLink>
+            }
+            else
+            {
+                <RadzenLink Path="@($"/audit-missions")">
+                    <RadzenText Text="Please select an audit mission "></RadzenText>
+                </RadzenLink>
+            }
+
+        </RadzenStack>
+
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenDataGrid @ref="@docGrid" AllowColumnResize="true" AllowColumnPicking="true" AllowSorting="true" Data="@_documents" TItem="BaseDocumentViewModel" AllowFiltering="true">
+            <Columns>
+                <RadzenDataGridColumn Title="Name" Property="Name"/>
+                <RadzenDataGridColumn Title="Extension" Property="Extension"/>
+                <RadzenDataGridColumn Title="Type" Property="DocumentType"/>
+                <RadzenDataGridColumn>
+                    <Template Context="document">
+                        <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+                            <RadzenButton Click="@(()=>NavigateDocumentDetails(document))" ButtonStyle="ButtonStyle.Dark" Text="More details"></RadzenButton>
+                            <RadzenButton Click="@(()=>NavigateDeleteDocument(document))" ButtonStyle="ButtonStyle.Danger" Icon="delete" Text="Delete"></RadzenButton>
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+
+            </Columns>
+        </RadzenDataGrid>
+        <RadzenButton Text="Add new Document" Click="@NavigateAddDocument"  ButtonStyle="ButtonStyle.Dark" ></RadzenButton>
+    </RadzenStack>
+
+    </RadzenCard>
+</RadzenStack>
+
+
+@code {
+
+    private List<BaseDocumentViewModel> _documents = [];
+
+    private CurrentUserAuditMissionViewModel _currentUserAuditMission { get; set; } = new CurrentUserAuditMissionViewModel();
+
+    private BaseAuditMissionDto _auditMission { get; set; } = new BaseAuditMissionDto();
+
+    private RadzenDataGrid<BaseDocumentViewModel> docGrid;
+}
+
+@functions
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCurrentUserAuditMissionAsync();
+        await FetchDocuments();
+    }
+
+    private async Task FetchDocuments()
+    {
+        var result = await _documentService.GetDocumentsByUserIdAsync();
+
+        if (result.Success)
+        {
+            _documents = result.DtoResponses;
+        }
+    }
+
+    public async Task GetCurrentUserAuditMissionAsync()
+    {
+        var result = await _currentUserAuditMissionService.GetCurrentUserAuditMissionAsync();
+
+        if (result is { Success: true, DtoResponse: not null }) _currentUserAuditMission = result.DtoResponse;
+        var auditMissionResult = await _auditMissionService.GetAuditMissionById(_currentUserAuditMission.AuditMissionId);
+
+        if (auditMissionResult is { Success: true, DtoResponse: not null }) _auditMission = auditMissionResult.DtoResponse;
+    }
+
+
+    private Task NavigateDocumentDetails(BaseDocumentViewModel document)
+    {
+
+        if (document.DocumentType == DocumentType.Standalone)
+        {
+            //navigate to standalone document viewer
+        }
+
+        else
+        {
+            //navigate to document viewer
+        }
+
+        return Task.CompletedTask;
+
+    }
+
+    private void NavigateAddDocument(MouseEventArgs obj)
+    {
+        _navigationManager.NavigateTo("/upload-document");
+    }
+
+    private async  Task NavigateDeleteDocument(BaseDocumentViewModel document)
+    {
+        var confirmResponse = await _dialogService.Confirm("Are you sure you want to delete this document?",
+            "Delete Document" );
+
+
+        var response = await _documentService.DeleteDocumentAsync(document.Id);
+
+        if (response.Success)
+        {
+            _notificationService.Notify(NotificationSeverity.Success, "Document deleted successfully");
+            _documents.Remove(document);
+            await docGrid.Reload();
+        }
+        else
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Failed to delete document");
+        }
+    }
+}

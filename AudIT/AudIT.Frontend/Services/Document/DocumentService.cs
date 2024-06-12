@@ -6,6 +6,7 @@ using Frontend.EntityDtos.Document.Standalone;
 using Frontend.EntityDtos.Document.Template;
 using Frontend.EntityDtos.Misc;
 using Frontend.EntityViewModels.Document;
+using Frontend.EntityViewModels.Documents;
 using Frontend.EntityViewModels.Documents.Standalone;
 using Frontend.EntityViewModels.Documents.Template;
 using Newtonsoft.Json;
@@ -132,5 +133,44 @@ public class DocumentService(HttpClient httpClient) : IDocumentService
         }
 
         return new BaseDTOResponse<BaseStandaloneDocViewModel>("Error while uploading standalone document");
+    }
+
+    public async Task<Stream?> DownloadTemplateDocumentAsync(string documentName)
+    {
+        var response = await httpClient.GetAsync($"{IDocumentService.ApiTemplatePath}/{documentName}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var stream = await response.Content.ReadAsStreamAsync();
+            return stream;
+        }
+
+        return null;
+    }
+
+    public async Task<BaseDTOResponse<BaseDocumentViewModel>> GetDocumentsByUserIdAsync()
+    {
+        var response = await httpClient.GetAsync($"{IDocumentService.ApiPathBaseDocument}/get-documents-by-user-id");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseDocumentViewModel>>(responseContent);
+            if (result != null) return result;
+        }
+
+        return new BaseDTOResponse<BaseDocumentViewModel>("Error while fetching documents");
+    }
+
+    public async Task<BaseResponse> DeleteDocumentAsync(Guid documentId)
+    {
+        var response = await httpClient.DeleteAsync($"{IDocumentService.ApiPathBaseDocument}/delete-document/{documentId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            return new BaseResponse("Document deleted successfully", true);
+        }
+
+        return new BaseResponse("Error while deleting document", false);
     }
 }

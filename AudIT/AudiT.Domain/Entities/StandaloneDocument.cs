@@ -22,8 +22,9 @@ public class StandaloneDocument:BaseDocument
         User owner,
         Guid ownerId,
         Department department,
-        Guid departmentId
-    ) : base(name, extension, owner, ownerId)
+        Guid departmentId,
+        DocumentType type = DocumentType.Standalone
+    ) : base(name, extension,type, owner, ownerId)
     {
         Department = department;
         DepartmentId = departmentId;

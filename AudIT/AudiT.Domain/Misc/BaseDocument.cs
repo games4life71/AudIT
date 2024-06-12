@@ -19,10 +19,11 @@ public class BaseDocument:AuditableEntity
 
     public string OwnerId { get; private set; }
 
+    public DocumentType DocumentType { get; private set; }
 
-
-    protected BaseDocument(string name , string extension , User owner , Guid ownerId)
+    protected BaseDocument(string name , string extension , DocumentType type, User owner , Guid ownerId)
     {
+        DocumentType = type;
         Id = new Guid();
         Name = name;
         Extension = extension;
@@ -35,4 +36,10 @@ public class BaseDocument:AuditableEntity
 
     }
 
+}
+
+public enum DocumentType
+{
+    Standalone,
+    Template
 }

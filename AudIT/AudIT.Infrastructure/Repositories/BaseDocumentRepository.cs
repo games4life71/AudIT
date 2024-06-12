@@ -29,7 +29,8 @@ public class BaseDocumentRepository : BaseRepository<BaseDocument>, IBaseDocumen
         try
         {
             var result = await _dbcContext.BaseDocuments
-                .Where(x => x.OwnerId == requestUserId.ToString()).ToListAsync();
+                .Where(x => x.OwnerId == requestUserId.ToString())
+                .ToListAsync();
 
             return Result<List<BaseDocument>>.Success(result);
         }
