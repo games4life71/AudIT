@@ -105,6 +105,9 @@
         if (document.DocumentType == DocumentType.Standalone)
         {
             //navigate to standalone document viewer
+            var documentName = document.Name+"."+document.Extension;
+
+            _navigationManager.NavigateTo($"/edit-word?documentName={documentName}$documentType=standalone");
         }
 
         else

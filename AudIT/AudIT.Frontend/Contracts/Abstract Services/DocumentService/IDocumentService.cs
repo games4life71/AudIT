@@ -36,4 +36,7 @@ public interface IDocumentService
     public Task<BaseResponse> DeleteDocumentAsync(Guid documentId);
 
 
+    public Task<BaseDTOResponse<BaseStandaloneDocViewModel>> UploadStandaloneDocumentContentAsync(
+        BaseCreateStandaloneDocumentStream documentDto);
+
 }

@@ -1,28 +1,56 @@
 ﻿@page "/edit-word"
 @inject  IDocumentService _documentService
- @using Frontend.Contracts.Abstract_Services.DocumentService
+@inject NotificationService _notificationService
+@inject NavigationManager _navigationManager
+
+
+@using Frontend.Contracts.Abstract_Services.DocumentService
+@using Frontend.EntityDtos.Document.Standalone
+@using Microsoft.AspNetCore.WebUtilities
 @using Syncfusion.Blazor.DocumentEditor
-<h3>EditWordPage</h3>
-<RadzenTextBox ValueChanged="@((value)=>FetchDocument(value))" Placeholder="document name" ></RadzenTextBox>
 
 
 
-<SfDocumentEditorContainer @ref="@container" Height="150%" >
+
+<RadzenStack Orientation="Orientation.Vertical">
+ <RadzenCard Variant="Variant.Outlined">
+  <RadzenStack Orientation="Orientation.Horizontal">
+   <RadzenButton Text="Save" Click="@SaveDocument"></RadzenButton>
+  </RadzenStack>
+ </RadzenCard>
+ <SfDocumentEditorContainer Width="85%" ShowPropertiesPane="false" @ref="@container" Height="100%">
+ </SfDocumentEditorContainer >
+
+</RadzenStack>
 
 
-</SfDocumentEditorContainer >
- <RadzenButton Text="Save" Click="@SaveDocument"></RadzenButton>
+
 
 
 
 
 @code {
 
- private string documentName;
- SfDocumentEditorContainer container;
+
+
+      SfDocumentEditorContainer container;
+
+
     protected override void OnInitialized()
     {
+     var uri = _navigationManager.Uri;
 
+     // Parse the query parameters
+     var queryParameters = QueryHelpers.ParseQuery(new Uri(uri).Query);
+
+     // Try to get the documentName parameter
+     if (queryParameters.TryGetValue("documentName", out var documentName))
+     {
+      // Use the document name
+      documentName = documentName.First();
+      FetchDocument(documentName);
+
+     }
 
 
     }
@@ -30,7 +58,34 @@
     private async void SaveDocument(MouseEventArgs obj)
     {
      var editor = container.DocumentEditor;
-     await editor.SaveAsync("sample.docx", FormatType.Docx);
+     // await editor.SaveAsync("sample.docx", FormatType.Docx);
+
+     var edited_document = await editor.SaveAsBlobAsync(FormatType.Docx);
+
+     var content = Convert.FromBase64String(edited_document);
+
+     var command = new BaseCreateStandaloneDocumentStream();
+
+
+     command.DepartmentId = Guid.Parse("CE2CE527-16F6-4E4D-8971-4D4B6A58CCA5");
+     command.Name = "sample.docx";
+     var uploadStream = new MemoryStream(content);
+     command.UploadDocument = uploadStream;
+
+
+   var result =   await _documentService.UploadStandaloneDocumentContentAsync(command);
+
+   if (result.Success)
+   {
+    _notificationService.Notify(NotificationSeverity.Success, "Document saved successfully");
+    //clear the editor
+    await editor.OpenBlankAsync();
+   }
+   else
+   {
+    _notificationService.Notify(NotificationSeverity.Error, "Document not saved");
+   }
+
     }
 
     private async  Task FetchDocument(string value)

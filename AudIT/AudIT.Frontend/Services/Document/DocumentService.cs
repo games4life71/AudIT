@@ -164,7 +164,8 @@ public class DocumentService(HttpClient httpClient) : IDocumentService
 
     public async Task<BaseResponse> DeleteDocumentAsync(Guid documentId)
     {
-        var response = await httpClient.DeleteAsync($"{IDocumentService.ApiPathBaseDocument}/delete-document/{documentId}");
+        var response =
+            await httpClient.DeleteAsync($"{IDocumentService.ApiPathBaseDocument}/delete-document/{documentId}");
 
         if (response.IsSuccessStatusCode)
         {
@@ -172,5 +173,43 @@ public class DocumentService(HttpClient httpClient) : IDocumentService
         }
 
         return new BaseResponse("Error while deleting document", false);
+    }
+
+    public async Task<BaseDTOResponse<BaseStandaloneDocViewModel>> UploadStandaloneDocumentContentAsync(
+        BaseCreateStandaloneDocumentStream documentDto)
+    {
+        var content = new MultipartFormDataContent();
+        StreamContent fileContent = null;
+        if (documentDto.UploadDocument != null)
+        {
+            fileContent = new StreamContent(documentDto.UploadDocument);
+        }
+
+        fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+        {
+            Name = "\"UploadDocument\"",
+            FileName = $"\"{documentDto.Name}\""
+        };
+
+        content.Add(fileContent);
+
+        //add the other form data
+
+        // content.Add(new StringContent(documentDto.OwnerId.ToString()), "OwnerId");
+        content.Add(new StringContent(documentDto.DepartmentId.ToString()), "DepartmentId");
+        content.Add(new StringContent(String.Empty), "Name");
+        content.Add(new StringContent(String.Empty), "Extension");
+
+
+        var response = await httpClient.PostAsync($"{IDocumentService.ApiStandalonePath}/create-standalone-document",
+            content);
+
+        if (response.IsSuccessStatusCode)
+        {
+            //parse
+            return new BaseDTOResponse<BaseStandaloneDocViewModel>("Document uploaded successfully", true);
+        }
+
+        return new BaseDTOResponse<BaseStandaloneDocViewModel>("Error while uploading standalone document");
     }
 }
