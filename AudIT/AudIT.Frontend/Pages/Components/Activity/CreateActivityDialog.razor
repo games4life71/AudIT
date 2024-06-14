@@ -4,11 +4,12 @@
 @using Frontend.EntityDtos.Activity
 @using Frontend.EntityViewModels.Activity
 @using Frontend.Services.AuthentificationServices
-
+@using ButtonType = Radzen.ButtonType
 @inject DialogService _dialogService
 @inject NotificationService _notificationService
 @inject IActivityService _activityService
 @inject CustomAuthStateProvider _authStateProvider
+@using Orientation = Radzen.Orientation
 <RadzenCard Variant="Variant.Outlined">
 
     <RadzenSteps>

@@ -1,6 +1,9 @@
 ﻿using Amazon.S3.Model;
 using AudIT.Applicationa.Contracts.DocumentServices;
 using MediatR;
+using Syncfusion.Pdf;
+using Syncfusion.XlsIO;
+using Syncfusion.XlsIORenderer;
 
 namespace AudIT.Applicationa.Requests.Document.StandaloneDocument.Commands.Download;
 

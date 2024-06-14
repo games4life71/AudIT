@@ -12,7 +12,7 @@
 @inject NavigationManager _navigationManager
 @inject ICurrentUserAuditMissionService _currentUserAuditMissionService
 @inject IAuditMissionService _auditMissionService
-
+@using Orientation = Radzen.Orientation
 <RadzenStack Orientation="Orientation.Vertical">
     <RadzenCard Variant="Variant.Outlined">
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
@@ -104,16 +104,13 @@
 
         if (document.DocumentType == DocumentType.Standalone)
         {
-            //navigate to standalone document viewer
-            // var documentName = document.Name+"."+document.Extension;
-            //
-            // _navigationManager.NavigateTo($"/edit-word?documentName={documentName}$documentType=standalone");
+            _navigationManager.NavigateTo($"/view-pdf/{document.Name}.{document.Extension}");
         }
 
         else
         {
             var documentName = document.Name+"."+document.Extension;
-            _navigationManager.NavigateTo($"/edit-word?documentName={documentName}&documentType=standalone");
+            _navigationManager.NavigateTo($"/edit-word?documentName={documentName}");
         }
 
         return Task.CompletedTask;

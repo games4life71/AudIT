@@ -48,7 +48,7 @@ public static class InfrastructureRegistration
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.Name="MyCookie";
         });
-
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXlfcnRcR2JcVUR1WUI=");
         services.Configure<CookiePolicyOptions>(options =>
         {
             options.MinimumSameSitePolicy = SameSiteMode.None;

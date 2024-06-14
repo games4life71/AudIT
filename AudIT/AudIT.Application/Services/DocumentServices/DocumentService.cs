@@ -6,6 +6,9 @@ using AudIT.Applicationa.Contracts.DocumentServices;
 using AudIT.Domain.Misc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Syncfusion.Pdf;
+using Syncfusion.XlsIO;
+using Syncfusion.XlsIORenderer;
 
 namespace AudIT.Applicationa.Services.DocumentServices;
 
@@ -67,6 +70,7 @@ public class DocumentService(IConfiguration _configuration) : IDocumentManager
             return (false, null);
         }
     }
+
 
     public async Task<(bool, string)> DeleteDocumentAsync(string key, DocumentType type)
     {
@@ -157,5 +161,56 @@ public class DocumentService(IConfiguration _configuration) : IDocumentManager
 
         return (completeResponse.HttpStatusCode == HttpStatusCode.OK, completeResponse.HttpStatusCode.ToString(),
             completeResponse.VersionId);
+    }
+
+    public async Task<(bool, Stream)> ConvertExcelToPdfAsync(GetObjectResponse response, string key)
+    {
+        try
+        {
+            var extension = key.Split('.').Last();
+
+            //if the file is a excel file then we need to convert it to pdf
+            if (extension == "xlsx" || extension == "xls")
+            {
+                using (ExcelEngine excelEngine = new ExcelEngine())
+                {
+                    IApplication application = excelEngine.Excel;
+                    application.DefaultVersion = ExcelVersion.Xlsx;
+
+
+                    MemoryStream excelStream = new MemoryStream();
+                    await response.ResponseStream.CopyToAsync(excelStream);
+                    excelStream.Position = 0;
+
+                    IWorkbook workbook = application.Workbooks.Open(excelStream);
+
+
+                    XlsIORenderer renderer = new XlsIORenderer();
+
+                    PdfDocument pdfDocument = renderer.ConvertToPDF(workbook);
+
+
+                    //return the pdf document  as a stream
+                    Stream stream = new MemoryStream();
+                    pdfDocument.Save(stream);
+
+                    workbook.Close();
+
+                    excelEngine.Dispose();
+
+                    return (true, stream);
+                }
+            }
+
+
+
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return (false, null);
+        }
+
+        return (false, null);
     }
 }

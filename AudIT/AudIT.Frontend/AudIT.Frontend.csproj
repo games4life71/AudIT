@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Blazor.Bootstrap" Version="2.2.0" />
         <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
         <PackageReference Include="Havit.Blazor.Components.Web.Bootstrap" Version="4.6.7" />
         <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.5" />
@@ -16,6 +17,7 @@
         <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
         <PackageReference Include="Radzen.Blazor" Version="4.31.5" />
+        <PackageReference Include="Syncfusion.Blazor.PdfViewer" Version="26.1.35" />
         <PackageReference Include="Syncfusion.Blazor.Themes" Version="26.1.35" />
         <PackageReference Include="Syncfusion.Blazor.WordProcessor" Version="26.1.35" />
     </ItemGroup>

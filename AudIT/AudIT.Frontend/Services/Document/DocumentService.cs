@@ -244,9 +244,23 @@ public class DocumentService(HttpClient httpClient) : IDocumentService
             content);
 
         if (response.IsSuccessStatusCode)
-            return new BaseDTOResponse<BaseTemplateDocViewModel>($"Succces {response.Content.ReadAsStringAsync() }", true);
+            return new BaseDTOResponse<BaseTemplateDocViewModel>($"Succces {response.Content.ReadAsStringAsync()}",
+                true);
 
 
         return new BaseDTOResponse<BaseTemplateDocViewModel>("Error while uploading template document");
+    }
+
+    public async Task<Stream?> DownloadStandaloneDocumentAsync(string documentName)
+    {
+        var response = await httpClient.GetAsync($"{IDocumentService.ApiStandalonePath}/{documentName}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var stream = await response.Content.ReadAsStreamAsync();
+            return stream;
+        }
+
+        return null;
     }
 }

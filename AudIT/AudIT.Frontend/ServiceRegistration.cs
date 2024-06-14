@@ -43,7 +43,7 @@ public static class ServiceRegistration
         services.AddSyncfusionBlazor();
         //Register Syncfusion license
         Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXlfcnRcR2JcVUR1WUI=");
-
+        builder.Services.AddBlazorBootstrap();
         services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
         services.AddScoped<IAuditMissionService, AuditMissionService>();
         services.AddScoped<CustomAuthStateProvider>();

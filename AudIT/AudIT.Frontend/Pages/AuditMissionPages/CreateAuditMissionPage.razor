@@ -7,6 +7,7 @@
 @using Frontend.EntityDtos.Institution
 @using Frontend.Services.AuthentificationServices
 @using Frontend.Services.InstitutionServices
+@using ButtonType = Radzen.ButtonType
 @inject IInstitutionService institutionService
 @inject IDepartmentService departmentService
 @inject NotificationService NotificationService
@@ -14,7 +15,7 @@
 @inject CustomAuthStateProvider authState
 @inject DialogService DialogService
 @inject NavigationManager _NavigationManager
-
+@using Orientation = Radzen.Orientation
 @if (institutions == null)
 {
     //show loading spinner

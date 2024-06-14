@@ -1,0 +1,59 @@
+﻿@page "/view-pdf/{documentName}"
+@using Frontend.Contracts.Abstract_Services.DocumentService
+@using Syncfusion.Blazor.PdfViewer
+@inject IDocumentService _documentService
+<h3>ViewStandaloneDocumentPage</h3>
+
+
+@if (display)
+{
+    <RadzenColumn>
+        <PdfViewer Url="@string.Format("data:application/pdf;base64,{0}", pdfBase64String)"/>
+    </RadzenColumn>
+}
+
+else
+{
+    // Display a loading spinner
+    <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+}
+
+
+@code {
+    SfPdfViewer pdfViewer;
+    private string pdfBase64String;
+
+    bool display = false;
+
+    [Parameter] public string documentName { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the document from the databaseThe PDF file is empty, i.e. its size is zero bytes.
+        var document = await _documentService.DownloadStandaloneDocumentAsync(documentName);
+
+        // Convert the document to a base64 string
+        if (document != null)
+        {
+            display = true;
+
+            // Convert the response stream to a byte array
+            byte[] byteArray;
+            using (var memoryStream = new MemoryStream())
+            {
+                await document.CopyToAsync(memoryStream);
+                byteArray = memoryStream.ToArray();
+            }
+
+            // Convert the byte array to a base64 string
+            string base64String = Convert.ToBase64String(byteArray);
+
+            pdfBase64String = base64String;
+        }
+
+        // Set the base64 string as the document path for the PDF Viewer
+    }
+
+
+}

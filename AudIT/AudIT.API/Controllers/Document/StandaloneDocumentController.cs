@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using System.Text;
 using System.Web;
+using AudIT.Applicationa.Contracts.DocumentServices;
 using AudIT.Applicationa.Requests.Document.Get.GetDocumentsByDepartmentID;
 using AudIT.Applicationa.Requests.Document.StandaloneDocument.Commands.Create;
 using AudIT.Applicationa.Requests.Document.StandaloneDocument.Commands.Download;
@@ -9,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AudIT.API.Controllers.Document;
 
-public class StandaloneDocumentController : BaseController
+public class StandaloneDocumentController(IDocumentManager documentManager) : BaseController
 {
     /// <summary>
     /// Endpoint to create a standalone document in the database
@@ -41,7 +42,7 @@ public class StandaloneDocumentController : BaseController
             }
 
             //proceed to save it to database if it was successful
-            var userId =  this.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            var userId = this.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
 
             var result = await Mediator.Send(new CreateStandDocumentCommand()
             {
@@ -89,7 +90,7 @@ public class StandaloneDocumentController : BaseController
                     return BadRequest("Failed to upload document");
                 }
 
-                var userId =  this.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+                var userId = this.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
                 //save it to database if it was successful
                 var result = await Mediator.Send(new CreateStandDocumentCommand()
                 {
@@ -121,6 +122,30 @@ public class StandaloneDocumentController : BaseController
             //append the standalone-documents/ to the key
             key = "standalone-documents/" + key;
             var result = await Mediator.Send(new DownloadCommand(key));
+
+            if (key.Split('.').Last() == "xlsx")
+            {
+                var pdfResult = await documentManager.ConvertExcelToPdfAsync(result.Item2, key);
+
+                if (!pdfResult.Item1)
+                {
+                    return BadRequest("Failed to convert document to pdf");
+                }
+
+                // Check if the stream has any content
+                if (pdfResult.Item2.Length == 0)
+                {
+                    return BadRequest("The converted PDF is empty");
+                }
+                pdfResult.Item2.Position = 0;
+                var pdfStream = new MemoryStream();
+                await pdfResult.Item2.CopyToAsync(pdfStream);
+                pdfStream.Position = 0;
+                pdfResult.Item2.Dispose();
+                return new FileStreamResult(pdfStream, "application/pdf");
+
+            }
+
             if (!result.Item1)
             {
                 return BadRequest("Failed to download document");

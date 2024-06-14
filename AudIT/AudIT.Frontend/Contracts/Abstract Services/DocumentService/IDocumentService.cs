@@ -31,6 +31,8 @@ public interface IDocumentService
     public Task<Stream?> DownloadTemplateDocumentAsync(string documentName);
 
 
+    public Task<Stream?> DownloadStandaloneDocumentAsync(string documentName);
+
     public Task<BaseDTOResponse<BaseDocumentViewModel>> GetDocumentsByUserIdAsync();
 
     public Task<BaseResponse> DeleteDocumentAsync(Guid documentId);

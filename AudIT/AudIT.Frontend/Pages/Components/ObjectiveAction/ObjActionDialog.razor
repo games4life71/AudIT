@@ -1,6 +1,7 @@
 ﻿@using Frontend.EntityViewModels.ActionRisk
 @inject Radzen.DialogService dialogService
 @inject NavigationManager _navigationManager
+@using Orientation = Radzen.Orientation
 <RadzenDataGrid Data="@ActionRisks">
     <Columns>
         <RadzenDataGridColumn Filterable="true" Sortable="true" Property="name" Title="Risk Name"></RadzenDataGridColumn>
