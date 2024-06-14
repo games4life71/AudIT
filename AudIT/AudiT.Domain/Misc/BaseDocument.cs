@@ -11,9 +11,9 @@ public class BaseDocument:AuditableEntity
 
     public Guid Id { get; private set; }
 
-    public string Name { get; private set; }
+    public string Name { get; protected set; }
 
-    public string Extension { get; private set; }
+    public string Extension { get; protected set; }
 
     public User Owner { get; private set; }
 

@@ -37,14 +37,19 @@ public class DeleteDocumentHandler(
             }
 
             //delete the document from the database
-            switch (document.Value.DocumentType)
+            // switch (document.Value.DocumentType)
+            // {
+            //     case DocumentType.Template:
+            //         await templateDocRepository.DeleteAsync(request.Id);
+            //         break;
+            //     case DocumentType.Standalone:
+            //         await standaloneDocRepository.DeleteAsync(request.Id);
+            //         break;
+            // }
+            var deleteResponse = await baseDocumentRepository.DeleteAsync(request.Id);
+            if (!deleteResponse.IsSuccess)
             {
-                case DocumentType.Template:
-                    await templateDocRepository.DeleteAsync(request.Id);
-                    break;
-                case DocumentType.Standalone:
-                    await standaloneDocRepository.DeleteAsync(request.Id);
-                    break;
+                return new BaseResponse("Cannot delete from the database", false);
             }
 
             return new BaseResponse("Document deleted successfully", true);

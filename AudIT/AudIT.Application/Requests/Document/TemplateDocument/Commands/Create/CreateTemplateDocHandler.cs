@@ -41,6 +41,29 @@ public class CreateTemplateDocHandler(
             };
         }
 
+
+        //get the docuemnt if exists
+        var name = request.Name.Split('.').First();
+        var exisingDocument = await docRepository.GetTemplateDocumentByName(name);
+
+        if (exisingDocument.IsSuccess)
+        {
+            //update this document , dont create a new one
+            exisingDocument.Value.UpdateDocument(request.Name, request.Extension, request.State, request.Type,
+                request.Version);
+            var resultUpdate = await docRepository.UpdateAsync(exisingDocument.Value);
+
+            if (!resultUpdate.IsSuccess)
+            {
+                return new BaseDTOResponse<BaseTemplateDocDto>("Failed to update the document", false);
+            }
+
+
+            return new BaseDTOResponse<BaseTemplateDocDto>(_mapper.Map<BaseTemplateDocDto>(resultUpdate.Value),
+                "Document updated successfully", true);
+        }
+
+
         //create the document
 
         var new_doc = AudiT.Domain.Entities.TemplateDocument.Create(
@@ -68,7 +91,6 @@ public class CreateTemplateDocHandler(
         {
             return new BaseDTOResponse<BaseTemplateDocDto>(_mapper.Map<BaseTemplateDocDto>(result.Value),
                 "Successfully created the template document", true);
-
         }
     }
 }

@@ -212,4 +212,41 @@ public class DocumentService(HttpClient httpClient) : IDocumentService
 
         return new BaseDTOResponse<BaseStandaloneDocViewModel>("Error while uploading standalone document");
     }
+
+    public async Task<BaseDTOResponse<BaseTemplateDocViewModel>> UploadTemplateDocumentContentAsync(
+        BaseCreateTemplateDocumentStream documentDto)
+    {
+        var content = new MultipartFormDataContent();
+
+
+        foreach (var docStream in documentDto.UploadDocuments)
+        {
+            StreamContent fileContent = null;
+            if (docStream != null)
+            {
+                fileContent = new StreamContent(docStream);
+
+                fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                {
+                    Name = "\"files\"",
+                    FileName = $"\"{documentDto.Name}\""
+                };
+
+                content.Add(fileContent);
+            }
+        }
+
+        content.Add(new StringContent("Version"), documentDto.Version?.ToString() ?? string.Empty);
+        content.Add(new StringContent(((int)documentDto.State).ToString()), "State");
+        content.Add(new StringContent(((int)documentDto.Type).ToString()), "Type");
+
+        var response = await httpClient.PostAsync($"{IDocumentService.ApiTemplatePath}/upload-template-documents",
+            content);
+
+        if (response.IsSuccessStatusCode)
+            return new BaseDTOResponse<BaseTemplateDocViewModel>($"Succces {response.Content.ReadAsStringAsync() }", true);
+
+
+        return new BaseDTOResponse<BaseTemplateDocViewModel>("Error while uploading template document");
+    }
 }

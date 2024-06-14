@@ -39,4 +39,7 @@ public interface IDocumentService
     public Task<BaseDTOResponse<BaseStandaloneDocViewModel>> UploadStandaloneDocumentContentAsync(
         BaseCreateStandaloneDocumentStream documentDto);
 
+
+    public Task<BaseDTOResponse<BaseTemplateDocViewModel>> UploadTemplateDocumentContentAsync(
+        BaseCreateTemplateDocumentStream documentDto);
 }

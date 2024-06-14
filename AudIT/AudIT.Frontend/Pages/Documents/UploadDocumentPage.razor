@@ -68,11 +68,12 @@
                         <RadzenLabel Text="Version" Component="version"></RadzenLabel>
                         <RadzenNumeric TValue="int" @bind-Value="@documentVersion"></RadzenNumeric>
 
-                        <RadzenLabel Text="Type" Component="type"></RadzenLabel>
+                        <RadzenLabel Text="State" Component="state"></RadzenLabel>
                         <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentTypeChanged" Data="@_documentTypes"/>
 
 
-                        <RadzenLabel Text="State" Component="state"></RadzenLabel>
+
+                        <RadzenLabel Text="Type" Component="type"></RadzenLabel>
                         @* <RadzenListBox  bind-Value="@_selectedDocumentState" Name="state" Data="_documentStates"/> *@
                         <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentStateChanged" Data="@_documentStates"/>
                     }

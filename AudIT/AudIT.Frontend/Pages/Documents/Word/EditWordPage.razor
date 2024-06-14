@@ -6,108 +6,201 @@
 
 @using Frontend.Contracts.Abstract_Services.DocumentService
 @using Frontend.EntityDtos.Document.Standalone
+@using Frontend.EntityDtos.Document.Template
+@using Frontend.EntityViewModels.Documents
 @using Microsoft.AspNetCore.WebUtilities
 @using Syncfusion.Blazor.DocumentEditor
 
 
+<RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Center">
+    <RadzenCard Variant="Variant.Outlined">
+
+    </RadzenCard>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+        <SfDocumentEditorContainer Width="85%" ShowPropertiesPane="true" @ref="@container" Height="100%">
+        </SfDocumentEditorContainer >
+        <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start">
+            <RadzenLabel Text="Version" Component="version"></RadzenLabel>
+            <RadzenNumeric TValue="int" @bind-Value="@documentVersion"></RadzenNumeric>
+
+            <RadzenLabel Text="State" Component="state"></RadzenLabel>
+            <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentTypeChanged" Data="@_documentTypes"/>
 
 
-<RadzenStack Orientation="Orientation.Vertical">
- <RadzenCard Variant="Variant.Outlined">
-  <RadzenStack Orientation="Orientation.Horizontal">
-   <RadzenButton Text="Save" Click="@SaveDocument"></RadzenButton>
-  </RadzenStack>
- </RadzenCard>
- <SfDocumentEditorContainer Width="85%" ShowPropertiesPane="false" @ref="@container" Height="100%">
- </SfDocumentEditorContainer >
+            <RadzenLabel Text="Type" Component="type"></RadzenLabel>
+            @* <RadzenListBox  bind-Value="@_selectedDocumentState" Name="state" Data="_documentStates"/> *@
+            <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentStateChanged" Data="@_documentStates"/>
+
+            <RadzenButton Text="Save" Click="@SaveDocument"></RadzenButton>
+        </RadzenStack>
+        </RadzenCard>
+
+        @code{
+
+            private bool templateDocumentSelected { get; set; } = false;
+
+            void OnDocumentTypeChanged(string newType)
+            {
+                Console.WriteLine($"Selected activity type: {newType}");
+                _selectedDocumentType = newType;
+            }
+
+            void OnDocumentStateChanged(string newState)
+            {
+                Console.WriteLine($"Selected activity type: {newState}");
+                _selectedDocumentState = newState;
+            }
+
+        }
+
+    </RadzenStack>
 
 </RadzenStack>
 
 
-
-
-
-
-
 @code {
 
+    private List<string> _documentTypes = Enum.GetNames(typeof(TemplateTypeStage)).ToList();
 
+    private List<string> _documentStates = Enum.GetNames(typeof(DocumentState)).ToList();
+    SfDocumentEditorContainer container;
 
-      SfDocumentEditorContainer container;
+    private int documentVersion { get; set; } = 0;
 
+    private string _selectedDocumentType { get; set; } = String.Empty;
+    private string _selectedDocumentState { get; set; } = String.Empty;
 
-    protected override void OnInitialized()
+    private string _extension = String.Empty;
+    private string _documentName = String.Empty;
+
+    protected override async void OnInitialized()
     {
-     var uri = _navigationManager.Uri;
+        var uri = _navigationManager.Uri;
+        var SupportedExtensions = new List<string> { ".docx", ".doc", ".txt" };
+        // Parse the query parameters
+        var queryParameters = QueryHelpers.ParseQuery(new Uri(uri).Query);
 
-     // Parse the query parameters
-     var queryParameters = QueryHelpers.ParseQuery(new Uri(uri).Query);
-
-     // Try to get the documentName parameter
-     if (queryParameters.TryGetValue("documentName", out var documentName))
-     {
-      // Use the document name
-      documentName = documentName.First();
-      FetchDocument(documentName);
-
-     }
-
-
+        // Try to get the documentName parameter
+        if (queryParameters.TryGetValue("documentName", out var documentName))
+        {
+            // Use the document name\
+            var value = documentName.FirstOrDefault();
+            if (value != null)
+            {
+                _documentName = value;
+                await FetchDocument(value);
+                if (SupportedExtensions.Contains(Path.GetExtension(value)))
+                {
+                }
+                else
+                {
+                    // _navigationManager.NavigateTo("/documents");
+                }
+            }
+        }
     }
 
-    private async void SaveDocument(MouseEventArgs obj)
+    private async void SaveDocument()
     {
-     var editor = container.DocumentEditor;
-     // await editor.SaveAsync("sample.docx", FormatType.Docx);
+        try
+        {
+            var editor = container.DocumentEditor;
+            // await editor.SaveAsync("sample.docx", FormatType.Docx);
 
-     var edited_document = await editor.SaveAsBlobAsync(FormatType.Docx);
+            string edited_document = String.Empty;
+            switch (_extension)
+            {
+                case ".docx":
+                    edited_document = await editor.SaveAsBlobAsync(FormatType.Docx);
+                    break;
 
-     var content = Convert.FromBase64String(edited_document);
+                case ".doc":
+                    edited_document = await editor.SaveAsBlobAsync(FormatType.Docx);
+                    break;
 
-     var command = new BaseCreateStandaloneDocumentStream();
+                case ".txt":
+                    edited_document = await editor.SaveAsBlobAsync(FormatType.Txt);
+                    break;
+
+                default:
+                    _notificationService.Notify(NotificationSeverity.Error, "Cannot save document this type");
+                    break;
+            }
 
 
-     command.DepartmentId = Guid.Parse("CE2CE527-16F6-4E4D-8971-4D4B6A58CCA5");
-     command.Name = "sample.docx";
-     var uploadStream = new MemoryStream(content);
-     command.UploadDocument = uploadStream;
+            var content = Convert.FromBase64String(edited_document);
+
+            var command = new BaseCreateTemplateDocumentStream();
+
+            command.Version = documentVersion.ToString();
+            command.State = (DocumentState)Enum.Parse(typeof(DocumentState), _selectedDocumentState);
+            command.Type =  (TemplateTypeStage)Enum.Parse(typeof(TemplateTypeStage), _selectedDocumentType);
 
 
-   var result =   await _documentService.UploadStandaloneDocumentContentAsync(command);
+            command.Name = _documentName;
 
-   if (result.Success)
-   {
-    _notificationService.Notify(NotificationSeverity.Success, "Document saved successfully");
-    //clear the editor
-    await editor.OpenBlankAsync();
-   }
-   else
-   {
-    _notificationService.Notify(NotificationSeverity.Error, "Document not saved");
-   }
 
+            var uploadStream = new MemoryStream(content);
+
+            command.UploadDocuments.Add(uploadStream);
+
+
+            var result = await _documentService.UploadTemplateDocumentContentAsync(command);
+
+            if (result.Success)
+            {
+                _notificationService.Notify(NotificationSeverity.Success, $"Document saved successfully");
+                //clear the editor
+                // await editor.OpenBlankAsync();
+            }
+            else
+            {
+                _notificationService.Notify(NotificationSeverity.Error, "Document not saved");
+            }
+
+            //make null the stream
+            uploadStream = null;
+            // //make null the content
+            content = null;
+        }
+        catch (Exception e)
+        {
+            _notificationService.Notify(NotificationSeverity.Error, e.Message);
+        }
     }
 
-    private async  Task FetchDocument(string value)
+    private async Task FetchDocument(string value)
     {
-      var stream = await _documentService.DownloadTemplateDocumentAsync(value);
-      if (stream != null)
-      {
-       var extension = Path.GetExtension(value);
+        var stream = await _documentService.DownloadTemplateDocumentAsync(value);
+        if (stream != null)
+        {
+            var extension = Path.GetExtension(value);
+            _extension = extension;
+            // Load the stream into the document editor
+            switch (extension)
+            {
+                case ".docx":
+                    await container.DocumentEditor.OpenAsync(stream, ImportFormatType.Docx);
+                    break;
 
-       // Load the stream into the document editor
+                case ".doc":
+                    await container.DocumentEditor.OpenAsync(stream, ImportFormatType.Doc);
+                    break;
 
-       await container.DocumentEditor.OpenAsync(stream,ImportFormatType.Txt);
+                case ".txt":
+                    await container.DocumentEditor.OpenAsync(stream, ImportFormatType.Txt);
+                    break;
 
-      }
-      else
-      {
-       throw new Exception("Document not found");
-      }
-
-
-
-
+                default:
+                    _navigationManager.NavigateTo("/documents");
+                    break;
+            }
+        }
+        else
+        {
+            throw new Exception("Document not found");
+        }
     }
 
 }

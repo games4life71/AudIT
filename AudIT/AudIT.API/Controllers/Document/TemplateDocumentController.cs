@@ -19,13 +19,16 @@ public class TemplateDocumentController : BaseController
         {
             foreach (var file in files)
             {
+
+
+
                 StringBuilder key = new StringBuilder();
                 var fileExtension = file.FileName.Split('.').Last();
                 key.Append("template-documents/");
                 key.Append(file.FileName.Split('.').First());
                 key.Append('.');
                 key.Append(fileExtension);
-
+                Console.WriteLine("The key is "  + key.ToString());
                 var uploadResult = Mediator.Send(new UploadStandDoc(file, key.ToString()));
 
                 if (!uploadResult.Result.Item1)
