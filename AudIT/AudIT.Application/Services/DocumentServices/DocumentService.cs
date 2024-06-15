@@ -6,6 +6,9 @@ using AudIT.Applicationa.Contracts.DocumentServices;
 using AudIT.Domain.Misc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Syncfusion.DocIO;
+using Syncfusion.DocIO.DLS;
+using Syncfusion.DocIORenderer;
 using Syncfusion.Pdf;
 using Syncfusion.XlsIO;
 using Syncfusion.XlsIORenderer;
@@ -201,9 +204,39 @@ public class DocumentService(IConfiguration _configuration) : IDocumentManager
                     return (true, stream);
                 }
             }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return (false, null);
+        }
 
+        return (false, null);
+    }
 
+    public async Task<(bool, Stream)> ConvertDocToPdfAsync(GetObjectResponse response, string key)
+    {
+        try
+        {
+            var extension = key.Split('.').Last();
 
+            if (extension == "docx" || extension == "doc")
+            {
+                //copy the response stream to a memory stream
+                MemoryStream docStream = new MemoryStream();
+                await response.ResponseStream.CopyToAsync(docStream);
+                docStream.Position = 0;
+
+                using (WordDocument wordDocument =
+                       new WordDocument(docStream, FormatType.Automatic))
+                {
+                    DocIORenderer renderer = new DocIORenderer();
+                    PdfDocument pdfDocument = renderer.ConvertToPDF(wordDocument);
+                    Stream stream = new MemoryStream();
+                    pdfDocument.Save(stream);
+                    return (true, stream);
+                }
+            }
         }
         catch (Exception e)
         {

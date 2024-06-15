@@ -162,4 +162,32 @@ public class ActivityService(HttpClient httpClient) : IActivityService
             Message = "An error occurred while updating activity"
         };
     }
+
+    public async Task<BaseDTOResponse<ActivityWithDepartViewModel>> AttachDocumentAsync(Guid activityId,
+        Guid baseDocumentId)
+    {
+        var command = new AttachDocumentToActivityDto
+        {
+            activityId = activityId,
+            baseDocumentId = baseDocumentId
+        };
+
+
+        var response = await httpClient.PostAsJsonAsync($"{IActivityService.ApiPath}/attach-document", command);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<ActivityWithDepartViewModel>>(content);
+
+            if (result != null) return result;
+        }
+
+        return new BaseDTOResponse<ActivityWithDepartViewModel>
+        {
+            Success = false,
+            Message = "An error occurred while attaching document to activity"
+        };
+    }
 }

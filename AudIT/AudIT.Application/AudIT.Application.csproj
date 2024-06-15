@@ -21,6 +21,8 @@
       <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.3.1" />
       <PackageReference Include="OpenXMLTemplates" Version="2.0.6" />
       <PackageReference Include="RazorLight" Version="2.3.1" />
+      <PackageReference Include="Syncfusion.DocIO.Net.Core" Version="26.1.35" />
+      <PackageReference Include="Syncfusion.DocIORenderer.Net.Core" Version="26.1.35" />
       <PackageReference Include="Syncfusion.XlsIORenderer.Net.Core" Version="26.1.35" />
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.3.1" />
     </ItemGroup>

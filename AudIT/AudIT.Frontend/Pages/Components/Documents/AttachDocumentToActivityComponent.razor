@@ -1,0 +1,72 @@
+﻿@using Frontend.Contracts.Abstract_Services.ActivityService
+@using Frontend.EntityViewModels.Activity
+@using Orientation = Radzen.Orientation
+@inject DialogService _dialogService
+@inject IActivityService _activityService
+@inject NotificationService _notificationService
+<RadzenStack Orientation="Orientation.Vertical">
+
+    <RadzenLabel Text="Activity Name " Component="forName"></RadzenLabel>
+    <RadzenListBox
+        Data="_activities"
+        TextProperty="Name"
+        ValueProperty="Id"
+        TValue="Guid"
+        @bind-Value="@_selectedActivityId"/>
+
+    <RadzenButton Text="Attach Document" Click="@(() => OpenSelectActivityDialog())" ButtonStyle="ButtonStyle.Primary"/>
+</RadzenStack>
+
+
+@code {
+    private List<BaseActivityViewmodel> _activities = [];
+
+    private Guid _selectedActivityId = Guid.Empty;
+
+    [Parameter] public Guid AuditMissionId { get; set; }
+
+    [Parameter] public Guid DocumentId { get; set; }
+}
+
+@functions
+{
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await _activityService.GetActivitiesByAuditMissionIdAsync(AuditMissionId);
+
+        if (response.Success)
+        {
+            _activities = response.DtoResponses;
+
+        }
+
+    }
+
+
+
+
+
+    private async  Task OpenSelectActivityDialog()
+    {
+        var response = await _dialogService.Confirm("Are you sure you want to attach this document to the selected activity?", "Attach Document to Activity", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+        if (response.Value)
+        {
+
+            var result = await _activityService.AttachDocumentAsync(_selectedActivityId, DocumentId);
+
+            if (result.Success)
+            {
+                _notificationService.Notify(NotificationSeverity.Success, "Document attached to activity successfully");
+                _dialogService.Close();
+            }
+            else
+            {
+                _notificationService.Notify(NotificationSeverity.Error, "Failed to attach document to activity");
+            }
+
+        }
+
+
+    }
+}

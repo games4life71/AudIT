@@ -145,7 +145,29 @@ public class StandaloneDocumentController(IDocumentManager documentManager) : Ba
                 return new FileStreamResult(pdfStream, "application/pdf");
 
             }
+            else if (key.Split('.').Last() == "doc" || key.Split('.').Last() == "docx")
+            {
 
+                var pdfResult = await documentManager.ConvertDocToPdfAsync(result.Item2, key);
+
+                if (!pdfResult.Item1)
+                {
+                    return BadRequest("Failed to convert document to pdf");
+                }
+
+                // Check if the stream has any content
+                if (pdfResult.Item2.Length == 0)
+                {
+                    return BadRequest("The converted PDF is empty");
+                }
+                pdfResult.Item2.Position = 0;
+                var pdfStream = new MemoryStream();
+                await pdfResult.Item2.CopyToAsync(pdfStream);
+                pdfStream.Position = 0;
+                pdfResult.Item2.Dispose();
+                return new FileStreamResult(pdfStream, "application/pdf");
+
+            }
             if (!result.Item1)
             {
                 return BadRequest("Failed to download document");

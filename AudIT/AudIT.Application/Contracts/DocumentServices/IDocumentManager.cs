@@ -21,5 +21,8 @@ public interface IDocumentManager
     Task<(bool success, string message, string version)> UploadBigDocumentAsync(IFormFile requestFile, string requestKey, bool b);
 
     public Task<(bool, Stream)> ConvertExcelToPdfAsync(GetObjectResponse response, string key);
+    public Task<(bool, Stream)> ConvertDocToPdfAsync(GetObjectResponse response, string key);
+
+
 
 }

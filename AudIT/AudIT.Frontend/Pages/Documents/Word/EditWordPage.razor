@@ -13,30 +13,36 @@
 
 
 <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Center">
-    <RadzenCard Variant="Variant.Outlined">
-
-    </RadzenCard>
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
-        <SfDocumentEditorContainer Width="85%" ShowPropertiesPane="true" @ref="@container" Height="100%">
-        </SfDocumentEditorContainer >
-        <RadzenCard Variant="Variant.Outlined">
-        <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start">
-            <RadzenLabel Text="Version" Component="version"></RadzenLabel>
-            <RadzenNumeric TValue="int" @bind-Value="@documentVersion"></RadzenNumeric>
-
-            <RadzenLabel Text="State" Component="state"></RadzenLabel>
-            <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentTypeChanged" Data="@_documentTypes"/>
+    @if(!loaded)
+    {
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    }
+    else
+    {
 
 
-            <RadzenLabel Text="Type" Component="type"></RadzenLabel>
-            @* <RadzenListBox  bind-Value="@_selectedDocumentState" Name="state" Data="_documentStates"/> *@
-            <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentStateChanged" Data="@_documentStates"/>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
+            <SfDocumentEditorContainer Width="85%" ShowPropertiesPane="true" @ref="@container" Height="100%">
+            </SfDocumentEditorContainer >
 
-            <RadzenButton Text="Save" Click="@SaveDocument"></RadzenButton>
-        </RadzenStack>
-        </RadzenCard>
+                <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start">
+                    <RadzenLabel Text="Version" Component="version"></RadzenLabel>
+                    <RadzenNumeric TValue="int" @bind-Value="@documentVersion"></RadzenNumeric>
 
-        @code{
+                    <RadzenLabel Text="State" Component="state"></RadzenLabel>
+                    <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentTypeChanged" Data="@_documentTypes"/>
+
+
+                    <RadzenLabel Text="Type" Component="type"></RadzenLabel>
+                    @* <RadzenListBox  bind-Value="@_selectedDocumentState" Name="state" Data="_documentStates"/> *@
+                    <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentStateChanged" Data="@_documentStates"/>
+
+                    <RadzenButton Text="Save" Click="@SaveDocument"></RadzenButton>
+                </RadzenStack>
+
+            @code{
 
             private bool templateDocumentSelected { get; set; } = false;
 
@@ -54,8 +60,8 @@
 
         }
 
-    </RadzenStack>
-
+        </RadzenStack>
+    }
 </RadzenStack>
 
 
@@ -74,6 +80,8 @@
     private string _extension = String.Empty;
     private string _documentName = String.Empty;
 
+
+    private bool loaded  = false;
     protected override async void OnInitialized()
     {
         var uri = _navigationManager.Uri;
@@ -153,6 +161,7 @@
                 _notificationService.Notify(NotificationSeverity.Success, $"Document saved successfully");
                 //clear the editor
                 // await editor.OpenBlankAsync();
+
             }
             else
             {
@@ -172,6 +181,8 @@
 
     private async Task FetchDocument(string value)
     {
+
+
         var stream = await _documentService.DownloadTemplateDocumentAsync(value);
         if (stream != null)
         {
@@ -182,14 +193,17 @@
             {
                 case ".docx":
                     await container.DocumentEditor.OpenAsync(stream, ImportFormatType.Docx);
+                    loaded = true;
                     break;
 
                 case ".doc":
                     await container.DocumentEditor.OpenAsync(stream, ImportFormatType.Doc);
+                    loaded = true;
                     break;
 
                 case ".txt":
                     await container.DocumentEditor.OpenAsync(stream, ImportFormatType.Txt);
+                    loaded = true;
                     break;
 
                 default:

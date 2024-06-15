@@ -1,14 +1,15 @@
-﻿@page "/view-pdf/{documentName}"
+﻿@page "/view-pdf"
 @using Frontend.Contracts.Abstract_Services.DocumentService
+@using Microsoft.AspNetCore.WebUtilities
 @using Syncfusion.Blazor.PdfViewer
 @inject IDocumentService _documentService
-<h3>ViewStandaloneDocumentPage</h3>
+@inject NavigationManager navigationManager
 
 
 @if (display)
 {
     <RadzenColumn>
-        <PdfViewer Url="@string.Format("data:application/pdf;base64,{0}", pdfBase64String)"/>
+        <PdfViewer  Url="@string.Format("data:application/pdf;base64,{0}", pdfBase64String)"/>
     </RadzenColumn>
 }
 
@@ -27,33 +28,46 @@ else
 
     bool display = false;
 
-    [Parameter] public string documentName { get; set; }
+    public string documentName { get; set; } = String.Empty;
+
     protected override async Task OnInitializedAsync()
     {
         // Get the document from the databaseThe PDF file is empty, i.e. its size is zero bytes.
-        var document = await _documentService.DownloadStandaloneDocumentAsync(documentName);
 
-        // Convert the document to a base64 string
-        if (document != null)
+        var uri = navigationManager.Uri;
+
+        var queryParams = QueryHelpers.ParseQuery(new Uri(uri).Query);
+
+
+        if (queryParams.TryGetValue("documentName", out var documentNameParam))
         {
-            display = true;
+            var name = documentNameParam.FirstOrDefault();
 
-            // Convert the response stream to a byte array
-            byte[] byteArray;
-            using (var memoryStream = new MemoryStream())
+            if (name != null)
             {
-                await document.CopyToAsync(memoryStream);
-                byteArray = memoryStream.ToArray();
+                documentName = name;
+                var document = await _documentService.DownloadStandaloneDocumentAsync(documentName);
+
+                if (document != null)
+                {
+                    display = true;
+
+                    // Convert the response stream to a byte array
+                    byte[] byteArray;
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await document.CopyToAsync(memoryStream);
+                        byteArray = memoryStream.ToArray();
+                    }
+
+                    // Convert the byte array to a base64 string
+                    string base64String = Convert.ToBase64String(byteArray);
+
+                    pdfBase64String = base64String;
+                }
             }
-
-            // Convert the byte array to a base64 string
-            string base64String = Convert.ToBase64String(byteArray);
-
-            pdfBase64String = base64String;
         }
 
-        // Set the base64 string as the document path for the PDF Viewer
     }
-
 
 }

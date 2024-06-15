@@ -19,4 +19,5 @@ public interface IActivityService
 
     public Task<BaseDTOResponse<ActivityWithDepartViewModel>> UpdateActivityAsync(UpdateActivityDto updateActivityViewModel);
 
+    public Task<BaseDTOResponse<ActivityWithDepartViewModel>> AttachDocumentAsync(Guid activityId, Guid baseDocumentId);
 }

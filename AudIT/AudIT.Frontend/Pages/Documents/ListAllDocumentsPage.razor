@@ -1,59 +1,98 @@
 ﻿@page "/documents"
+@using Frontend.Contracts.Abstract_Services.ActivityService
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
 @using Frontend.Contracts.Abstract_Services.DocumentService
 @using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityViewModels.Activity
 @using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
 @using Frontend.EntityViewModels.Document
 @using Frontend.EntityViewModels.Documents
+@using Frontend.Pages.Components.Documents
 @inject  IDocumentService _documentService
 @inject NotificationService _notificationService
-@inject DialogService _dialogService
 @inject NavigationManager _navigationManager
 @inject ICurrentUserAuditMissionService _currentUserAuditMissionService
 @inject IAuditMissionService _auditMissionService
+@inject IActivityService _activityService
+@inject DialogService _dialogService
 @using Orientation = Radzen.Orientation
+
+
 <RadzenStack Orientation="Orientation.Vertical">
     <RadzenCard Variant="Variant.Outlined">
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
-        <RadzenText TextStyle="TextStyle.H4" class="rz-mb-6" Text="@($"Your saved documents")"></RadzenText>
-        <RadzenStack Orientation="Orientation.Horizontal">
-            @if (_auditMission.Id != Guid.Empty)
-            {
-                <RadzenLink Path="@($"/audit-mission/{_auditMission.Id}")">
-                    <RadzenText Text="@($"Selected Audit Mission: {_auditMission.Name}")"></RadzenText>
-                </RadzenLink>
-            }
-            else
-            {
-                <RadzenLink Path="@($"/audit-missions")">
-                    <RadzenText Text="Please select an audit mission "></RadzenText>
-                </RadzenLink>
-            }
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenText TextStyle="TextStyle.H4" class="rz-mb-6" Text="@($"Your saved documents")"></RadzenText>
+            <RadzenStack Orientation="Orientation.Horizontal">
+                @if (_auditMission.Id != Guid.Empty)
+                {
+                    <RadzenLink Path="@($"/audit-mission/{_auditMission.Id}")">
+                        <RadzenText Text="@($"Selected Audit Mission: {_auditMission.Name}")"></RadzenText>
+                    </RadzenLink>
+                }
+                else
+                {
+                    <RadzenLink Path="@($"/audit-missions")">
+                        <RadzenText Text="Please select an audit mission "></RadzenText>
+                    </RadzenLink>
+                }
+
+            </RadzenStack>
 
         </RadzenStack>
 
-    </RadzenStack>
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenDataGrid @ref="@docGrid" AllowColumnResize="true" AllowColumnPicking="true" AllowSorting="true" Data="@_documents" TItem="BaseDocumentViewModel" AllowFiltering="true">
+                <Columns>
+                    <RadzenDataGridColumn Title="Name" Property="Name"/>
+                    <RadzenDataGridColumn Title="Extension" Property="Extension"/>
+                    <RadzenDataGridColumn Title="Type" Property="DocumentType"/>
+                    <RadzenDataGridColumn>
+                        <Template Context="document">
+                            <RadzenStack JustifyContent="JustifyContent.Center" Wrap="FlexWrap.WrapReverse" Orientation="Orientation.Horizontal">
+                                <RadzenButton Click="@(() => NavigateDocumentDetails(document))"
+                                              ButtonStyle="ButtonStyle.Dark"
+                                              Icon="visibility"
+                                              Text=@(GetButtonText(document))>
+                                </RadzenButton>
+                                <RadzenButton Click="@(() => NavigateDeleteDocument(document))"
+                                              ButtonStyle="ButtonStyle.Danger"
+                                              Icon="delete"
+                                              Text="">
+                                </RadzenButton>
+                                <RadzenButton
 
-    <RadzenStack Orientation="Orientation.Vertical">
-        <RadzenDataGrid @ref="@docGrid" AllowColumnResize="true" AllowColumnPicking="true" AllowSorting="true" Data="@_documents" TItem="BaseDocumentViewModel" AllowFiltering="true">
-            <Columns>
-                <RadzenDataGridColumn Title="Name" Property="Name"/>
-                <RadzenDataGridColumn Title="Extension" Property="Extension"/>
-                <RadzenDataGridColumn Title="Type" Property="DocumentType"/>
-                <RadzenDataGridColumn>
-                    <Template Context="document">
-                        <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
-                            <RadzenButton Click="@(()=>NavigateDocumentDetails(document))" ButtonStyle="ButtonStyle.Dark" Text="More details"></RadzenButton>
-                            <RadzenButton Click="@(()=>NavigateDeleteDocument(document))" ButtonStyle="ButtonStyle.Danger" Icon="delete" Text="Delete"></RadzenButton>
-                        </RadzenStack>
-                    </Template>
-                </RadzenDataGridColumn>
+                                    Click="@(() => OpenSelectActivityDialog(document))"
+                                    Icon="add_link"
+                                    ButtonStyle="ButtonStyle.Primary"
+                                    Text="Attach to Activity"/>
 
-            </Columns>
-        </RadzenDataGrid>
-        <RadzenButton Text="Add new Document" Click="@NavigateAddDocument"  ButtonStyle="ButtonStyle.Dark" ></RadzenButton>
-    </RadzenStack>
+
+
+                            </RadzenStack>
+                        </Template>
+                    </RadzenDataGridColumn>
+
+                    @code{
+
+                        private string GetButtonText(BaseDocumentViewModel document)
+                        {
+                            if (document.DocumentType == DocumentType.Standalone)
+                            {
+                                return "View";
+                            }
+                            else
+                            {
+                                return "Edit";
+                            }
+                        }
+
+                    }
+
+                </Columns>
+            </RadzenDataGrid>
+            <RadzenButton Text="Add new Document" Click="@NavigateAddDocument" ButtonStyle="ButtonStyle.Dark"></RadzenButton>
+        </RadzenStack>
 
     </RadzenCard>
 </RadzenStack>
@@ -61,6 +100,7 @@
 
 @code {
 
+    private Guid selectedActivityId = Guid.NewGuid();
     private List<BaseDocumentViewModel> _documents = [];
 
     private CurrentUserAuditMissionViewModel _currentUserAuditMission { get; set; } = new CurrentUserAuditMissionViewModel();
@@ -68,6 +108,16 @@
     private BaseAuditMissionDto _auditMission { get; set; } = new BaseAuditMissionDto();
 
     private RadzenDataGrid<BaseDocumentViewModel> docGrid;
+
+    private List<BaseActivityViewmodel> _activities;
+
+    private bool disabledActivityList = true;
+
+    public ListAllDocumentsPage()
+    {
+        _activities = new List<BaseActivityViewmodel>();
+    }
+
 }
 
 @functions
@@ -101,20 +151,18 @@
 
     private Task NavigateDocumentDetails(BaseDocumentViewModel document)
     {
-
         if (document.DocumentType == DocumentType.Standalone)
         {
-            _navigationManager.NavigateTo($"/view-pdf/{document.Name}.{document.Extension}");
+            _navigationManager.NavigateTo($"/view-pdf?documentName={document.Name}.{document.Extension}");
         }
 
         else
         {
-            var documentName = document.Name+"."+document.Extension;
+            var documentName = document.Name + "." + document.Extension;
             _navigationManager.NavigateTo($"/edit-word?documentName={documentName}");
         }
 
         return Task.CompletedTask;
-
     }
 
     private void NavigateAddDocument(MouseEventArgs obj)
@@ -122,10 +170,10 @@
         _navigationManager.NavigateTo("/upload-document");
     }
 
-    private async  Task NavigateDeleteDocument(BaseDocumentViewModel document)
+    private async Task NavigateDeleteDocument(BaseDocumentViewModel document)
     {
         var confirmResponse = await _dialogService.Confirm("Are you sure you want to delete this document?",
-            "Delete Document" );
+            "Delete Document");
 
 
         var response = await _documentService.DeleteDocumentAsync(document.Id);
@@ -141,4 +189,32 @@
             _notificationService.Notify(NotificationSeverity.Error, "Failed to delete document");
         }
     }
+
+    private async void OpenSelectActivityDialog(BaseDocumentViewModel document)
+    {
+
+       _dialogService.Open<AttachDocumentToActivityComponent>(
+            "Select Activity"
+            , new Dictionary<string, object>
+        {
+            {"AuditMissionId", _currentUserAuditMission.AuditMissionId},
+            {"DocumentId", document.Id}
+        });
+
+
+        //fetch the activities for the selected audit mission
+        var response = await _activityService.GetActivitiesByAuditMissionIdAsync(_currentUserAuditMission.AuditMissionId);
+
+        if (response.Success)
+        {
+            _activities = response.DtoResponses;
+            disabledActivityList = false;
+        }
+        else
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Failed to fetch activities");
+        }
+    }
+
+
 }
