@@ -13,14 +13,14 @@
 
 
 <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Center">
-    @if(!loaded)
-    {
-        <div class="spinner-border text-primary" role="status">
-            <span class="sr-only">Loading...</span>
-        </div>
-    }
-    else
-    {
+    @* @if(!loaded) *@
+    @* { *@
+    @*     <div class="spinner-border text-primary" role="status"> *@
+    @*         <span class="sr-only">Loading...</span> *@
+    @*     </div> *@
+    @* } *@
+    @* else *@
+    @* { *@
 
 
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start">
@@ -61,7 +61,7 @@
         }
 
         </RadzenStack>
-    }
+
 </RadzenStack>
 
 
@@ -194,16 +194,19 @@
                 case ".docx":
                     await container.DocumentEditor.OpenAsync(stream, ImportFormatType.Docx);
                     loaded = true;
+                    StateHasChanged();
                     break;
 
                 case ".doc":
                     await container.DocumentEditor.OpenAsync(stream, ImportFormatType.Doc);
                     loaded = true;
+                    StateHasChanged();
                     break;
 
                 case ".txt":
                     await container.DocumentEditor.OpenAsync(stream, ImportFormatType.Txt);
                     loaded = true;
+                    StateHasChanged();
                     break;
 
                 default:

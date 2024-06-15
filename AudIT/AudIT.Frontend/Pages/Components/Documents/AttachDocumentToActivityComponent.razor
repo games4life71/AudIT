@@ -44,8 +44,6 @@
 
 
 
-
-
     private async  Task OpenSelectActivityDialog()
     {
         var response = await _dialogService.Confirm("Are you sure you want to attach this document to the selected activity?", "Attach Document to Activity", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });

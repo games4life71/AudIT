@@ -1,18 +1,29 @@
 ﻿@page "/create-objective"
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.DepartmentService
+@using Frontend.Contracts.Abstract_Services.DocumentService
+@using Frontend.Contracts.Abstract_Services.InstitutionsService
 @using Frontend.Contracts.Abstract_Services.ObjectiveActionService
 @using Frontend.Contracts.Abstract_Services.ObjectiveService
 @using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityDtos.Department
+@using Frontend.EntityDtos.Document.Standalone
+@using Frontend.EntityDtos.Document.Template
+@using Frontend.EntityDtos.Institution
 @using Frontend.EntityDtos.Objective
 @using Frontend.EntityDtos.ObjectiveAction
 @using ButtonType = Radzen.ButtonType
 @using Orientation = Radzen.Orientation
 
+@inject IDepartmentService _departmentService
 @inject NotificationService _notificationService
 @inject IObjectiveActionService _objectiveActionService
 @inject IAuditMissionService _auditMissionService
 @inject IObjectiveService _objectiveService
 @inject NavigationManager _navigationManger
+@inject IInstitutionService _institutionService
+@inject IDocumentService _documentService
+
 <RadzenCard>
     <RadzenSteps>
 
@@ -110,8 +121,110 @@
 
                 </RadzenRow>
             </RadzenStepsItem>
-            <RadzenStepsItem Text="Attach Documents (optional)">
+            @* Attach documents*@
 
+            <RadzenStepsItem Text="Attach Documents (optional)">
+                @code{
+
+
+                public bool DepartmentDisabledCheck()
+                {
+                return _institutions.Count == 0 || _departments.Count == 0;
+                }
+
+
+                }
+                <RadzenRow>
+                    <RadzenColumn >
+                        <RadzenStack Orientation="Orientation.Vertical">
+                            <RadzenLabel Text="Institution: "></RadzenLabel>
+                            <RadzenDropDownDataGrid TValue="Guid"
+                                                    Value="_selectedInstitutionId"
+                                                    TextProperty="Name"
+                                                    ValueProperty="Id"
+                                                    Data="_institutions"
+                                                    ValueChanged="@((value) => FetchDepartments(value))"/>
+
+                            <RadzenLabel Text="Department: "></RadzenLabel>
+                            <RadzenDropDownDataGrid TValue="Guid"
+                                                    Disabled="DepartmentDisabledCheck()"
+                                                    TextProperty="Name"
+                                                    ValueProperty="Id"
+                                                    Data="_departments"
+                                                    @bind-Value="@_selectedDepartmentId"/>
+                        </RadzenStack>
+                    </RadzenColumn>
+
+                    <RadzenColumn>
+                        <RadzenStack Orientation="Orientation.Vertical">
+                            <RadzenToggleButton
+                                Click="@ToggleButtonClick"
+                                ToggleShade="Shade.Darker"
+                                Icon="toggle_on"
+                                Variant="Variant.Flat"
+                                Text="Template Document"></RadzenToggleButton>
+
+                            @if (templateDocumentSelected)
+                            {
+                                <RadzenLabel Text="Version" Component="version"></RadzenLabel>
+                                <RadzenNumeric TValue="int" @bind-Value="@documentVersion"></RadzenNumeric>
+
+                                <RadzenLabel Text="State" Component="state"></RadzenLabel>
+                                <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentTypeChanged" Data="@_documentTypes"/>
+
+
+
+                                <RadzenLabel Text="Type" Component="type"></RadzenLabel>
+                                @* <RadzenListBox  bind-Value="@_selectedDocumentState" Name="state" Data="_documentStates"/> *@
+                                <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentStateChanged" Data="@_documentStates"/>
+                            }
+
+                        </RadzenStack>
+
+                    </RadzenColumn>
+
+                </RadzenRow>
+                <RadzenRow>
+                    <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Vertical">
+                        <RadzenLabel Text="Uplod Document"></RadzenLabel>
+                        <RadzenUpload @ref="@uploadForm"
+                                      Multiple="true"
+
+                                      Icon="uploads"
+                                      MaxFileCount="5"
+                                      Change="@((args) => ChangeSelectedFiles(args))">
+
+                        </RadzenUpload>
+
+                    </RadzenStack>
+                </RadzenRow>
+                @* <RadzenStack class="rz-my-4" Orientation="Orientation.Vertical"> *@
+                @*     <RadzenButton Click="@UploadFiles" IsBusy="isBusySubmit" Text="Submit" ButtonStyle="ButtonStyle.Success"></RadzenButton> *@
+                @* </RadzenStack> *@
+
+                @code{
+                private bool templateDocumentSelected { get; set; } = false;
+
+                private void ToggleButtonClick(MouseEventArgs obj)
+                {
+                templateDocumentSelected = !templateDocumentSelected;
+                }
+
+                void OnDocumentTypeChanged(string newType)
+                {
+                Console.WriteLine($"Selected activity type: {newType}");
+                _selectedDocumentType = newType;
+                }
+
+                void OnDocumentStateChanged(string newState)
+                {
+                Console.WriteLine($"Selected activity type: {newState}");
+                _selectedDocumentState = newState;
+                }
+                }
+
+
+                @*Summary and confirm step *@
             </RadzenStepsItem>
             <RadzenStepsItem Text="Summary and confirm">
                 <RadzenRow class="rz-my-6">
@@ -176,14 +289,33 @@
                     <RadzenColumn>
                         <RadzenCard Variant="Variant.Outlined">
                             <RadzenText TextStyle="TextStyle.DisplayH5" Text="Attachd Documents:"></RadzenText>
-                            <RadzenText TextStyle="TextStyle.DisplayH6" TextAlign="TextAlign.Center" Text="No documents attached"></RadzenText>
+                            @if(_selectedFiles.Count > 0)
+                            {
+                                <RadzenCard Variant="Variant.Outlined">
+                                    <RadzenDataList Data="_selectedFiles" TItem="FileInfo">
+                                        <Template Context="file">
+                                            <RadzenRow class="rz-my-2" JustifyContent="JustifyContent.SpaceBetween">
+                                                <RadzenColumn >
+                                                    <RadzenText TextStyle="TextStyle.DisplayH6" Text="@file.Name"></RadzenText>
+                                                </RadzenColumn>
+                                            </RadzenRow>
+                                        </Template>
+                                    </RadzenDataList>
+                                </RadzenCard>
+                            }
+                            else
+                            {
+
+                                <RadzenText TextStyle="TextStyle.DisplayH6" TextAlign="TextAlign.Center" Text="No documents attached"></RadzenText>
+                            }
                         </RadzenCard>
                     </RadzenColumn>
-                </RadzenRow>
 
-                <RadzenStack JustifyContent="JustifyContent.End" Orientation="Orientation.Horizontal">
+                </RadzenRow>
+                <RadzenStack class="rz-mt-6" Orientation="Orientation.Vertical" >
                     <RadzenButton IsBusy="@submitButtonBusy" Click="@SumbitCreation" Size="ButtonSize.Large" ButtonStyle="ButtonStyle.Success" Text="Submit"></RadzenButton>
                 </RadzenStack>
+
             </RadzenStepsItem>
 
 
@@ -196,6 +328,25 @@
 
 @code {
 
+
+    //attach documents variables
+    private Guid _selectedInstitutionId { get; set; } = Guid.Empty;
+    private Guid _selectedDepartmentId { get; set; } = Guid.Empty;
+
+    private List<BaseInstitutionDto> _institutions { get; set; } = [];
+    private List<BaseDepartmentDto> _departments { get; set; } = [];
+
+    private int documentVersion { get; set; } = 0;
+
+    private string _selectedDocumentType { get; set; } = String.Empty;
+    private string _selectedDocumentState { get; set; } = String.Empty;
+
+    private List<string> _documentTypes = Enum.GetNames(typeof(TemplateTypeStage)).ToList();
+    private List<string> _documentStates = Enum.GetNames(typeof(DocumentState)).ToList();
+    private List<FileInfo> _selectedFiles = [];
+
+    private RadzenUpload uploadForm;
+    private bool isBusySubmit { get; set; } = false;
 
     private List<BaseAuditMissionDto> _auditMissions = [];
     private bool submitButtonBusy = false;
@@ -220,6 +371,7 @@
     protected async override Task OnInitializedAsync()
     {
         await FetchAuditMissions();
+        await FetchInstitutions();
 
         // _addedObjActions.Add(new CreateObjectiveActionDto());
     }
@@ -358,6 +510,10 @@
             submitButtonBusy = false;
             _notificationService.Notify(NotificationSeverity.Error, "Failed to create objective", "The objective was not created successfully");
         }
+        //save the documents
+        UploadFiles();
+
+
     }
 
     //Save the objective action into the 2 lists
@@ -407,4 +563,131 @@
 
         StateHasChanged();
     }
+
+
+
+    //attach document functions
+
+    private async Task FetchInstitutions()
+    {
+        var result = await _institutionService.GetAllInstitutionsAsync();
+
+        if (result.Success && result.DtoResponses.Count > 0)
+        {
+            _institutions = result.DtoResponses;
+        }
+    }
+
+    private async Task FetchDepartments(Guid value)
+    {
+        _selectedInstitutionId = value;
+
+        var result = await _departmentService.GetDepartmentsByInstitutionIdAsync(value);
+
+        if (result.Success && result.DtoResponses.Count > 0)
+        {
+            _departments = result.DtoResponses;
+        }
+    }
+
+    private async void UploadFiles()
+    {
+        try
+        {
+            if (!templateDocumentSelected)
+            {
+                //upload a normal document
+                if (_selectedFiles.Count == 1)
+                {
+                    var command = new BaseCreateStandaloneDocument();
+
+                    command.DepartmentId = _selectedDepartmentId;
+                    command.UploadDocument = _selectedFiles.First();
+
+                    var result = await _documentService.UploadStandaloneDocumentAsync(command);
+
+                    if (result.Success)
+                    {
+                        _notificationService.Notify(NotificationSeverity.Success, "Document uploaded successfully");
+                        //clear the selected files
+                        _selectedFiles.Clear();
+                        _selectedDepartmentId = Guid.Empty;
+                        _selectedInstitutionId = Guid.Empty;
+                        await uploadForm.ClearFiles();
+                    }
+                    else
+                    {
+                        _notificationService.Notify(NotificationSeverity.Error, "Document upload failed");
+                    }
+                }
+
+                else
+                {
+                    var command = new MultipleCreateStandaloneDocument();
+
+                    command.DepartmentId = _selectedDepartmentId;
+                    command.UploadDocuments = _selectedFiles;
+
+                    var result = await _documentService.UploadMultipleStandaloneDocsAsync(command);
+
+                    if (result.Success)
+                    {
+                        _notificationService.Notify(NotificationSeverity.Success, "Documents uploaded successfully");
+                        //clear the selected files
+                        _selectedFiles.Clear();
+                        _selectedDepartmentId = Guid.Empty;
+                        _selectedInstitutionId = Guid.Empty;
+                        await uploadForm.ClearFiles();
+                    }
+                    else
+                    {
+                        _notificationService.Notify(NotificationSeverity.Error, "Document upload failed");
+                    }
+                }
+            }
+            else
+            {
+                isBusySubmit = true;
+                var command = new BaseCreateTemplateDocumentDto();
+
+                command.Version = documentVersion.ToString();
+                //find the state in DocumentState enum
+                command.State = (DocumentState)Enum.Parse(typeof(DocumentState),_selectedDocumentState);
+                command.Type = (TemplateTypeStage)Enum.Parse(typeof(TemplateTypeStage),_selectedDocumentType);
+
+
+                command.Files = _selectedFiles;
+
+                var result = await _documentService.UploadTemplateDocumentAsync(command);
+
+                if (result.Success)
+                {
+                    _notificationService.Notify(NotificationSeverity.Success, "Document uploaded successfully");
+                    //clear the selected files
+                    _selectedFiles.Clear();
+                    _selectedDepartmentId = Guid.Empty;
+                    _selectedInstitutionId = Guid.Empty;
+                    await uploadForm.ClearFiles();
+                }
+                else
+                {
+                    _notificationService.Notify(NotificationSeverity.Error, "Document upload failed");
+                }
+                isBusySubmit = false;
+                StateHasChanged();
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    private Task ChangeSelectedFiles(UploadChangeEventArgs args)
+    {
+        _selectedFiles = args.Files.ToList();
+        return Task.CompletedTask;
+    }
+
 }
