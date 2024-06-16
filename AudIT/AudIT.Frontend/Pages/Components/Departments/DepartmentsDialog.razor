@@ -1,0 +1,41 @@
+﻿@using Frontend.EntityDtos.Department
+@using Orientation = Radzen.Orientation
+@inject DialogService _dialogService
+
+<RadzenStack Orientation="Orientation.Vertical">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation=" Orientation.Vertical">
+            <RadzenDataGrid Data="Departments" TItem="BaseDepartmentDto">
+                <Columns>
+                    <RadzenDataGridColumn Title="Name" Property="Name"/>
+                    <RadzenDataGridColumn Title="Address" Property="Address"/>
+                    <RadzenDataGridColumn Title="HomePhoneNumber" Property="HomePhoneNumber"/>
+
+                </Columns>
+            </RadzenDataGrid>
+
+            <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+                <RadzenButton Text="Configure" Click="@ConfigureDepartments" ButtonStyle="ButtonStyle.Warning" Icon="settings"/>
+                <RadzenButton Click="@CloseDialog" Text="Close" ButtonStyle="ButtonStyle.Info" Icon="close"/>
+
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+</RadzenStack>
+
+@code {
+
+
+    [Parameter] public List<BaseDepartmentDto> Departments { get; set; }
+
+    private void ConfigureDepartments(MouseEventArgs obj)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void CloseDialog(MouseEventArgs obj)
+    {
+        _dialogService.Close();
+    }
+
+}

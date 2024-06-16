@@ -12,5 +12,8 @@ public class InstitutionProfile : MyCustomProfile
         CreateMap<Institution, BaseInstitutionDto>();
         CreateMap<CreateInstitutionCommand, Institution>();
         CreateMap<BaseInstitutionDto, Institution>();
+        CreateMap<InstitutionInfoDto, Institution>();
+        CreateMap<Institution, InstitutionInfoDto>();
+
     }
 }

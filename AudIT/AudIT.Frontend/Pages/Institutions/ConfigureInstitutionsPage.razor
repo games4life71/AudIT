@@ -1,0 +1,139 @@
+﻿@page "/institutions"
+@using Frontend.Contracts.Abstract_Services.InstitutionsService
+@using Frontend.EntityDtos.Institution
+@using Frontend.EntityViewModels.Institution
+@using Frontend.Pages.Components.Departments
+@using Frontend.Pages.Components.Institution
+@using Orientation = Radzen.Orientation
+@inject IInstitutionService _institutionService
+@inject NotificationService _notificationService
+@inject DialogService _dialogService
+
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenStack Orientation="Orientation.Vertical">
+
+        <RadzenDataGrid
+            @ref="@_institutionsGrid"
+            Data="_institutions"
+            TItem="InstitutionFullViewModel"
+            AllowFiltering="true"
+            AllowPaging="true"
+            AllowSorting="true"
+            ExpandMode="DataGridExpandMode.Multiple">
+            <Columns>
+                <RadzenDataGridColumn Title="Name " Property="Name"/>
+                <RadzenDataGridColumn Title="Adress" Property="Address"/>
+                <RadzenDataGridColumn Title="HomePhoneNumber" Property="HomePhoneNumber"/>
+                <RadzenDataGridColumn>
+                    <Template Context="institution">
+                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+
+                            @code
+                            {
+                                private bool showDepartmentsDisabled(InstitutionFullViewModel institution)
+                                {
+                                    return institution.Departments.Count == 0;
+                                }
+                            }
+
+                            <RadzenButton
+                                Disabled="@showDepartmentsDisabled(institution)"
+                                ButtonStyle="ButtonStyle.Info"
+                                Text="Departments"
+                                Click="@(() => ShowDepartments(institution))"
+                                Icon="info"/>
+                            <RadzenButton Text="Edit" Icon="edit"/>
+                            <RadzenButton Click="@(() => DeleteInstituion(institution))" ButtonStyle="ButtonStyle.Danger" Text="Delete" Icon="delete"/>
+                        </RadzenStack>
+
+                    </Template>
+                </RadzenDataGridColumn>
+
+
+            </Columns>
+        </RadzenDataGrid>
+        <RadzenButton ButtonStyle="ButtonStyle.Dark" Click="@AddInstitution" Text="Add new Institution"></RadzenButton>
+    </RadzenStack>
+</RadzenCard>
+
+
+@code {
+
+    private List<InstitutionFullViewModel> _institutions = [];
+
+    private RadzenDataGrid<InstitutionFullViewModel> _institutionsGrid;
+
+
+}
+
+
+@functions
+{
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchInstitutionsAsync();
+    }
+
+    private async Task FetchInstitutionsAsync()
+    {
+        var response = await _institutionService.GetAllInstitutionsFullAsync();
+
+        if (response.Success)
+        {
+            _institutions = response.DtoResponses;
+        }
+    }
+
+
+    private void AddInstitution(MouseEventArgs obj)
+    {
+        _dialogService.Open<AddInstitutionComponent>(
+            "Add Institution",
+            new Dictionary<string, object> { { "OnInstitutionAdded", new EventCallback<BaseInstitutionDto>(this,OnInstitutionAdded) } },
+            new DialogOptions { Width = "500px", Height = "500px" }
+
+
+            );
+    }
+
+    private async Task OnInstitutionAdded(BaseInstitutionDto institution)
+    {
+        await FetchInstitutionsAsync();
+
+       await  _institutionsGrid.Reload();
+    }
+    private Task ShowDepartments(InstitutionFullViewModel institution)
+    {
+        var departments = _institutions.First(x => x.Id == institution.Id).Departments;
+
+        _dialogService.Open<DepartmentsDialog>(
+            "Departments",
+            new Dictionary<string, object> { { "Departments", departments } });
+
+
+        return Task.CompletedTask;
+    }
+
+    private async Task DeleteInstituion(InstitutionFullViewModel institution)
+    {
+        var resultConfirm = await _dialogService.Confirm("Are you sure you want to delete this institution?", "Delete Institution");
+
+        if (resultConfirm.Value)
+        {
+            var deleteResult = await _institutionService.DeleteInstitutionAsync(institution.Id);
+
+            if (deleteResult.Success)
+            {
+                _notificationService.Notify(NotificationSeverity.Success, "Institution deleted successfully");
+                _institutions.Remove(institution);
+                _institutionsGrid.Reload();
+            }
+            else
+            {
+                _notificationService.Notify(NotificationSeverity.Error, "Failed to delete institution");
+            }
+        }
+    }
+
+}

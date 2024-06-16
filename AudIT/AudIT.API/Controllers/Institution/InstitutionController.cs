@@ -2,18 +2,16 @@
 using AudIT.Applicationa.Requests.Institution.Commands.Create;
 using AudIT.Applicationa.Requests.Institutions.Commands.Delete;
 using AudIT.Applicationa.Requests.Institutions.Queries.GetAll;
+using AudIT.Applicationa.Requests.Institutions.Queries.GetAllIFull;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AudIT.API.Controllers.Institution;
 
-
-
-public class InstitutionController:BaseController
+public class InstitutionController : BaseController
 {
-
     [HttpPost]
-    [Authorize(Roles =UserRoles.Unverified)]
+    [Authorize(Roles = UserRoles.Unverified)]
     [Route("add-institution")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> AddInstitution([FromBody] CreateInstitutionCommand command)
@@ -26,8 +24,8 @@ public class InstitutionController:BaseController
         {
             return BadRequest(result.Message);
         }
-        return Ok(result);
 
+        return Ok(result);
     }
 
     [HttpDelete]
@@ -40,6 +38,7 @@ public class InstitutionController:BaseController
         {
             return BadRequest(result.Message);
         }
+
         return Ok(result);
     }
 
@@ -53,8 +52,21 @@ public class InstitutionController:BaseController
         {
             return BadRequest(result.Message);
         }
+
         return Ok(result);
     }
 
+    [HttpGet]
+    [Route("get-all-institutions-full")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAllInstitutionsFull()
+    {
+        var result = await Mediator.Send(new GetAllInstitutionsFullQuery());
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
 
+        return Ok(result);
+    }
 }

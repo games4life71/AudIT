@@ -1,0 +1,63 @@
+﻿@using Frontend.Contracts.Abstract_Services.InstitutionsService
+@using Frontend.EntityDtos.Institution
+@using Orientation = Radzen.Orientation
+@inject IInstitutionService _institutionService
+@inject NotificationService _notificationService
+@inject DialogService _dialogService
+<RadzenStack Orientation="Orientation.Vertical">
+
+    <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenLabel Text="Name"></RadzenLabel>
+            <RadzenTextBox @bind-Value="@_newInstitution.Name" Placeholder="Name..."></RadzenTextBox>
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenLabel Text="Address"></RadzenLabel>
+            <RadzenTextBox @bind-Value="@_newInstitution.Address" Placeholder="Address..."></RadzenTextBox>
+        </RadzenStack>
+
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenLabel Text="Phone Number"></RadzenLabel>
+            <RadzenMask @bind-Value="@_newInstitution.HomePhoneNumber" Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(00) 0000-0000" Name="Phone"/>
+        </RadzenStack>
+
+    </RadzenStack>
+
+    <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal" class="rz-mt-10">
+        <RadzenButton Text="Cancel" ButtonStyle="ButtonStyle.Info" Click="@ResetStats"></RadzenButton>
+        <RadzenButton Text="Submit" ButtonStyle="ButtonStyle.Success" Click="@AddInstitution"></RadzenButton>
+
+    </RadzenStack>
+</RadzenStack>
+
+
+@code {
+
+    private CreateInstitutionDto _newInstitution = new CreateInstitutionDto();
+
+    [Parameter] public EventCallback<BaseInstitutionDto> OnInstitutionAdded { get; set; }
+
+    private void ResetStats(MouseEventArgs obj)
+    {
+        _dialogService.Close();
+    }
+
+    private async Task AddInstitution(MouseEventArgs obj)
+    {
+        var result = await _institutionService.AddInstitutionAsync(_newInstitution);
+
+        if (result.Success)
+        {
+            _notificationService.Notify(NotificationSeverity.Success, "Institution added successfully");
+
+            var addedInstitution = result.DtoResponse;
+            //send a response
+            await OnInstitutionAdded.InvokeAsync(addedInstitution);
+            _dialogService.Close();
+        }
+    }
+
+}

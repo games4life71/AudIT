@@ -2,11 +2,11 @@
 
 public class BaseInstitutionDto
 {
-    public Guid Id { get; private set; }
+    public Guid Id { get;  set; }
 
-    public string Name { get; private set; }
+    public string Name { get;  set; }
 
-    public string Address { get; private set; }
+    public string Address { get;  set; }
 
     public BaseInstitutionDto(Guid id, string name, string address)
     {
