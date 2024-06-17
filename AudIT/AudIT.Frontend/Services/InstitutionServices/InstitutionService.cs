@@ -85,4 +85,21 @@ public class InstitutionService(HttpClient _httpClient) : IInstitutionService
 
         return new BaseDTOResponse<BaseInstitutionDto>("Error while adding institution", false);
     }
+
+    public async Task<BaseDTOResponse<InstitutionFullViewModel>> EditInstitutionAsync(EditInstitutionDto institution)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"{IInstitutionService.ApiPath}/edit-institution", institution);
+
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<InstitutionFullViewModel>>(content);
+
+            if (result != null) return result;
+        }
+
+        return new BaseDTOResponse<InstitutionFullViewModel>("Error while editing institution", false);
+    }
 }

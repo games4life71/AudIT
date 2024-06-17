@@ -62,6 +62,13 @@ public class Institution : AuditableEntity
         return Result<Institution>.Success(new Institution(name, address, homePhoneNumber));
     }
 
+    public void Update(string name, string address, string homePhoneNumber)
+    {
+        Name = name;
+        Address = address;
+        HomePhoneNumber = homePhoneNumber;
+    }
+
     private void AddInstitutionAdmin(User user)
     {
         InstitutionAdmin = user;

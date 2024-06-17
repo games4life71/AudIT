@@ -26,7 +26,7 @@
                 <RadzenDataGridColumn Title="HomePhoneNumber" Property="HomePhoneNumber"/>
                 <RadzenDataGridColumn>
                     <Template Context="institution">
-                        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+                        <RadzenStack Wrap="FlexWrap.Wrap" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
 
                             @code
                             {
@@ -37,12 +37,12 @@
                             }
 
                             <RadzenButton
-                                Disabled="@showDepartmentsDisabled(institution)"
+
                                 ButtonStyle="ButtonStyle.Info"
                                 Text="Departments"
                                 Click="@(() => ShowDepartments(institution))"
                                 Icon="info"/>
-                            <RadzenButton Text="Edit" Icon="edit"/>
+                            <RadzenButton Click="@(() => EditInstitution(institution))" Text="Edit" Icon="edit"/>
                             <RadzenButton Click="@(() => DeleteInstituion(institution))" ButtonStyle="ButtonStyle.Danger" Text="Delete" Icon="delete"/>
                         </RadzenStack>
 
@@ -90,19 +90,18 @@
     {
         _dialogService.Open<AddInstitutionComponent>(
             "Add Institution",
-            new Dictionary<string, object> { { "OnInstitutionAdded", new EventCallback<BaseInstitutionDto>(this,OnInstitutionAdded) } },
-            new DialogOptions { Width = "500px", Height = "500px" }
-
-
-            );
+            new Dictionary<string, object> { { "OnInstitutionAdded", new EventCallback<BaseInstitutionDto>(this, OnInstitutionAdded) } },
+            new DialogOptions { Width = "500px", Height = "500px", Draggable = true }
+        );
     }
 
     private async Task OnInstitutionAdded(BaseInstitutionDto institution)
     {
         await FetchInstitutionsAsync();
 
-       await  _institutionsGrid.Reload();
+        await _institutionsGrid.Reload();
     }
+
     private Task ShowDepartments(InstitutionFullViewModel institution)
     {
         var departments = _institutions.First(x => x.Id == institution.Id).Departments;
@@ -136,4 +135,30 @@
         }
     }
 
+    private Task EditInstitution(InstitutionFullViewModel institution)
+    {
+        _dialogService.Open<EditInstitutionComponent>(
+            "Edit Institution",
+            new Dictionary<string, object>
+            {
+                { "Institution", institution },
+                { "OnInstitutionEdited", new EventCallback<InstitutionFullViewModel>(this, OnInstitutionEdited) }
+            },
+            new DialogOptions { Width = "500px", Height = "700px", Draggable = true }
+        );
+
+        return Task.CompletedTask;
+    }
+
+    private async Task OnInstitutionEdited(InstitutionFullViewModel institution)
+    {
+        var result = _institutions.First(x => x.Id == institution.Id);
+
+        result.Name = institution.Name;
+        result.Address = institution.Address;
+        result.HomePhoneNumber = institution.HomePhoneNumber;
+
+
+        await _institutionsGrid.Reload();
+    }
 }

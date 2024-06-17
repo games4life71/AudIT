@@ -1,6 +1,7 @@
 ﻿using AudIT.Applicationa.Models.Misc;
 using AudIT.Applicationa.Requests.Institution.Commands.Create;
 using AudIT.Applicationa.Requests.Institutions.Commands.Delete;
+using AudIT.Applicationa.Requests.Institutions.Commands.Edit;
 using AudIT.Applicationa.Requests.Institutions.Queries.GetAll;
 using AudIT.Applicationa.Requests.Institutions.Queries.GetAllIFull;
 using Microsoft.AspNetCore.Authorization;
@@ -62,6 +63,20 @@ public class InstitutionController : BaseController
     public async Task<IActionResult> GetAllInstitutionsFull()
     {
         var result = await Mediator.Send(new GetAllInstitutionsFullQuery());
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
+
+    [HttpPut]
+    [Route("edit-institution")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> EditInstitution(EditInstitutionCommand command)
+    {
+        var result = await Mediator.Send(command);
         if (!result.Success)
         {
             return BadRequest(result.Message);

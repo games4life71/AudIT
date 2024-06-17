@@ -1,0 +1,74 @@
+﻿@using Frontend.Contracts.Abstract_Services.InstitutionsService
+@using Frontend.EntityDtos.Institution
+@using Frontend.EntityViewModels.Institution
+@using Orientation = Radzen.Orientation
+@inject IInstitutionService _institutionService
+@inject DialogService _dialogService
+@inject NotificationService _notificationService
+
+
+<RadzenStack Orientation="Orientation.Vertical">
+    <RadzenText Text="Edit Institution information" TextAlign="TextAlign.Center"></RadzenText>
+    <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenLabel Text="Name"></RadzenLabel>
+            <RadzenTextBox @bind-Value="@_institution.Name" Placeholder="Name..." Name="Name"></RadzenTextBox>
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenLabel Text="Address"></RadzenLabel>
+            <RadzenTextBox @bind-Value="@_institution.Address" Placeholder="Address..." Name="Address"></RadzenTextBox>
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenLabel Text="Phone number: "></RadzenLabel>
+            <RadzenMask @bind-Value="@_institution.PhoneNumber" Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(00) 0000-0000" Name="Phone"></RadzenMask>
+        </RadzenStack>
+
+        <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text="Cancel"></RadzenButton>
+            <RadzenButton Click="@SubmitChanges" ButtonStyle="ButtonStyle.Success" Text="Submit"></RadzenButton>
+        </RadzenStack>
+    </RadzenStack>
+</RadzenStack>
+
+
+@code {
+    [Parameter] public InstitutionFullViewModel Institution { get; set; }
+    [Parameter] public EventCallback<InstitutionFullViewModel> OnInstitutionEdited { get; set; }
+    private EditInstitutionDto _institution;
+
+
+}
+
+@functions
+{
+
+
+    protected override Task OnInitializedAsync()
+    {
+        _institution = new EditInstitutionDto
+        {
+            Id = Institution.Id,
+            Name = Institution.Name,
+            Address = Institution.Address,
+            PhoneNumber = Institution.HomePhoneNumber
+        };
+
+        return base.OnInitializedAsync();
+    }
+
+    public async Task SubmitChanges()
+    {
+        var result = await _institutionService.EditInstitutionAsync(_institution);
+
+        if (result.Success)
+        {
+            _notificationService.Notify(NotificationSeverity.Success, "Institution edited successfully");
+            await OnInstitutionEdited.InvokeAsync(result.DtoResponse);
+            _dialogService.Close();
+        }
+    }
+
+
+}

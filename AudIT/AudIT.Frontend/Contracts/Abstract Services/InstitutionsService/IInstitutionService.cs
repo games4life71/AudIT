@@ -14,4 +14,6 @@ public interface IInstitutionService
     public Task<BaseResponse> DeleteInstitutionAsync(Guid id);
 
     public Task<BaseDTOResponse<BaseInstitutionDto>> AddInstitutionAsync(CreateInstitutionDto institution);
+
+    public Task<BaseDTOResponse<InstitutionFullViewModel>> EditInstitutionAsync(EditInstitutionDto institution);
 }
