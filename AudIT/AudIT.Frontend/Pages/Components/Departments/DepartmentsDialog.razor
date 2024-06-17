@@ -36,10 +36,12 @@
 
     [Parameter] public List<BaseDepartmentDto> Departments { get; set; }
 
+    [Parameter] public Guid InstitutionId { get; set; }
 
     private void ConfigureDepartments(MouseEventArgs obj)
     {
-        _navigationManager.NavigateTo("/departments");
+        var path = $"/departments?institutionId={InstitutionId}";
+        _navigationManager.NavigateTo(path);
     }
 
     private void CloseDialog(MouseEventArgs obj)

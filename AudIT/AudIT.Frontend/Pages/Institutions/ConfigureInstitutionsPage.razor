@@ -108,7 +108,11 @@
 
         _dialogService.Open<DepartmentsDialog>(
             "Departments",
-            new Dictionary<string, object> { { "Departments", departments } });
+            new Dictionary<string, object>
+            {
+                { "Departments", departments },
+                {"InstitutionId",institution.Id}
+            });
 
 
         return Task.CompletedTask;

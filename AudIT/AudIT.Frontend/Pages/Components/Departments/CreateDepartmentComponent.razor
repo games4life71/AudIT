@@ -1,0 +1,74 @@
+﻿@using Frontend.Contracts.Abstract_Services.DepartmentService
+@using Frontend.EntityDtos.Department
+@using Orientation = Radzen.Orientation
+@inject NotificationService _notificationService
+@inject DialogService _dialogService
+@inject IDepartmentService _departmentService
+
+
+<RadzenStack Orientation="Orientation.Vertical">
+    <RadzenText Text="Add a new department" TextAlign="TextAlign.Center"/>
+
+    <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenLabel Text="Name"/>
+        <RadzenTextBox @bind-Value="@_newDepartment.Name" Placeholder="Department name..."/>
+    </RadzenStack>
+
+
+    <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenLabel Text="Address"/>
+        <RadzenTextBox @bind-Value="@_newDepartment.Adress" Placeholder="Department address..."/>
+    </RadzenStack>
+
+
+    <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenLabel Text="Phone Number"/>
+        <RadzenMask Mask="(***) ***-****" Pattern="[^0-9]"
+                    Placeholder="(00) 0000-0000"
+                    @bind-Value="@_newDepartment.PhoneNumber"/>
+    </RadzenStack>
+
+    <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+        <RadzenButton Click="@Cancel" Text="Cancel" ButtonStyle="ButtonStyle.Secondary"/>
+        <RadzenButton Click="@Submit" Text="Submit" ButtonStyle="ButtonStyle.Success"/>
+    </RadzenStack>
+</RadzenStack>
+
+
+@code {
+
+    [Parameter] public Guid InstitutionId { get; set; }
+    private CreateDepartmentDto _newDepartment = new CreateDepartmentDto();
+
+     [Parameter]  public  EventCallback<BaseDepartmentDto> OnDepartmentAdded { get; set; }
+}
+
+@functions
+{
+
+
+    private void Cancel(MouseEventArgs obj)
+    {
+        _dialogService.Close();
+    }
+
+    private async Task Submit(MouseEventArgs obj)
+    {
+        var confirm = await _dialogService.Confirm("Are you sure you want to add this department?", "Confirm Department Addition");
+
+        if (confirm.Value)
+        {
+            _newDepartment.InstitutionId = InstitutionId;
+            var result = await _departmentService.CreateDepartmentAsync(_newDepartment);
+
+            if (result.Success)
+            {
+                _notificationService.Notify(NotificationSeverity.Success, "Department added successfully");
+                await OnDepartmentAdded.InvokeAsync(result.DtoResponse);
+                _dialogService.Close();
+            }
+        }
+    }
+
+
+}

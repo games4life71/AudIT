@@ -1,4 +1,5 @@
-﻿using Frontend.Contracts.Abstract_Services.DepartmentService;
+﻿using System.Net.Http.Json;
+using Frontend.Contracts.Abstract_Services.DepartmentService;
 using Frontend.EntityDtos.Department;
 using Frontend.EntityDtos.Misc;
 using Newtonsoft.Json;
@@ -47,7 +48,8 @@ public class DepartmentService(HttpClient httpClient) : IDepartmentService
     {
         try
         {
-            var response = await httpClient.GetAsync($"{IDepartmentService.ApiPath}/get-departments-by-institution-id/{id}");
+            var response =
+                await httpClient.GetAsync($"{IDepartmentService.ApiPath}/get-departments-by-institution-id/{id}");
             if (!response.IsSuccessStatusCode)
                 return new BaseDTOResponse<BaseDepartmentDto>
                 {
@@ -76,5 +78,46 @@ public class DepartmentService(HttpClient httpClient) : IDepartmentService
                 Message = e.Message
             };
         }
+    }
+
+    public async Task<BaseDTOResponse<BaseDepartmentDto>> CreateDepartmentAsync(CreateDepartmentDto createDepartmentDto)
+    {
+        var response =
+            await httpClient.PostAsJsonAsync($"{IDepartmentService.ApiPath}/create-department", createDepartmentDto);
+
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseDepartmentDto>>(content);
+
+            if (result is { Success: true, DtoResponse: not null })
+            {
+                return new BaseDTOResponse<BaseDepartmentDto>(result.DtoResponse);
+            }
+        }
+
+        return new BaseDTOResponse<BaseDepartmentDto>
+        {
+            Success = false,
+            Message = response.ReasonPhrase
+        };
+    }
+
+    public async Task<BaseDTOResponse<BaseResponse>> DeleteDepartmentAsync(Guid id)
+    {
+        var response = await httpClient.DeleteAsync($"{IDepartmentService.ApiPath}/delete-department/{id}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            return new BaseDTOResponse<BaseResponse>("Department deleted successfully.", true);
+        }
+
+        return new BaseDTOResponse<BaseResponse>
+        {
+            Success = false,
+            Message = response.ReasonPhrase
+        };
     }
 }

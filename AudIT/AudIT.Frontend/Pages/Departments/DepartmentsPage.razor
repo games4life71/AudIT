@@ -1,0 +1,162 @@
+﻿@page "/departments"
+@using Frontend.Contracts.Abstract_Services.DepartmentService
+@using Frontend.Contracts.Abstract_Services.InstitutionsService
+@using Frontend.EntityDtos.Department
+@using Frontend.EntityDtos.Institution
+@using Frontend.Pages.Components.Departments
+@using Microsoft.AspNetCore.WebUtilities
+@using Orientation = Radzen.Orientation
+@inject NavigationManager _navigationManager
+@inject IInstitutionService _institutionService
+@inject IDepartmentService _departmentService
+@inject DialogService _dialogService
+@inject NotificationService _notificationService
+
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenStack Orientation="Orientation.Vertical">
+
+        <RadzenDropDownDataGrid
+            Placeholder="Select Institution"
+            Data="_institutions"
+            Value="_institutionId"
+            TextProperty="Name"
+            ValueProperty="Id"
+            TValue="Guid"
+            ValueChanged="@((args) => FetchDepartmens(args))"/>
+
+
+        <RadzenDataGrid
+            @ref="@_dataGrid"
+            Data="_departments"
+            AllowFiltering="true" AllowSorting="true" AllowColumnResize="true" TItem="BaseDepartmentDto">
+            <Columns>
+                <RadzenDataGridColumn Title="Name" Property="Name"/>
+                <RadzenDataGridColumn Title="Address" Property="Address"/>
+                <RadzenDataGridColumn Title="Phone Number" Property="HomePhoneNumber"/>
+                <RadzenDataGridColumn >
+                    <Template Context="data">
+                        <RadzenStack Wrap="FlexWrap.Wrap" JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+                            <RadzenButton ButtonStyle="ButtonStyle.Warning" Icon="edit" Text="Edit"></RadzenButton>
+                            <RadzenButton Click="@(() => DeleteDepartment(data))" ButtonStyle="ButtonStyle.Danger" Icon="delete" Text="Delete"></RadzenButton>
+                        </RadzenStack>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+        <RadzenButton Click="@AddDepartment" Icon="add" ButtonStyle="ButtonStyle.Dark" Text="Add Department"></RadzenButton>
+
+    </RadzenStack>
+</RadzenCard>
+
+@code {
+
+    private RadzenDataGrid<BaseDepartmentDto> _dataGrid;
+    private Guid _institutionId = Guid.Empty;
+
+    private List<BaseInstitutionDto> _institutions = [];
+
+    private List<BaseDepartmentDto> _departments = [];
+
+
+}
+
+@functions
+{
+    protected override async Task OnInitializedAsync()
+    {
+        //get the institutionId parameter
+        await FetchQueryParams();
+        await FetchInstutitions();
+        if (_institutionId != Guid.Empty)
+        {
+            await FetchDepartmens(_institutionId);
+        }
+    }
+
+    private Task FetchQueryParams()
+    {
+        var uri = _navigationManager.Uri;
+        //get the query string parameters
+        var queryDictionary = QueryHelpers.ParseQuery(new Uri(uri).Query);
+
+        //get the institutionId parameter
+        if (queryDictionary.TryGetValue("institutionId", out var institutionId))
+        {
+            var value = institutionId.FirstOrDefault();
+            if (!String.IsNullOrEmpty(value))
+            {
+                //use the institutionId
+                _institutionId = Guid.Parse(value);
+            }
+            else
+            {
+                //redirect to the institutions page
+                // _navigationManager.NavigateTo("/institutions");
+            }
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private async Task FetchInstutitions()
+    {
+        //fetch the institutions
+        var response = await _institutionService.GetAllInstitutionsAsync();
+
+        if (response.Success)
+        {
+            _institutions = response.DtoResponses;
+        }
+    }
+
+
+    private async Task FetchDepartmens(Guid institutionId)
+    {
+        var response = await _departmentService.GetDepartmentsByInstitutionIdAsync(institutionId);
+
+        if (response.Success)
+        {
+            _departments = response.DtoResponses;
+        }
+    }
+
+    private void AddDepartment(MouseEventArgs obj)
+    {
+        _dialogService.Open<CreateDepartmentComponent>(
+            "Create Department",
+            new Dictionary<string, object>
+            {
+                { "InstitutionId", _institutionId },
+                { "OnDepartmentAdded", new EventCallback<BaseDepartmentDto>(this, OnDeparmentAdded) }
+            },
+            new DialogOptions
+            {
+                Width = "500px",
+                Height = "700px"
+            });
+    }
+
+    public async Task OnDeparmentAdded(BaseDepartmentDto department)
+    {
+        _departments.Add(department);
+        await _dataGrid.Reload();
+        StateHasChanged();
+    }
+
+    private async Task DeleteDepartment(BaseDepartmentDto data)
+    {
+        var confirm = await _dialogService.Confirm("Are you sure you want to delete this department?", "Delete Department");
+
+        if (confirm.Value)
+        {
+            var response = await _departmentService.DeleteDepartmentAsync(data.Id);
+
+            if (response.Success)
+            {
+                _notificationService.Notify(NotificationSeverity.Success, "Department Deleted Successfully");
+                _departments.Remove(data);
+                await _dataGrid.Reload();
+            }
+        }
+    }
+}

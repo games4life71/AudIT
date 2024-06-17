@@ -10,4 +10,8 @@ public interface IDepartmentService
     public Task<BaseDTOResponse<BaseDepartmentDto>> GetDepartmentByIdAsync(Guid id);
 
     public Task<BaseDTOResponse<BaseDepartmentDto>> GetDepartmentsByInstitutionIdAsync(Guid id);
+
+    public Task<BaseDTOResponse<BaseDepartmentDto>> CreateDepartmentAsync(CreateDepartmentDto createDepartmentDto);
+
+    public Task<BaseDTOResponse<BaseResponse>> DeleteDepartmentAsync(Guid id);
 }
