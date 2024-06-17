@@ -57,4 +57,11 @@ public class Department:AuditableEntity
 
     }
 
+    public void Update(string name, string address, string homePhoneNumber)
+    {
+        Name = name;
+        Address = address;
+        HomePhoneNumber = homePhoneNumber;
+    }
+
 }

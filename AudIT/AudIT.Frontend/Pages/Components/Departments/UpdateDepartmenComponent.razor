@@ -1,0 +1,73 @@
+﻿@using Frontend.Contracts.Abstract_Services.DepartmentService
+@using Frontend.EntityDtos.Department
+@using Orientation = Radzen.Orientation
+
+@inject IDepartmentService _departmentService
+@inject DialogService _dialogService
+@inject NotificationService _notificationService
+
+<RadzenStack Orientation="Orientation.Vertical">
+    <RadzenText Text="Edit department information" TextAlign="TextAlign.Center"/>
+
+    <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenLabel Text="Name"/>
+        <RadzenTextBox @bind-Value="@Department.Name" Placeholder="Department name..."/>
+    </RadzenStack>
+
+
+    <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenLabel Text="Address"/>
+        <RadzenTextBox @bind-Value="@Department.Address" Placeholder="Department address..."/>
+    </RadzenStack>
+
+
+    <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenLabel Text="Phone Number"/>
+        <RadzenMask Mask="(***) ***-****" Pattern="[^0-9]"
+                    Placeholder="(00) 0000-0000"
+                    @bind-Value="@Department.HomePhoneNumber"/>
+    </RadzenStack>
+
+    <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+        <RadzenButton Click="@Cancel" Text="Cancel" ButtonStyle="ButtonStyle.Secondary"/>
+        <RadzenButton Click="@Submit" Text="Submit" ButtonStyle="ButtonStyle.Success"/>
+    </RadzenStack>
+</RadzenStack>
+
+
+@code
+{
+    [Parameter] public BaseDepartmentDto Department { get; set; }
+
+    [Parameter] public EventCallback<BaseDepartmentDto> OnDepartmentUpdated { get; set; }
+}
+
+@functions
+{
+    private void Cancel(MouseEventArgs obj)
+    {
+        _dialogService.Close();
+    }
+
+    private async Task Submit(MouseEventArgs obj)
+    {
+        var command = new UpdateDepartmentDto();
+
+        command.Id = Department.Id;
+        command.Name = Department.Name!;
+        command.Adress = Department.Address;
+        command.PhoneNumber = Department.HomePhoneNumber;
+
+
+        var result = await _departmentService.UpdateDepartmentAsync(command);
+
+        if (result.Success)
+        {
+            _notificationService.Notify(NotificationSeverity.Success, "Department updated successfully");
+            await OnDepartmentUpdated.InvokeAsync(Department);
+            _dialogService.Close();
+        }
+    }
+
+
+}

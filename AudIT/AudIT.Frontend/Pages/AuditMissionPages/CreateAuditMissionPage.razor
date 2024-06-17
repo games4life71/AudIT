@@ -279,7 +279,7 @@ else
         {
             //show success message
             NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Success", Detail = "Audit Mission created successfully", Duration = 4000 });
-            await Task.Delay(1000);
+            // await Task.Delay(1000);
             _NavigationManager.NavigateTo("/audit-missions");
             return;
         }

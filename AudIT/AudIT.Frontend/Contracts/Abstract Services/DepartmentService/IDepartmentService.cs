@@ -14,4 +14,6 @@ public interface IDepartmentService
     public Task<BaseDTOResponse<BaseDepartmentDto>> CreateDepartmentAsync(CreateDepartmentDto createDepartmentDto);
 
     public Task<BaseDTOResponse<BaseResponse>> DeleteDepartmentAsync(Guid id);
+
+    public Task<BaseDTOResponse<BaseDepartmentDto>> UpdateDepartmentAsync(UpdateDepartmentDto updateDepartmentDto);
 }

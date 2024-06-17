@@ -120,4 +120,28 @@ public class DepartmentService(HttpClient httpClient) : IDepartmentService
             Message = response.ReasonPhrase
         };
     }
+
+    public async Task<BaseDTOResponse<BaseDepartmentDto>> UpdateDepartmentAsync(UpdateDepartmentDto updateDepartmentDto)
+    {
+        var response =
+            await httpClient.PutAsJsonAsync($"{IDepartmentService.ApiPath}/update-department", updateDepartmentDto);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseDepartmentDto>>(content);
+
+            if (result is { Success: true, DtoResponse: not null })
+            {
+                return new BaseDTOResponse<BaseDepartmentDto>(result.DtoResponse);
+            }
+        }
+
+        return new BaseDTOResponse<BaseDepartmentDto>
+        {
+            Success = false,
+            Message = response.ReasonPhrase
+        };
+    }
 }

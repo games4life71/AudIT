@@ -36,7 +36,7 @@
                 <RadzenDataGridColumn >
                     <Template Context="data">
                         <RadzenStack Wrap="FlexWrap.Wrap" JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
-                            <RadzenButton ButtonStyle="ButtonStyle.Warning" Icon="edit" Text="Edit"></RadzenButton>
+                            <RadzenButton Click="@(() => UpdateDepartment(data))" ButtonStyle="ButtonStyle.Warning" Icon="edit" Text="Edit"></RadzenButton>
                             <RadzenButton Click="@(() => DeleteDepartment(data))" ButtonStyle="ButtonStyle.Danger" Icon="delete" Text="Delete"></RadzenButton>
                         </RadzenStack>
                     </Template>
@@ -158,5 +158,28 @@
                 await _dataGrid.Reload();
             }
         }
+    }
+
+    private Task UpdateDepartment(BaseDepartmentDto data)
+    {
+        _dialogService.Open<UpdateDepartmenComponent>(
+            "Update Department Info",
+            new Dictionary<string, object>()
+            {
+                { "Department", data },
+                { "OnDepartmentUpdated", new EventCallback<BaseDepartmentDto>(this, OnDepartmentUpdated) }
+            }
+        );
+
+        return Task.CompletedTask;
+
+    }
+
+    public async Task OnDepartmentUpdated(BaseDepartmentDto department)
+    {
+        var index = _departments.FindIndex(x => x.Id == department.Id);
+        _departments[index] = department;
+        await _dataGrid.Reload();
+        StateHasChanged();
     }
 }
