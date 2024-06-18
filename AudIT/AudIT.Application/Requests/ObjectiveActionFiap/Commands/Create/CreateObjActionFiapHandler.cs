@@ -12,6 +12,7 @@ public class CreateObjActionFiapHandler(
     IAuditMissionRepository auditMissionRepository,
     IObjectiveActionRepository objectiveActionRepository,
     IRecommendationRepository recommendationRepository,
+    IAuditMissionRecommendationsRepository auditMissionRecommendationsRepository,
     IMapper mapper
 ) : IRequestHandler<CreateObjActionFiapCommand, BaseDTOResponse<BaseObjActionFiapDto>>
 {
@@ -89,6 +90,19 @@ public class CreateObjActionFiapHandler(
                     $"Cannot insert into DB {resultRecommendation.Error}", false);
             }
 
+            //add it into AuditMissionRecommendation table
+            var auditMissionRecommendation = AudiT.Domain.Entities.AuditMissionRecommendations.Create(
+              auditMission.Value,
+              resultRecommendation.Value
+            );
+
+            var resultAuditMissionRecommendation = await auditMissionRecommendationsRepository.AddAsync(auditMissionRecommendation.Value);
+
+            if (!resultAuditMissionRecommendation.IsSuccess)
+            {
+                return new BaseDTOResponse<BaseObjActionFiapDto>(
+                    $"Cannot insert into DB {resultAuditMissionRecommendation.Error}", false);
+            }
 
 
 

@@ -1,5 +1,7 @@
 ﻿using AudIT.Applicationa.Requests.Recommendations.Commands.Create;
+using AudIT.Applicationa.Requests.Recommendations.Commands.Delete;
 using AudIT.Applicationa.Requests.Recommendations.Commands.Patch;
+using AudIT.Applicationa.Requests.Recommendations.Commands.Update;
 using AudIT.Applicationa.Requests.Recommendations.Queries.GetAllByAuditMission;
 using AudIT.Applicationa.Requests.Recommendations.Queries.GetById;
 using AudiT.Domain.Entities;
@@ -50,6 +52,32 @@ public class RecommendationController : BaseController
     public async Task<IActionResult> GetRecommendationsByAuditMission(Guid auditMissionId)
     {
         var result = await Mediator.Send(new GetRecommendationsByAuditMissionCommand(auditMissionId));
+        if (!result.Success)
+            return BadRequest(result.Message);
+
+        return Ok(result);
+    }
+
+    [HttpPut]
+    [Route("update-recommendation")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> UpdateRecommendation(UpdateRecommendationCommmand request)
+    {
+        var result = await Mediator.Send(request);
+        if (!result.Success)
+            return BadRequest(result.Message);
+
+        return Ok(result);
+    }
+
+    [HttpDelete]
+    [Route("delete-recommendation/{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> DeleteRecommendation(Guid id)
+    {
+        var result = await Mediator.Send(new DeleteRecommendationCommand(id));
         if (!result.Success)
             return BadRequest(result.Message);
 

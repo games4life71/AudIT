@@ -71,6 +71,25 @@ public class Recommendation : AuditableEntity
         this.Status = newStatus;
     }
 
+    public void Update(
+        string description,
+        DateTime dueDate,
+        string problem,
+        string? aditionalFindings,
+        string? cause,
+        string? consequence,
+        string recommendationDescription
+    )
+    {
+        Description = description;
+        DueDate = dueDate;
+        Problem = problem;
+        AditionalFindings = aditionalFindings;
+        Cause = cause;
+        Consequence = consequence;
+        RecommendationDescription = recommendationDescription;
+    }
+
     public static Result<Recommendation> Create(
         string description,
         DateTime dueDate,

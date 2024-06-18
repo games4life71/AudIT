@@ -35,4 +35,22 @@ public class AuditMissionRecommendationRepository : BaseRepository<AuditMissionR
 
         return Result<List<Recommendation>>.Success(recommendations);
     }
+
+    public async Task<(string, bool)> DeleteByRecommendationId(Guid requestId)
+    {
+        var auditMissionRecommendation = await _context.AuditMissionRecommendations
+            .Where(amr => amr.RecommendationId == requestId)
+            .FirstOrDefaultAsync();
+
+        if (auditMissionRecommendation == null)
+        {
+            return ("Recommendation not found", false);
+        }
+
+        _context.AuditMissionRecommendations.Remove(auditMissionRecommendation);
+
+        await _context.SaveChangesAsync();
+
+        return ("Recommendation deleted successfully", true);
+    }
 }
