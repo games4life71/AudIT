@@ -1,5 +1,6 @@
 ﻿using AudIT.Applicationa.Requests.Recommendations.Commands.Create;
 using AudIT.Applicationa.Requests.Recommendations.Commands.Patch;
+using AudIT.Applicationa.Requests.Recommendations.Queries.GetAllByAuditMission;
 using AudIT.Applicationa.Requests.Recommendations.Queries.GetById;
 using AudiT.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -42,4 +43,16 @@ public class RecommendationController : BaseController
         return Ok(result);
     }
 
+    [HttpGet]
+    [Route("get-all-by-audit-mission/{auditMissionId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetRecommendationsByAuditMission(Guid auditMissionId)
+    {
+        var result = await Mediator.Send(new GetRecommendationsByAuditMissionCommand(auditMissionId));
+        if (!result.Success)
+            return BadRequest(result.Message);
+
+        return Ok(result);
+    }
 }

@@ -71,9 +71,42 @@ public class ObjectiveActionRepository(AudITContext context)
 
         if (objectiveActions.Count == 0)
         {
-            return Result<List<ObjectiveAction>>.Failure($"ObjectiveActions that are selected for auditing for Objective with id {requestObjectiveId} not found.");
+            return Result<List<ObjectiveAction>>.Failure(
+                $"ObjectiveActions that are selected for auditing for Objective with id {requestObjectiveId} not found.");
         }
 
         return Result<List<ObjectiveAction>>.Success(objectiveActions);
+    }
+
+    public Task<Result<AuditMission>> GetAuditMissionByObjectiveActionId(Guid objectiveActionId)
+    {
+        var auditMission = _dbcContext.ObjectiveAction
+            .Include(o => o.Objective)
+            .ThenInclude(x => x.AuditMission)
+            .FirstOrDefault(o => o.Id == objectiveActionId)?.Objective.AuditMission;
+
+        if (auditMission == null)
+        {
+            return Task.FromResult(
+                Result<AuditMission>.Failure(
+                    $"AuditMission for ObjectiveAction with id {objectiveActionId} not found."));
+        }
+
+        return Task.FromResult(Result<AuditMission>.Success(auditMission));
+    }
+
+    public async override Task<Result<ObjectiveAction>> FindByIdAsync(Guid id)
+    {
+        var objectiveAction = _dbcContext.ObjectiveAction
+            .Include(o => o.Objective)
+            .ThenInclude(x => x.AuditMission)
+            .FirstOrDefault(o => o.Id == id);
+
+        if (objectiveAction == null)
+        {
+            return Result<ObjectiveAction>.Failure($"ObjectiveAction with id {id} not found.");
+        }
+
+        return Result<ObjectiveAction>.Success(objectiveAction);
     }
 }

@@ -1,4 +1,5 @@
-﻿using AudiT.Domain.Entities;
+﻿using AudIT.Applicationa.Requests.ObjectiveActions.DTO;
+using AudiT.Domain.Entities;
 
 namespace AudIT.Applicationa.Requests.Recommendations.DTO;
 
@@ -12,7 +13,7 @@ public class BaseRecommendationDTO
 
     public Status Status { get; set; }
 
-    public ObjectiveAction ObjectiveAction { get; private set; }
+    public BaseObjActionDto ObjectiveAction { get; private set; }
 
     public string Problem { get; set; }
 
@@ -24,7 +25,7 @@ public class BaseRecommendationDTO
 
     public string RecommendationDescription { get; set; }
 
-    public BaseRecommendationDTO(Guid id, string description, DateTime dueDate, Status status, ObjectiveAction objectiveAction, string problem, string? aditionalFindings, string? cause, string? consequence, string recommendationDescription)
+    public BaseRecommendationDTO(Guid id, string description, DateTime dueDate, Status status, BaseObjActionDto objectiveAction, string problem, string? aditionalFindings, string? cause, string? consequence, string recommendationDescription)
     {
         Id = id;
         Description = description;

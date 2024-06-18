@@ -10,6 +10,7 @@ namespace AudIT.Applicationa.Requests.Recommendations.Commands.Create;
 public class CreateRecommendationHandler(
     IRecommendationRepository recommendationRepository,
     IObjectiveActionRepository objectiveActionRepository,
+    IAuditMissionRecommendationsRepository auditMissionRecommendationsRepository,
     IMapper mapper
 ) : IRequestHandler<CreateRecommendationCommand, BaseDTOResponse<BaseRecommendationDTO>>
 {
@@ -42,6 +43,30 @@ public class CreateRecommendationHandler(
 
         if (!result.IsSuccess)
             return new BaseDTOResponse<BaseRecommendationDTO>(result.Error, false);
+
+        //add the reccomendation to the AuditMissionRecommendation table
+
+        var auditMission = await objectiveActionRepository.GetAuditMissionByObjectiveActionId(objAction.Value.Id);
+
+        if (!auditMission.IsSuccess)
+        {
+            return new BaseDTOResponse<BaseRecommendationDTO>("Audit Mission not found", false);
+        }
+
+        var auditMissionRecommendation = AuditMissionRecommendations.Create(
+            auditMission.Value,
+            result.Value
+        );
+
+        var auditMissionRecommendationResult = await auditMissionRecommendationsRepository.AddAsync(auditMissionRecommendation.Value);
+
+        if (!auditMissionRecommendationResult.IsSuccess)
+        {
+            return new BaseDTOResponse<BaseRecommendationDTO>(auditMissionRecommendationResult.Error, false);
+        }
+
+
+
 
         return new BaseDTOResponse<BaseRecommendationDTO>(mapper.Map<BaseRecommendationDTO>(result.Value),
             "Recommendation created successfully", true);

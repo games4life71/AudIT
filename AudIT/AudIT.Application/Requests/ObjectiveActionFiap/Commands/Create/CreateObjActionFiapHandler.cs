@@ -1,6 +1,7 @@
 ﻿using AudIT.Applicationa.Contracts.AbstractRepositories;
 using AudIT.Applicationa.Requests.ObjectiveActionFiap.DTO;
 using AudIT.Applicationa.Responses;
+using AudiT.Domain.Entities;
 using AutoMapper;
 using MediatR;
 
@@ -69,7 +70,7 @@ public class CreateObjActionFiapHandler(
 
             var newRecommendation = AudiT.Domain.Entities.Recommendation.Create(
                 request.Recommendation,
-                DateTime.Now,
+                request.AuditedPeriodEnd,
                 request.Problem,
                 request.AditionalFindings,
                 request.Cause,
@@ -78,6 +79,7 @@ public class CreateObjActionFiapHandler(
                 newObjActionFiap.Value.ObjectiveAction,
                 newObjActionFiap.Value.ObjectiveActionId
             );
+            newRecommendation.Value.SetStatus(Status.NotImplemented);
 
             var resultRecommendation = await recommendationRepository.AddAsync(newRecommendation.Value);
 

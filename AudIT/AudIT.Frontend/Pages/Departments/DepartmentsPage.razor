@@ -112,6 +112,7 @@
 
     private async Task FetchDepartmens(Guid institutionId)
     {
+        _institutionId = institutionId;
         var response = await _departmentService.GetDepartmentsByInstitutionIdAsync(institutionId);
 
         if (response.Success)
@@ -122,6 +123,12 @@
 
     private void AddDepartment(MouseEventArgs obj)
     {
+        if(_institutionId == Guid.Empty)
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Please select an institution to add a department");
+            return;
+        }
+
         _dialogService.Open<CreateDepartmentComponent>(
             "Create Department",
             new Dictionary<string, object>

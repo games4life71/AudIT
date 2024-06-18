@@ -35,7 +35,6 @@ public static class InfrastructureRegistration
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-
         services.ConfigureExternalCookie(options =>
         {
             options.Cookie.SameSite = SameSiteMode.None;
@@ -46,9 +45,10 @@ public static class InfrastructureRegistration
         {
             options.Cookie.SameSite = SameSiteMode.None;
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-            options.Cookie.Name="MyCookie";
+            options.Cookie.Name = "MyCookie";
         });
-        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXlfcnRcR2JcVUR1WUI=");
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(
+            "Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXlfcnRcR2JcVUR1WUI=");
         services.Configure<CookiePolicyOptions>(options =>
         {
             options.MinimumSameSitePolicy = SameSiteMode.None;
@@ -101,6 +101,7 @@ public static class InfrastructureRegistration
         services.AddScoped<IObjectiveActionFiapRepository, ObjectiveActionFiapRepository>();
         services.AddScoped<IUserInstitutionRepository, UserInstitutionRepository>();
         services.AddScoped<ICurrentUserAuditMissioRepo, CurrentUserAuditMissionRepository>();
+        services.AddScoped<IAuditMissionRecommendationsRepository, AuditMissionRecommendationRepository>();
         services.AddScoped(typeof(IRepositoryAcces<>), typeof(BaseAccesRepository<>));
         services.AddScoped<IRepositoryFactory, RepositoryFactory>();
 

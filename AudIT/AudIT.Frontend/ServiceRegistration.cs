@@ -11,6 +11,7 @@ using Frontend.Contracts.Abstract_Services.FiapService;
 using Frontend.Contracts.Abstract_Services.InstitutionsService;
 using Frontend.Contracts.Abstract_Services.ObjectiveActionService;
 using Frontend.Contracts.Abstract_Services.ObjectiveService;
+using Frontend.Contracts.Abstract_Services.RecommendationService;
 using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel;
 using Frontend.Services.ActionRiskServices;
 using Frontend.Services.Activity;
@@ -24,6 +25,7 @@ using Frontend.Services.InstitutionServices;
 using Frontend.Services.Misc;
 using Frontend.Services.ObjectiveActionServices;
 using Frontend.Services.ObjectiveServices;
+using Frontend.Services.Recommendation;
 using Havit.Blazor.Components.Web;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -42,7 +44,8 @@ public static class ServiceRegistration
         services.AddRadzenComponents();
         services.AddSyncfusionBlazor();
         //Register Syncfusion license
-        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXlfcnRcR2JcVUR1WUI=");
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(
+            "Ngo9BigBOggjHTQxAR8/V1NCaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXlfcnRcR2JcVUR1WUI=");
         builder.Services.AddBlazorBootstrap();
         services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
         services.AddScoped<IAuditMissionService, AuditMissionService>();
@@ -56,6 +59,7 @@ public static class ServiceRegistration
         services.AddScoped<IObjectiveActionService, ObjectiveActionService>();
         services.AddScoped<IActionRiskService, ActionRiskService>();
         services.AddScoped<ICurrentUserAuditMissionService, CurrentUserAuditMissionService>();
+        services.AddScoped<IRecommendationService, RecommendationService>();
         services.AddBlazoredLocalStorage();
 
         // services.AddScoped<ClaimsPrincipal>();

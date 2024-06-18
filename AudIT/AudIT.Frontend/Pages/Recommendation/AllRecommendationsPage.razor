@@ -1,0 +1,201 @@
+﻿@page "/recommendations"
+@using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
+@using Frontend.Contracts.Abstract_Services.RecommendationService
+@using Frontend.EntityViewModels.Recommendation
+@using Microsoft.AspNetCore.WebUtilities
+@using Orientation = Radzen.Orientation
+@using Radzen.Blazor
+@using Radzen.Blazor
+@inject NavigationManager _navigationManager
+@inject IRecommendationService _recommendationService
+@inject ICurrentUserAuditMissionService _currentUserAuditMissionService
+
+
+<RadzenStack Orientation="Orientation.Vertical">
+
+    <RadzenDataGrid
+        Data="_recommendations"
+        TItem="BaseRecommendationViewModel">
+        <Template Context="recommendation">
+            <RadzenTabs TabPosition="TabPosition.Top">
+                <Tabs>
+                    <RadzenTabsItem Text="Basic Information">
+                        <RadzenRow   Style="width: 85%" JustifyContent="JustifyContent.SpaceEvenly">
+                            <RadzenStack Orientation="Orientation.Vertical">
+                                <RadzenStack Orientation="Orientation.Vertical">
+                                    <RadzenLabel Text="Name"/>
+                                    <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.Description" ReadOnly="@(!EditPressed)"/>
+                                </RadzenStack>
+
+                                <RadzenStack Orientation="Orientation.Vertical">
+                                    <RadzenLabel Text="Problem"/>
+                                    <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.Problem" ReadOnly="@(!EditPressed)"/>
+                                </RadzenStack>
+
+                                <RadzenStack Orientation="Orientation.Vertical">
+                                    <RadzenLabel Text="Cause"/>
+                                    <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.Cause"ReadOnly="@(!EditPressed)"/>
+                                </RadzenStack>
+                            </RadzenStack>
+
+                            <RadzenStack Orientation="Orientation.Vertical">
+
+                                <RadzenStack Orientation="Orientation.Vertical">
+                                    <RadzenLabel Text="Description"></RadzenLabel>
+                                    <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.RecommendationDescription"ReadOnly="@(!EditPressed)"></RadzenTextArea>
+                                </RadzenStack>
+
+                                <RadzenStack Orientation="Orientation.Vertical">
+                                    <RadzenLabel Text="Consequences"></RadzenLabel>
+                                    <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.Consequence" ReadOnly="@(!EditPressed)"></RadzenTextArea>
+                                </RadzenStack>
+
+                                <RadzenStack Orientation="Orientation.Vertical">
+                                    <RadzenLabel Text="Aditional Findings"></RadzenLabel>
+                                    <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.AditionalFindings" ReadOnly="@(!EditPressed)"></RadzenTextArea>
+                                </RadzenStack>
+
+                            </RadzenStack>
+                        </RadzenRow>
+                        <RadzenRow JustifyContent="JustifyContent.Center" class="rz-my-6">
+                            <RadzenStack Orientation="Orientation.Horizontal">
+
+                                <RadzenStack  Orientation="Orientation.Vertical">
+                                    <RadzenLabel Text="Due Date"></RadzenLabel>
+                                    <RadzenDatePicker   @bind-Value="recommendation.DueDate" ReadOnly="@(!EditPressed)"></RadzenDatePicker>
+                                </RadzenStack>
+
+                                <RadzenStack Orientation="Orientation.Vertical">
+                                    <RadzenLabel Text="Status"></RadzenLabel>
+                                    <RadzenDropDown ReadOnly="@(!EditPressed)" TValue="TestValue" Data="_testValues"></RadzenDropDown>
+                                </RadzenStack>
+                            </RadzenStack>
+                        </RadzenRow>
+
+                        <RadzenRow JustifyContent="JustifyContent.Center">
+                            <RadzenStack Orientation="Orientation.Horizontal">
+                                <RadzenButton ButtonStyle="ButtonStyle.Warning" Text="Edit" Visible="@(!EditPressed)" Click="@ShowOtherButtons"></RadzenButton>
+                                <RadzenButton ButtonStyle="ButtonStyle.Secondary" Visible="EditPressed" Text="Cancel"/>
+                                <RadzenButton ButtonStyle="ButtonStyle.Success" Visible="EditPressed" Text="Save"/>
+                            </RadzenStack>
+                        </RadzenRow>
+
+                        @code{
+                            private bool EditPressed = false;
+
+                            private void ShowOtherButtons()
+                            {
+                                EditPressed = !EditPressed;
+                            }
+
+                        }
+
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Settings" Icon="settings">
+                        <RadzenStack JustifyContent="JustifyContent.Start" Orientation="Orientation.Horizontal">
+
+                            <RadzenButton ButtonStyle="ButtonStyle.Warning" Icon="edit" Text="Objective"></RadzenButton>
+
+                            <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="notification_add" Text="Notify institution"/>
+
+                            <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger"  Text="Delete Recommendation"/>
+
+                        </RadzenStack>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </Template>
+
+        <Columns>
+            <RadzenDataGridColumn Title="Description" Property="Description"/>
+            <RadzenDataGridColumn Title="Due Date " Property="DueDate"/>
+            <RadzenDataGridColumn Title="Status" Property="Status"/>
+
+
+        </Columns>
+
+
+    </RadzenDataGrid>
+
+
+</RadzenStack>
+
+
+@code {
+
+    private List<BaseRecommendationViewModel> _recommendations = [];
+
+    private Guid _auditMissionId = Guid.Empty;
+
+    public class TestValue
+    {
+        public string Name { get; set; }
+        public string Value { get; set; }
+    }
+
+    private List<TestValue> _testValues = [];
+
+
+}
+
+@functions
+{
+
+    protected override async Task OnInitializedAsync()
+    {
+        _testValues.Add(new TestValue { Name = "Test", Value = "Test" });
+        _testValues.Add(new TestValue { Name = "Test", Value = "Test" });
+        _testValues.Add(new TestValue { Name = "Test", Value = "Test" });
+        await FetchAuditMissionParameter();
+        await FetchRecommendations();
+    }
+
+
+    private async Task FetchAuditMissionParameter()
+    {
+        var uri = new Uri(_navigationManager.Uri);
+
+        var query = QueryHelpers.ParseQuery(uri.Query);
+
+        if (query.TryGetValue("auditMissionId", out var auditMissionId))
+        {
+            if (auditMissionId.Count > 1)
+            {
+                throw new InvalidOperationException("Multiple auditMissionId query parameters found.");
+            }
+
+            _auditMissionId = Guid.Parse(auditMissionId.FirstOrDefault());
+        }
+        else
+        {
+            //get the current user audit mission
+
+            await FetchUserAuditMission();
+        }
+    }
+
+    private async Task FetchUserAuditMission()
+    {
+        var response = await _currentUserAuditMissionService.GetCurrentUserAuditMissionAsync();
+
+        if (response.Success)
+        {
+            if (response.DtoResponse != null) _auditMissionId = response.DtoResponse.AuditMissionId;
+        }
+    }
+
+    private async Task FetchRecommendations()
+    {
+        if (_auditMissionId != Guid.Empty)
+        {
+            var response = await _recommendationService.FindAllByAuditMissionIdAsync(_auditMissionId);
+
+            if (response.Success)
+            {
+                _recommendations = response.DtoResponses;
+            }
+        }
+    }
+
+
+}
