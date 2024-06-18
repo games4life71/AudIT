@@ -15,4 +15,7 @@ public interface IRecommendationService
 
     public Task<BaseResponse> DeleteRecommendationAsync(Guid id);
 
+
+    public Task<BaseDTOResponse<BaseRecommendationViewModel>> CreateRecommendationAsync(CreateRecommendationDto createRecommendationDto);
+
 }

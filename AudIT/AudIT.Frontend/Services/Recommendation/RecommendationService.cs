@@ -58,4 +58,21 @@ public class RecommendationService(HttpClient httpClient) : IRecommendationServi
 
         return new BaseResponse("Deleted successfully", true);
     }
+
+    public async Task<BaseDTOResponse<BaseRecommendationViewModel>> CreateRecommendationAsync(
+        CreateRecommendationDto createRecommendationDto)
+    {
+        var response = await httpClient.PostAsJsonAsync($"{IRecommendationService.ApiPath}", createRecommendationDto);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return new BaseDTOResponse<BaseRecommendationViewModel>("Failed to create", false);
+        }
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseRecommendationViewModel>>(content);
+
+        return result ?? new BaseDTOResponse<BaseRecommendationViewModel>("Failed to create", false);
+    }
 }

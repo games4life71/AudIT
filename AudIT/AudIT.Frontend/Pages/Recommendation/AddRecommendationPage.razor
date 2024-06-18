@@ -1,0 +1,335 @@
+﻿@page "/add-recommendation"
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
+@using Frontend.Contracts.Abstract_Services.ObjectiveActionService
+@using Frontend.Contracts.Abstract_Services.ObjectiveService
+@using Frontend.Contracts.Abstract_Services.RecommendationService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityDtos.Recommendation
+@using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
+@using Frontend.EntityViewModels.Objective
+@using Frontend.EntityViewModels.ObjectiveAction
+@using Orientation = Radzen.Orientation
+
+@inject IObjectiveService _objectiveService
+@inject IObjectiveActionService _objectiveActionService
+@inject ICurrentUserAuditMissionService _currentUserAuditMissionService
+@inject IAuditMissionService _auditMissionService
+@inject IRecommendationService _recommendationService
+@inject DialogService _dialogService
+@inject NotificationService _notificationService
+@inject NavigationManager _navigationManager
+
+
+<RadzenStack Orientation="Orientation.Vertical">
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenText Text="Add a new recommendation" TextStyle="TextStyle.DisplayH5"/>
+        @if (_auditMission.Id != Guid.Empty)
+        {
+            <RadzenLink Path="@($"/audit-mission/{_auditMission.Id}")">
+                <RadzenText Text="@($"Selected Audit Mission: {_auditMission.Name}")"></RadzenText>
+            </RadzenLink>
+        }
+        else
+        {
+            <RadzenLink Path="@($"/audit-missions")">
+                <RadzenText Text="Please select an audit mission "></RadzenText>
+            </RadzenLink>
+        }
+
+    </RadzenStack>
+
+    <RadzenCard Variant="Variant.Outlined">
+
+        <RadzenSteps >
+            <Steps>
+                <RadzenStepsItem Text="Select Objective">
+                    <RadzenStack Orientation=" Orientation.Vertical">
+                        <RadzenLabel Text="Objective"></RadzenLabel>
+                        <RadzenDropDown
+                            Placeholder="Select objective..."
+                            Data="_objectives"
+                            TValue="Guid"
+                            TextProperty="Name"
+                            ValueProperty="Id"
+                            ValueChanged="@((id) => OnObjectiveSelected(id))"/>
+                    </RadzenStack>
+                </RadzenStepsItem>
+
+                <RadzenStepsItem Text="Select Objective Action">
+                    <RadzenStack Orientation=" Orientation.Vertical">
+                        <RadzenLabel Text="Objective Action"></RadzenLabel>
+                        <RadzenDropDown
+                            Placeholder="Select objective action..."
+                            Data="_objectiveActions"
+                            TValue="string"
+                            TextProperty="name"
+                            ValueProperty="id"
+                            ValueChanged="@((id) => ObjectiveActionSelected(id))"/>
+                    </RadzenStack>
+                </RadzenStepsItem>
+
+                @code{
+
+                    private void ObjectiveActionSelected(string id)
+                    {
+                        _selectedObjectiveActionId = Guid.Parse(id);
+                    }
+
+                }
+
+                <RadzenStepsItem Text="Information">
+                    <ChildContent>
+                        <RadzenTabs>
+                            <Tabs>
+                                <RadzenTabsItem Text="Basic Information">
+                                    <RadzenStack JustifyContent="JustifyContent.SpaceAround" Orientation="Orientation.Horizontal">
+
+                                        <RadzenStack Orientation="Orientation.Vertical">
+                                            <RadzenLabel Text="Name:"></RadzenLabel>
+                                            <RadzenTextBox @bind-Value="_createRecommendationDto.Description" Placeholder="Name"/>
+                                        </RadzenStack>
+
+                                        <RadzenStack Orientation="Orientation.Vertical">
+                                            <RadzenLabel Text="Problem:"></RadzenLabel>
+                                            <RadzenTextArea @bind-Value="_createRecommendationDto.Problem" Placeholder="Problem description..."></RadzenTextArea>
+                                        </RadzenStack>
+
+                                        <RadzenStack Orientation="Orientation.Vertical">
+                                            <RadzenLabel Text="Due Date:"></RadzenLabel>
+                                            <RadzenDatePicker @bind-Value="@_createRecommendationDto.DueDate" Kind="DateTimeKind.Local" Placeholder="Due date..." Min="DateTime.Now"/>
+                                        </RadzenStack>
+
+                                    </RadzenStack>
+
+                                </RadzenTabsItem>
+                                <RadzenTabsItem Text="Details">
+                                    <RadzenStack JustifyContent="JustifyContent.Center" class="rz-my-4" Orientation="Orientation.Horizontal">
+                                        <RadzenStack Orientation="Orientation.Vertical">
+                                            <RadzenLabel Text="Aditional findings"></RadzenLabel>
+                                            <RadzenTextBox @bind-Value="_createRecommendationDto.AditionalFindings" Placeholder="Aditional findings..."/>
+                                        </RadzenStack>
+
+                                        <RadzenStack Orientation="Orientation.Vertical">
+                                            <RadzenLabel Text="Cause"></RadzenLabel>
+                                            <RadzenTextBox @bind-Value="_createRecommendationDto.Cause" Placeholder="Cause..."/>
+                                        </RadzenStack>
+                                    </RadzenStack>
+
+                                    <RadzenStack class="rz-my-4" JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+                                        <RadzenStack Orientation="Orientation.Vertical">
+                                            <RadzenLabel Text="Description"></RadzenLabel>
+                                            <RadzenTextArea @bind-Value="_createRecommendationDto.RecommendationDescription" Placeholder="Description..."/>
+                                        </RadzenStack>
+
+                                        <RadzenStack Orientation="Orientation.Vertical">
+                                            <RadzenLabel Text="Consequences"></RadzenLabel>
+                                            <RadzenTextArea @bind-Value="_createRecommendationDto.Consequence" Placeholder="Consequences..."/>
+                                        </RadzenStack>
+                                    </RadzenStack>
+
+                                </RadzenTabsItem>
+
+
+                            </Tabs>
+                        </RadzenTabs>
+
+                    </ChildContent>
+
+                </RadzenStepsItem>
+
+                @code{
+
+                    private string GetObjActionName(Guid id)
+                    {
+                        var objAction = _objectiveActions.FirstOrDefault(x => x.id == id.ToString());
+                        if (objAction != null)
+                        {
+                            return objAction.name;
+                        }
+
+                        return string.Empty;
+                    }
+
+
+                }
+
+                <RadzenStepsItem Text="Validate&Submit">
+                    <RadzenCard Variant="Variant.Outlined">
+                        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceAround" Orientation="Orientation.Horizontal">
+                            <RadzenStack Orientation="Orientation.Vertical">
+                                <RadzenLabel Text="Name:" Component="forName"></RadzenLabel>
+                                <RadzenText class="rz-mb-4" Text="@_createRecommendationDto.Description" Name="forName"></RadzenText>
+
+                                <RadzenLabel Text="Objective Action:"></RadzenLabel>
+                                <RadzenText class="rz-mb-4" Text="@GetObjActionName(_selectedObjectiveActionId)"/>
+
+                                <RadzenLabel Text="Due Date:"></RadzenLabel>
+                                <RadzenText class="rz-mb-4" Text="@_createRecommendationDto.DueDate.ToString()"/>
+
+                                <RadzenLabel Text="Problem:"></RadzenLabel>
+                                <RadzenText Text="@_createRecommendationDto.Problem"/>
+                            </RadzenStack>
+
+                            <RadzenStack Orientation="Orientation.Vertical">
+                                <RadzenLabel Text="Aditional Findings:"></RadzenLabel>
+                                <RadzenText class="rz-mb-4" Text="@_createRecommendationDto.AditionalFindings"/>
+
+                                <RadzenLabel Text="Cause:"></RadzenLabel>
+                                <RadzenText class="rz-mb-4" Text="@_createRecommendationDto.Cause"/>
+
+                                <RadzenLabel Text="Description:"></RadzenLabel>
+                                <RadzenText class="rz-mb-4" Text="@_createRecommendationDto.RecommendationDescription"/>
+
+
+                                <RadzenLabel Text="Consequences:"></RadzenLabel>
+                                <RadzenText class="rz-mb-4" Text="@_createRecommendationDto.Consequence"></RadzenText>
+
+
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenCard>
+                    <RadzenStack class="rz-mt-2" Orientation="Orientation.Vertical">
+                        <RadzenButton Click="@AddRecommendation" Text="Submit" ButtonStyle="ButtonStyle.Primary"/>
+                    </RadzenStack>
+                </RadzenStepsItem>
+            </Steps>
+
+        </RadzenSteps>
+
+    </RadzenCard>
+
+</RadzenStack>
+
+@code {
+
+
+    private CurrentUserAuditMissionViewModel _currentUserAuditMission { get; set; } = new CurrentUserAuditMissionViewModel();
+    private BaseAuditMissionDto _auditMission { get; set; } = new BaseAuditMissionDto();
+    private DateTime selectedDate { get; set; } = DateTime.Now;
+    private List<BaseObjectiveViewModel> _objectives = [];
+
+    private List<ObjectiveActionViewModel> _objectiveActions = [];
+
+    private Guid _selectedObjectiveActionId { get; set; } = Guid.Empty;
+
+    private CreateRecommendationDto _createRecommendationDto { get; set; } = new CreateRecommendationDto();
+}
+
+
+
+@functions
+{
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCurrentUserAuditMissionAsync();
+        await FetchObjectives();
+    }
+
+    public async Task GetCurrentUserAuditMissionAsync()
+    {
+        var result = await _currentUserAuditMissionService.GetCurrentUserAuditMissionAsync();
+
+        if (result is { Success: true, DtoResponse: not null }) _currentUserAuditMission = result.DtoResponse;
+        var auditMissionResult = await _auditMissionService.GetAuditMissionById(_currentUserAuditMission.AuditMissionId);
+
+        if (auditMissionResult is { Success: true, DtoResponse: not null }) _auditMission = auditMissionResult.DtoResponse;
+    }
+
+
+    private async Task FetchObjectives()
+    {
+        var response = await _objectiveService.GetObjectivesByAuditMissionIdAsync(_currentUserAuditMission.AuditMissionId);
+
+        if (response is { Success: true, DtoResponses: not null })
+        {
+            _objectives = response.DtoResponses;
+        }
+    }
+
+    private async Task OnObjectiveSelected(Guid objectiveId)
+    {
+        var response = await _objectiveActionService.GetObjectiveActionByObjectiveIdAsync(objectiveId);
+
+        if (response.Success)
+        {
+            _objectiveActions = response.DtoResponses;
+        }
+    }
+
+    private bool CheckAllValid()
+    {
+        if (_selectedObjectiveActionId== Guid.Empty)
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Please select an objective action");
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(_createRecommendationDto.Description))
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Please enter a name");
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(_createRecommendationDto.Problem))
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Please enter a problem");
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(_createRecommendationDto.AditionalFindings))
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Please enter aditional findings");
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(_createRecommendationDto.Cause))
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Please enter a cause");
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(_createRecommendationDto.RecommendationDescription))
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Please enter a description");
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(_createRecommendationDto.Consequence))
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Please enter a consequence");
+            return false;
+        }
+
+        return true;
+    }
+
+    private async Task AddRecommendation(MouseEventArgs obj)
+    {
+
+        if (!CheckAllValid())
+        {
+            return;
+        }
+
+        var responseConfirm = await _dialogService.Confirm("Are you sure you want to add this recommendation?", "Add Recommendation");
+
+        if (responseConfirm.Value)
+        {
+            _createRecommendationDto.ObjectiveActionId = _selectedObjectiveActionId;
+            var response = await _recommendationService.CreateRecommendationAsync(_createRecommendationDto);
+
+            if (response.Success)
+            {
+                _notificationService.Notify(NotificationSeverity.Success, "Recommendation added successfully");
+                _navigationManager.NavigateTo("/recommendations");
+            }
+            else
+            {
+                _notificationService.Notify(NotificationSeverity.Error, "Failed to add recommendation");
+            }
+        }
+    }
+}
