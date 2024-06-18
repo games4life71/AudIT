@@ -11,8 +11,47 @@ Acestea fiind zise, proiectul este impartit in doua mari componente (client si s
 	
 	\item componenta de server, este alcatuita din diferite \textit{endpoint-uri}  Web API care ofera functionalitati clientilor sai, aceasta comunicand si cu mediul de stocare al datelor, o baza de date MySQL;
 	
-	\item componenta client, sau interfata grafica a platformei, este o aplicatie web interactiva de tipul SPA (\textit{Single page application}), oferind functionalitatile descrise prin intermediul \textit{request-urilor} catre server, urmand ca mai apoi sa fie afisate pe pagina web prin intermediul \textit{WebAssembly};
+	\item componenta client, sau interfata grafica a platformei, este o aplicatie web interactiva de tipul SPA (\textit{Single page application}), oferind functionalitatile descrise prin intermediul \textit{request-urilor} catre server, urmand ca mai apoi sa fie afisate pe pagina web prin intermediul \textit{WebAssembly}.
 \end{itemize}  
+
+\subsection*{Diagrame de context C4 }
+
+Diagramele de context C4 reprezinta un stadard in ceea ce priveste o vedere de ansamblu, dar care merge inspectata in detaliu pentru fiecare component al aplicatiei, astfel promovand o ierarhizarea si o intelegere a intreg sistemului mai buna.\\
+
+
+\subsection*{Nivelul 1}
+Primnul nivel al diagramelor de context ofera o viziune de ansamblu asupra sistemelor ce compun solutia descrisa.
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.6\textwidth]{c2/C4_level1}
+	\caption{Primul nivel diagrama C4}
+\end{figure}
+
+\newpage
+\subsection*{Nivelul 2}
+Al doilea nivel prezinta \textit{containerele} principale ale fiecaurui sistem din nivelul anterior, astfel oferind o viziune mai clara asupra arhitecturii generale a platformei si a functionalitatilor sale.
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=0.7\textwidth]{c2/C4_level2}
+	\caption{Al doile nivel din diagrama C4}
+\end{figure}
+
+\subsection*{Nivelul 3}
+Al treilea nivel ofera o viziune mult mai detaliata asupra componentelor ce apartin \textit{container-ului} de la nivelul secund, oferind abstractii cat mai apropiate de codul ce urmeaza a fi scris pentru a le implementa.
+
+\vspace{1cm}
+\begin{figure}[h]
+	\centering
+	
+	\includegraphics[width=1\textwidth]{c2/C4_level3}
+	\caption{Nivelul trei din diagrama C4}
+\end{figure}
+
+
 
 \section{Arhitectura serverului}
 
@@ -27,7 +66,7 @@ Alegerea acestui tip de arhitectura a fost motivata de mai multe avantaje cheie 
 	
 	\item usurinta testarii de tip \textit{unit-testing} cat si \textit{integration-testing} intrucat toate modulele sunt in acelasi loc;
 	
-	\item  depistarea erorilor si rezolvarea lor este mult mai rapida;
+	\item  depistarea erorilor si rezolvarea lor este mult mai rapida.
 \end{itemize}
 Ca in orice alegere pe care o facem, trebuie sa punem in balanta avantajele si dezavantajele pe care aceasta le ofera si sa le comparam strict cu nevoile si problemele pe care incercam sa le rezolvam. Privind in ansamblu si pe termen lung, arhitectura de tip \textit{monolith} prezinta si ea unele dezavantaje : 
 
@@ -37,14 +76,14 @@ Ca in orice alegere pe care o facem, trebuie sa punem in balanta avantajele si d
  
  \item \textit{scalabilitate redusa} datorita stransei legaturi dintre componentele prezente in aplicatie;
  
- \item 	orice schimbare adusa in materie de noi functionalitati necesita lansarii intregii aplicatii, nu doar a unui singur modul;
+ \item 	orice schimbare adusa in materie de noi functionalitati necesita lansarii intregii aplicatii, nu doar a unui singur modul.
 
 \end{itemize}
 
 Pentru a diminua efectele negative pe care aceste dezavantaje le au asupra intregului proces de dezvoltare a aplicatiei, am incercat implementarea diferitelor solutii in materie de arhitectura, \textit{desing pattern-uri} cretionale, arhitecturale cat si a numeroase practici bune comune in scrierea si mentenanta codului.
 
 \subsection*{Arhitectura \textit{Clean Code}}
-Arhitectura \textit{Clean Code } este bazata pe ideea principala precum ca stratul de logica interna (\textit{business layer}) este situat central in diagrama circulara, astfel acesta este protejat de schimbari externe. Aceasta proprietate poate fi reformulata astfel incat se defineste \textbf{Regula Dependintei} care presupune ca dependintele pot sa fie orientate doar inspre interiorul cercului, astfel niciunul din modulele interioare nu ar trebui sa fie legat in orice fel de un modul exterior acestuia.
+Arhitectura \textit{Clean Code } este bazata pe ideea principala precum ca stratul de logica interna (\textit{business layer}) este situat central in diagrama circulara, astfel acesta este protejat de schimbari externe. Aceasta proprietate poate fi reformulata astfel incat se defineste \textbf{Regula Dependentei} care presupune ca dependintele pot sa fie orientate doar inspre interiorul cercului, astfel niciunul din modulele interioare nu ar trebui sa fie legat in orice fel de un modul exterior acestuia.
 
 \begin{figure}[h]
 	\centering
@@ -63,7 +102,7 @@ Adoptarea acestui tip de arhitectura impreuna cu cea de tip \textit{monolith} in
 	
 	\item testarea componentelor se poate face atat individual cat si in relatie cu alte module, astfel eliminand nevoia de testare a intregii aplicatii;
 	
-	\item stratul de logica interna este independent de baza de date folosita, asftel serverul de stocare al datelor poate fi schimbat cu usurinta;
+	\item stratul de logica interna este independent de baza de date folosita, asftel serverul de stocare al datelor poate fi schimbat cu usurinta.
 
 \end{itemize} 
 Modul in care arhitectura de tip \textit{Clean Code} a fost implementata in aceste proiect consta in separarea straturilor aplicatiei, astfel incat avem:
@@ -76,7 +115,7 @@ Modul in care arhitectura de tip \textit{Clean Code} a fost implementata in aces
 	
   	\item \textit{UI Layer} defineste structura de prezentare a aplicatiei si este formata din parte de \textit{Frontend} a aplicatiei;
   
- 	 \item \textit{Infrastructure Layer} in care gasim logica ce se ocupa de comunicarea cu serviciile externe cum ar fi baza de date, AWS sau servicii de identitate;
+ 	 \item \textit{Infrastructure Layer} in care gasim logica ce se ocupa de comunicarea cu serviciile externe cum ar fi baza de date, AWS sau servicii de identitate.
  	 
 \end{itemize}
 
@@ -100,7 +139,7 @@ Solutia prezentata de acest model este crearea unei clase \textit{template} care
 \end{figure}
 
 \subsection*{\textit{Mediator pattern}}
-Acest \textit{design pattern} este unul de tip comportamental si se asigura ca nu exista dependinte haotice intre entitatile/clasele din codul scris. Modelul restrictioneaza comunicarea directa intre obiecte si le obliga sa interactioneaze doar prin intermediul unui \textit{mediator}.\\
+Acest \textit{design pattern} este unul de tip comportamental si se asigura ca nu exista dependente haotice intre entitatile/clasele din codul scris. Modelul restrictioneaza comunicarea directa intre obiecte si le obliga sa interactioneaze doar prin intermediul unui \textit{mediator}.\\
 Acest model este implementat prin utilizarea unei interfate sau clase abstracte care stie toate referintele la componentele care vor sa comunice. In acest mod, in loc sa trimita solicitari directe, un obiect comunica prin intermediul mediatorului, acesta stiind unde sa redirectioneaze cererea primita.
 
 
@@ -115,7 +154,7 @@ Acest model este implementat prin utilizarea unei interfate sau clase abstracte 
 \subsection*{\textit{Command pattern}}	
 
 Acest \textit{design pattern} este de asemenea unul de tip comportamental si se utilizeaza partial de \textit{design pattern-ul Mediator}, transformand astfel o comanda, spre exemplu o cerere de creare a unei noi entitati, intr-un obiect independent, acesta ulterior fiind trimis catre mediator si executat in \textit{handler-ul} corespunzator acestuia, de obicei numit \textit{receiver}.\\
-In contextul dezvoltarii partii de server a aplicatiei AudIT, acesta este utiliat, impreuna cu modelul Mediator pentru a delega orice comanda (\textit{request}) primita catre obiectul care stie sa o execute. In acest mod, se elimina dependinte stranse intre obiecte, promovand un cod cat mai bine organizat si elegant.\\
+In contextul dezvoltarii partii de server a aplicatiei AudIT, acesta este utiliat, impreuna cu modelul Mediator pentru a delega orice comanda (\textit{request}) primita catre obiectul care stie sa o execute. In acest mod, se elimina dependente stranse intre obiecte, promovand un cod cat mai bine organizat si elegant.\\
 
 \vspace{1cm}
 \begin{figure}[h]
@@ -167,7 +206,7 @@ In plus, s-au utilizat diferite biblioteci pentru dezvoltarea anumitor servicii,
 	
 	\item AutoMapper este o bibilioteca externa utilizata pentru a transforma diferitele tipuri de obiecte intre ele, eliminand astfel codul \textit{boilerplate} necesar pentru a copia datele de la  o entitate la alta;
 	
-	\item OpenXML este o biblioteca \textit{open-source} care permite manipularea fisierelor Office de tipul .XLSX sau .DOCS. Este integrata pentru a oferi utilizatorilor functionalitatea de a putea edita sau exporta pe platforma documente oficiale tip sablon;
+	\item OpenXML este o biblioteca \textit{open-source} care permite manipularea fisierelor Office de tipul .XLSX sau .DOCS. Este integrata pentru a oferi utilizatorilor functionalitatea de a putea edita sau exporta pe platforma documente oficiale tip sablon.
 	
 \end{itemize}
    
@@ -221,7 +260,7 @@ De asemenea, pentru o stilizare si o reutilizare a componentelor, s-a folosit li
 		
 		\item securitatea datelor oferita de MySQL prin integrarea unui sistem solid de privilegii si de restrictionarea a accesului bazat pe roluri;
 		
-		\item flexibilitatea si functionalitatile pe care acesta le ofera sporesc productivitatea dezvoltarii aplicatiilor;
+		\item flexibilitatea si functionalitatile pe care acesta le ofera sporesc productivitatea dezvoltarii aplicatiilor.
 	\end{itemize} 
  
  \subsection*{Entity Framework Core}
@@ -235,7 +274,7 @@ Aceasta tehnologie dispune de o serie de caracteristici si functionalitati care 
 	
 	\item suportul pentru majoritatea bazelor de date existente in momentul de fata, primind constant actualizari;
 	
-	\item performanta interogarilor, astfel incat sistemul este optimizat sa colecteze intr-un mod eficient rezultatele interogarilor;
+	\item performanta interogarilor, astfel incat sistemul este optimizat sa colecteze intr-un mod eficient rezultatele interogarilor.
 	 
 \end{itemize}
 
@@ -327,40 +366,3 @@ La pasul de creare a unui cont nou, utilizatorilor le este  impusa folosirea une
 Verificarea se face pe baza unui email primit de acesta in care se cere validarea identitatii noul cont creat, astfel minimizand riscul crearii a unor conturi false respectiv a unor false identitati.
 
 \newpage
-\section{Diagrame de context C4 }
-
-Diagramele de context C4 reprezinta un stadard in ceea ce priveste o vedere de ansamblu, dar care merge inspectata in detaliu pentru fiecare component al aplicatiei, astfel promovand o ierarhizarea si o intelegere a intreg sistemului mai buna.\\
-
-
-\subsection*{Nivelul 1}
-Primnul nivel al diagramelor de context ofera o viziune de ansamblu asupra sistemelor ce compun solutia descrisa.
-\vspace{1cm}
-\begin{figure}[h]
-	\centering
-	
-	\includegraphics[width=0.6\textwidth]{c2/C4_level1}
-	\caption{Primul nivel diagrama C4}
-\end{figure}
-
-\newpage
-\subsection*{Nivelul 2}
-Al doilea nivel prezinta \textit{containerele} principale ale fiecaurui sistem din nivelul anterior, astfel oferind o viziune mai clara asupra arhitecturii generale a platformei si a functionalitatilor sale.
-\vspace{1cm}
-\begin{figure}[h]
-	\centering
-	
-	\includegraphics[width=0.7\textwidth]{c2/C4_level2}
-	\caption{Al doile nivel din diagrama C4}
-\end{figure}
-
-\subsection*{Nivelul 3}
-Al treilea nivel ofera o viziune mult mai detaliata asupra componentelor ce apartin \textit{container-ului} de la nivelul secund, oferind abstractii cat mai apropiate de codul ce urmeaza a fi scris pentru a le implementa.
-
-\vspace{1cm}
-\begin{figure}[h]
-	\centering
-	
-	\includegraphics[width=1\textwidth]{c2/C4_level3}
-	\caption{Nivelul trei din diagrama C4}
-\end{figure}
-

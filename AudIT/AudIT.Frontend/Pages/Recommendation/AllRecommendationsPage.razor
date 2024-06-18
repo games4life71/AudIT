@@ -229,8 +229,12 @@
             commmand.AditionalFindings = recommendation.AditionalFindings;
             commmand.DueDate = recommendation.DueDate;
             commmand.Id = recommendation.Id;
+            if (!String.IsNullOrEmpty(selectedStatus))
+            {
+                commmand.Status = (Status)Enum.Parse(typeof(Status), selectedStatus);
+            }
 
-            commmand.Status = (Status)Enum.Parse(typeof(Status), selectedStatus);
+
 
 
             var response = await _recommendationService.UpdateRecommendationAsync(commmand);
