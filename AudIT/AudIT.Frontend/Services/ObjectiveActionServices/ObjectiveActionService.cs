@@ -90,7 +90,7 @@ public class ObjectiveActionService(HttpClient httpClient) : IObjectiveActionSer
         };
     }
 
-    public async Task<BaseDTOResponse<ObjectiveActionViewModel>> GetObjectiveActionByObjectiveIdAsync(Guid id)
+    public async Task<BaseDTOResponse<ObjectiveActionViewModel>> GetObjectivesActionByObjectiveIdAsync(Guid id)
     {
         var resposne = await httpClient.GetAsync($"{IObjectiveActionService.ApiPath}/get-objective-actions/{id}");
 

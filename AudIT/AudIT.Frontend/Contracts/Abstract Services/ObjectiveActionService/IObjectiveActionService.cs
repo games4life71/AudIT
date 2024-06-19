@@ -17,5 +17,5 @@ public interface IObjectiveActionService
 
     public Task<BaseDTOResponse<ObjectiveActionViewModel>> GetObjectiveActionByIdAsync(Guid id);
 
-    public Task<BaseDTOResponse<ObjectiveActionViewModel>> GetObjectiveActionByObjectiveIdAsync(Guid id);
+    public Task<BaseDTOResponse<ObjectiveActionViewModel>> GetObjectivesActionByObjectiveIdAsync(Guid id);
 }

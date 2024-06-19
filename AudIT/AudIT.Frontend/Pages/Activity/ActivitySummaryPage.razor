@@ -162,7 +162,7 @@
 
     private async Task FetchObjectiveActionsAsync(Guid value)
     {
-        var result = await _objectiveActionService.GetObjectiveActionByObjectiveIdAsync(value);
+        var result = await _objectiveActionService.GetObjectivesActionByObjectiveIdAsync(value);
 
         if (result.Success)
         {

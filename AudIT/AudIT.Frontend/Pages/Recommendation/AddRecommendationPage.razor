@@ -251,7 +251,7 @@
 
     private async Task OnObjectiveSelected(Guid objectiveId)
     {
-        var response = await _objectiveActionService.GetObjectiveActionByObjectiveIdAsync(objectiveId);
+        var response = await _objectiveActionService.GetObjectivesActionByObjectiveIdAsync(objectiveId);
 
         if (response.Success)
         {

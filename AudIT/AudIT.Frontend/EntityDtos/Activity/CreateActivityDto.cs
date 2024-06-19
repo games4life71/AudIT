@@ -14,10 +14,10 @@ public class CreateActivityDto
 
     public Guid UserId { get; set; }
 
-    public Guid? ObjectiveActionId { get; set; }
+    public Guid ObjectiveActionId { get; set; }
 
     public CreateActivityDto(string name, ActivityType type, Guid departmentId, Guid auditMissionId, Guid userId,
-        Guid? objectiveActionId)
+        Guid objectiveActionId)
     {
         Name = name;
         Type = type;

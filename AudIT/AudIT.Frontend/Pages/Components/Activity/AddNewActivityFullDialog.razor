@@ -1,0 +1,226 @@
+﻿@using Frontend.Contracts.Abstract_Services.ActivityService
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
+@using Frontend.Contracts.Abstract_Services.ObjectiveActionService
+@using Frontend.EntityDtos.Activity
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityViewModels.Activity
+@using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
+@using Frontend.EntityViewModels.Objective
+@using Frontend.EntityViewModels.ObjectiveAction
+@using Frontend.Services.AuthentificationServices
+@using ButtonType = Radzen.ButtonType
+@using Orientation = Radzen.Orientation
+
+@inject CustomAuthStateProvider _authStateProvider
+@inject IObjectiveActionService objActionService;
+@inject NotificationService _notificationService
+@inject DialogService _dialogService
+@inject IAuditMissionService auditMissionService
+@inject IActivityService _activityService
+@inject NavigationManager _navigationManager
+@inject ICurrentUserAuditMissionService _currentUserAuditMissionService
+@inject IAuditMissionService _auditMissionService
+
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenStack Orientation="Orientation.Vertical">
+        @if (_auditMission.Id != Guid.Empty)
+        {
+            <RadzenLink Path="@($"/audit-mission/{_auditMission.Id}")">
+                <RadzenText Text="@($"Selected Audit Mission: {_auditMission.Name}")"></RadzenText>
+            </RadzenLink>
+        }
+        else
+        {
+            <RadzenLink Path="@($"/audit-missions")">
+                <RadzenText Text="Please select an audit mission "></RadzenText>
+            </RadzenLink>
+        }
+        <RadzenSteps class="rz-mt-6">
+            <Steps>
+                <RadzenStepsItem Text="Objective">
+                    <RadzenStack Orientation="Orientation.Vertical">
+                        <RadzenLabel Text="Objective:"></RadzenLabel>
+                        <RadzenDropDown
+                            Data="Objectives"
+                            TValue="Guid"
+                            TextProperty="Name"
+                            ValueProperty="Id"
+                            Value="_selectedObjectiveId"
+                            ValueChanged="@((value) => ObjectiveSelected(value))"/>
+
+
+                    </RadzenStack>
+                </RadzenStepsItem>
+
+                @code{
+
+                    private async Task ObjActionSelected(string value)
+                    {
+                        _createActivityDto.ObjectiveActionId = Guid.Parse(value);
+                    }
+
+
+                }
+
+                <RadzenStepsItem Text=" Objective Action">
+                    <RadzenStack Orientation="Orientation.Vertical">
+                        <RadzenLabel Text="Action:"></RadzenLabel>
+                        <RadzenDropDown
+                            Data="_objectiveActions"
+                            TValue="string"
+                            TextProperty="name"
+                            ValueProperty="id"
+                            Value="@_createActivityDto.ObjectiveActionId"
+                            ValueChanged="@((value) => ObjActionSelected(value))"/>
+                    </RadzenStack>
+                </RadzenStepsItem>
+
+                <RadzenStepsItem Text="Name">
+                    <RadzenRow JustifyContent="JustifyContent.Center">
+                        <RadzenStack Orientation="Orientation.Vertical">
+                            <RadzenLabel Text="Name:"></RadzenLabel>
+                            <RadzenTextBox @bind-Value="@_createActivityDto.Name" Name="forName" Placeholder="Name..."></RadzenTextBox>
+                        </RadzenStack>
+                    </RadzenRow>
+                </RadzenStepsItem>
+                <RadzenStepsItem Text="Activity Type">
+                    <RadzenRow JustifyContent="JustifyContent.Center">
+                        <RadzenStack Orientation="Orientation.Vertical">
+                            <RadzenStack Orientation="Orientation.Horizontal">
+                                <RadzenLabel Text="Type:"></RadzenLabel>
+                                <RadzenText Text="@_selectedActivityType"></RadzenText>
+                            </RadzenStack>
+                            <RadzenListBox @bind-Value="@_selectedActivityType" Data="@_activityTypes"/>
+                            <RadzenButton Click="@CreateActivity" Text="Create" ButtonStyle="ButtonStyle.Success"></RadzenButton>
+                            <RadzenButton Text="Cancel" ButtonStyle="ButtonStyle.Dark"></RadzenButton>
+                        </RadzenStack>
+                    </RadzenRow>
+                </RadzenStepsItem>
+            </Steps>
+        </RadzenSteps>
+    </RadzenStack>
+</RadzenCard>
+
+
+@code {
+
+    [Parameter] public List<BaseObjectiveViewModel> Objectives { get; set; }
+
+    [Parameter] public Guid AuditMissionId { get; set; }
+
+    [Parameter] public EventCallback OnActivityCreated { get; set; }
+
+    private List<string> _activityTypes = Enum.GetNames(typeof(ActivityType)).ToList();
+
+    private List<ObjectiveActionViewModel> _objectiveActions = [];
+
+    private string _selectedActivityType = String.Empty;
+
+    private CreateActivityDto _createActivityDto = new CreateActivityDto();
+
+    private Guid _selectedObjectiveId = Guid.Empty;
+
+    private CurrentUserAuditMissionViewModel _currentUserAuditMission { get; set; } = new CurrentUserAuditMissionViewModel();
+
+    private BaseAuditMissionDto _auditMission { get; set; } = new BaseAuditMissionDto();
+
+}
+
+
+@functions
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCurrentUserAuditMissionAsync();
+    }
+
+
+    private async Task CreateActivity()
+    {
+        if (_createActivityDto.Name == String.Empty)
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Name is required", "Please enter a name for the activity");
+            return;
+        }
+
+
+        if (_selectedActivityType == String.Empty)
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Activity type is required", "Please select an activity type");
+            return;
+        }
+
+        if (_createActivityDto.ObjectiveActionId == Guid.Empty)
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Objective Action is required", "Please select an objective action");
+            return;
+        }
+
+
+        _createActivityDto.Type = (ActivityType)Enum.Parse(typeof(ActivityType), _selectedActivityType);
+        _createActivityDto.AuditMissionId = AuditMissionId;
+        var departmentId = await FetchDepartmentId();
+        if (departmentId != Guid.Empty)
+        {
+            _createActivityDto.DepartmentId = departmentId;
+        }
+
+        var userId = await _authStateProvider.GetUserIdFromTokenAsync();
+
+        _createActivityDto.UserId = userId.Item1;
+
+        var result = await _activityService.CreateActivityAsync(_createActivityDto);
+
+        if (result.Success)
+        {
+            await OnActivityCreated.InvokeAsync();
+            _dialogService.Close(true);
+            _notificationService.Notify(NotificationSeverity.Success, "Success", "Activity created successfully");
+
+            _navigationManager.NavigateTo("/activities");
+        }
+        else
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Error", "An error occurred while creating the activity");
+        }
+    }
+
+
+    private async Task ObjectiveSelected(Guid value)
+    {
+        _selectedObjectiveId = value;
+
+        var result = await objActionService.GetObjectivesActionByObjectiveIdAsync(value);
+
+        if (result.Success)
+        {
+            _objectiveActions = result.DtoResponses;
+        }
+    }
+
+    private async Task<Guid> FetchDepartmentId()
+    {
+        var result = await auditMissionService.GetAuditMissionById(AuditMissionId);
+
+        if (result.Success)
+        {
+            if (result.DtoResponse != null) return result.DtoResponse.DepartmentId;
+        }
+
+        return Guid.Empty;
+    }
+
+    public async Task GetCurrentUserAuditMissionAsync()
+    {
+        var result = await _currentUserAuditMissionService.GetCurrentUserAuditMissionAsync();
+
+        if (result is { Success: true, DtoResponse: not null }) _currentUserAuditMission = result.DtoResponse;
+        var auditMissionResult = await _auditMissionService.GetAuditMissionById(_currentUserAuditMission.AuditMissionId);
+
+        if (auditMissionResult is { Success: true, DtoResponse: not null }) _auditMission = auditMissionResult.DtoResponse;
+    }
+}
+
+
+
