@@ -7,6 +7,7 @@ using Frontend.Contracts.Abstract_Services.AuditMissionService;
 using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService;
 using Frontend.Contracts.Abstract_Services.DepartmentService;
 using Frontend.Contracts.Abstract_Services.DocumentService;
+using Frontend.Contracts.Abstract_Services.ExportService;
 using Frontend.Contracts.Abstract_Services.FiapService;
 using Frontend.Contracts.Abstract_Services.InstitutionsService;
 using Frontend.Contracts.Abstract_Services.ObjectiveActionService;
@@ -20,6 +21,7 @@ using Frontend.Services.AuthentificationServices;
 using Frontend.Services.CurrentUserAuditMissionService;
 using Frontend.Services.Department;
 using Frontend.Services.Document;
+using Frontend.Services.ExportService;
 using Frontend.Services.FiapService;
 using Frontend.Services.InstitutionServices;
 using Frontend.Services.Misc;
@@ -60,6 +62,7 @@ public static class ServiceRegistration
         services.AddScoped<IActionRiskService, ActionRiskService>();
         services.AddScoped<ICurrentUserAuditMissionService, CurrentUserAuditMissionService>();
         services.AddScoped<IRecommendationService, RecommendationService>();
+        services.AddScoped<IExportService, ExportService>();
         services.AddBlazoredLocalStorage();
 
         // services.AddScoped<ClaimsPrincipal>();

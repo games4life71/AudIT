@@ -9,10 +9,10 @@ namespace AudIT.API.Controllers.Export;
 [Route("api/[controller]")]
 public class ExportController : BaseController
 {
-    [HttpGet]
+    [HttpPost]
     [Route("activities/csv")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> ExportActivitiesCSV([FromQuery] List<Guid> activityIds)
+    public async Task<IActionResult> ExportActivitiesCSV([FromBody] List<Guid> activityIds)
     {
         var command = new ExportActivityCSVCommand
         {

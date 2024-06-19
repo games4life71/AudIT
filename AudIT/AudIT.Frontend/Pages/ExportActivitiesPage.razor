@@ -1,0 +1,174 @@
+﻿@page "/export-activities"
+@using System.Collections.ObjectModel
+@using Frontend.Contracts.Abstract_Services.ActivityService
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
+@using Frontend.Contracts.Abstract_Services.ExportService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityViewModels.Activity
+@using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
+@using Orientation = Radzen.Orientation
+
+
+@inject IExportService _exportService
+@inject IActivityService _activityService
+@inject ICurrentUserAuditMissionService _currentAuditMissionService
+@inject IAuditMissionService _auditMissionService
+@inject IJSRuntime _jsRuntime
+
+<RadzenStack Orientation="Orientation.Vertical">
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenText Text="Export Activities" TextStyle="TextStyle.DisplayH5"/>
+        @if (_auditMission.Id != Guid.Empty)
+        {
+            <RadzenLink Path="@($"/audit-mission/{_auditMission.Id}")">
+                <RadzenText Text="@($"Selected Audit Mission: {_auditMission.Name}")"></RadzenText>
+            </RadzenLink>
+        }
+        else
+        {
+            <RadzenLink Path="@($"/audit-missions")">
+                <RadzenText Text="Please select an audit mission "></RadzenText>
+            </RadzenLink>
+        }
+
+    </RadzenStack>
+
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenStack Orientation="Orientation.Horizontal" class="rz-my-6">
+                <RadzenStack Orientation="Orientation.Vertical">
+                    <RadzenText Text="Activities:" TextStyle="TextStyle.DisplayH6"></RadzenText>
+                    <RadzenDataGrid AllowSorting="true"
+                                    AllowFiltering="true"
+                                    PageSize="7"
+                                    Data="_sourceActivities"
+                                    RowRender="@RowRender"
+                                    ondragover="event.preventDefault()"
+                                    @ondrop=@((args) => Move(_destinationActivities, _sourceActivities))>
+
+                        <Columns>
+                            @RenderColumns()
+
+                        </Columns>
+                    </RadzenDataGrid>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical">
+                    <RadzenText Text="Selected activities:" TextStyle="TextStyle.DisplayH6"></RadzenText>
+                    <RadzenDataGrid
+                        AllowSorting="true"
+                        AllowFiltering="true"
+                        PageSize="7"
+                        Data="_destinationActivities"
+                        RowRender="@RowRender"
+                        ondragover="event.preventDefault()"
+                        @ondrop=@((args) => Move(_sourceActivities, _destinationActivities))>
+
+                        <Columns>
+                            @RenderColumns()
+                        </Columns>
+
+                    </RadzenDataGrid>
+                </RadzenStack>
+            </RadzenStack>
+            <RadzenButton Click="@ExportActivities" Text="Export" ButtonStyle="ButtonStyle.Success"></RadzenButton>
+        </RadzenStack>
+
+    </RadzenCard>
+
+
+</RadzenStack>
+
+
+@code {
+
+    private CurrentUserAuditMissionViewModel _currentAuditMission = new CurrentUserAuditMissionViewModel();
+
+    private BaseAuditMissionDto _auditMission { get; set; } = new BaseAuditMissionDto();
+
+    private ObservableCollection<BaseActivityViewmodel> _sourceActivities = [];
+    private ObservableCollection<BaseActivityViewmodel> _destinationActivities = [];
+
+    BaseActivityViewmodel draggedItem;
+}
+
+@functions
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCurrentUserAuditMissionAsync();
+        await FetchActivities();
+    }
+
+
+    private async Task FetchActivities()
+    {
+        var response = await _activityService.GetActivitiesByAuditMissionIdAsync(_currentAuditMission.AuditMissionId);
+
+        if (response.Success)
+        {
+            if (response.DtoResponses.Any())
+            {
+                _sourceActivities = new ObservableCollection<BaseActivityViewmodel>(response.DtoResponses);
+            }
+        }
+    }
+
+    public async Task GetCurrentUserAuditMissionAsync()
+    {
+        var result = await _currentAuditMissionService.GetCurrentUserAuditMissionAsync();
+
+        if (result is { Success: true, DtoResponse: not null }) _currentAuditMission = result.DtoResponse;
+        var auditMissionResult = await _auditMissionService.GetAuditMissionById(_currentAuditMission.AuditMissionId);
+
+        if (auditMissionResult is { Success: true, DtoResponse: not null }) _auditMission = auditMissionResult.DtoResponse;
+    }
+
+    private void RowRender(RowRenderEventArgs<BaseActivityViewmodel> args)
+    {
+        args.Attributes.Add("title", "Drag row to move it to the other DataGrid");
+        args.Attributes.Add("style", "cursor:grab");
+        args.Attributes.Add("draggable", "true");
+        args.Attributes.Add("ondragstart", EventCallback.Factory.Create<DragEventArgs>(this, () => draggedItem = args.Data));
+    }
+
+    RenderFragment RenderColumns()
+    {
+        return __builder =>
+        {
+            <text>
+                <RadzenDataGridColumn TItem="BaseActivityViewmodel" Property="Name" Title="Name"/>
+                <RadzenDataGridColumn TItem="BaseActivityViewmodel" Property="Type" Title="Type"/>
+            </text>
+        };
+    }
+
+
+    void Move(ObservableCollection<BaseActivityViewmodel> source, ObservableCollection<BaseActivityViewmodel> destination)
+    {
+        if (source.Contains(draggedItem))
+        {
+            source.Remove(draggedItem);
+        }
+
+        if (!destination.Contains(draggedItem))
+        {
+            destination.Add(draggedItem);
+        }
+    }
+
+    private async Task ExportActivities(MouseEventArgs obj)
+    {
+        var activityIds = _destinationActivities.Select(x => x.Id).ToList();
+
+        var stream = await _exportService.ExportActivitiesCSVAsync(activityIds);
+
+        if (stream is not null)
+        {
+            var fileName = $"Activities_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv";
+            using var StreamRef = new DotNetStreamReference(stream);
+            await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, StreamRef);
+        }
+    }
+}
