@@ -10,6 +10,7 @@
 @using Orientation = Radzen.Orientation
 
 
+@inject NavigationManager _navigationManager
 @inject IExportService _exportService
 @inject IActivityService _activityService
 @inject ICurrentUserAuditMissionService _currentAuditMissionService
@@ -72,6 +73,7 @@
                     </RadzenDataGrid>
                 </RadzenStack>
             </RadzenStack>
+            <RadzenButton Click="@NavigateAddActivity" ButtonStyle="ButtonStyle.Dark" Text="Add Activity"></RadzenButton>
             <RadzenButton Click="@ExportActivities" Text="Export" ButtonStyle="ButtonStyle.Success"></RadzenButton>
         </RadzenStack>
 
@@ -170,5 +172,10 @@
             using var StreamRef = new DotNetStreamReference(stream);
             await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, StreamRef);
         }
+    }
+
+    private void NavigateAddActivity(MouseEventArgs obj)
+    {
+        _navigationManager.NavigateTo($"/add-activity");
     }
 }

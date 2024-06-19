@@ -16,4 +16,16 @@ public class ExportService(HttpClient httpClient) : IExportService
 
         return null;
     }
+
+    public async Task<Stream>? ExportFiapAsync(Guid fiapId)
+    {
+        var result = await httpClient.GetAsync($"{IExportService.ApiPath}/fiap/{fiapId}");
+
+        if (result.IsSuccessStatusCode)
+        {
+            return await result.Content.ReadAsStreamAsync();
+        }
+
+        return null;
+    }
 }

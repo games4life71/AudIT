@@ -1,0 +1,136 @@
+﻿@page "/export-fiap"
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
+@using Frontend.Contracts.Abstract_Services.ExportService
+@using Frontend.Contracts.Abstract_Services.FiapService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
+@using Frontend.EntityViewModels.Fiap
+@using Orientation = Radzen.Orientation
+
+@inject IJSRuntime _jsRuntime
+@inject ICurrentUserAuditMissionService _currentAuditMissionService
+@inject IAuditMissionService _auditMissionService
+@inject IFiapService _fiapService
+@inject IExportService exportService
+@inject DialogService _dialogService
+@inject NotificationService _notificationService
+<RadzenStack Orientation="Orientation.Vertical">
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenText Text="Autocomplete FIAP Document" TextStyle="TextStyle.DisplayH5"/>
+        @if (_auditMission.Id != Guid.Empty)
+        {
+            <RadzenLink Path="@($"/audit-mission/{_auditMission.Id}")">
+                <RadzenText Text="@($"Selected Audit Mission: {_auditMission.Name}")"></RadzenText>
+            </RadzenLink>
+        }
+        else
+        {
+            <RadzenLink Path="@($"/audit-missions")">
+                <RadzenText Text="Please select an audit mission "></RadzenText>
+            </RadzenLink>
+        }
+
+    </RadzenStack>
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical">
+
+            <RadzenDataGrid
+                Data="@_fiaps"
+                TItem="BaseObjActionFiapViewmodel"
+                AllowFiltering="true"
+                AllowPaging="true"
+                PageSize="10"
+                AllowSorting="true"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                SelectionMode="DataGridSelectionMode.Single"
+                @bind-Value="@selectedFiaps">
+
+                <Columns>
+                    <RadzenDataGridColumn Title="Name" Property="Name"/>
+                    <RadzenDataGridColumn Title="Problem" Property="Problem"/>
+                    <RadzenDataGridColumn Title="Recommendation" Property="Recommendation"/>
+                </Columns>
+            </RadzenDataGrid>
+            <RadzenButton Click="@ExportFiap" Icon="download" ButtonStyle="ButtonStyle.Dark" Text="Autocomplete & Download "></RadzenButton>
+
+        </RadzenStack>
+
+
+    </RadzenCard>
+
+
+</RadzenStack>
+
+
+@code {
+    private CurrentUserAuditMissionViewModel _currentAuditMission = new CurrentUserAuditMissionViewModel();
+
+    private BaseAuditMissionDto _auditMission { get; set; } = new BaseAuditMissionDto();
+
+    private List<BaseObjActionFiapViewmodel> _fiaps = [];
+
+    private IList<BaseObjActionFiapViewmodel> selectedFiaps { get; set; } = [];
+}
+
+
+@functions
+{
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCurrentUserAuditMissionAsync();
+        await FetchFiaps();
+    }
+
+    private async Task GetCurrentUserAuditMissionAsync()
+    {
+        var result = await _currentAuditMissionService.GetCurrentUserAuditMissionAsync();
+
+        if (result is { Success: true, DtoResponse: not null }) _currentAuditMission = result.DtoResponse;
+        var auditMissionResult = await _auditMissionService.GetAuditMissionById(_currentAuditMission.AuditMissionId);
+
+        if (auditMissionResult is { Success: true, DtoResponse: not null }) _auditMission = auditMissionResult.DtoResponse;
+    }
+
+
+    private async Task FetchFiaps()
+    {
+        var result = await _fiapService.GetFiapsByAudidMissionAsync(_currentAuditMission.AuditMissionId);
+
+        if (result.Success)
+        {
+            _fiaps = result.DtoResponses;
+        }
+    }
+
+    private async Task ExportFiap(MouseEventArgs obj)
+    {
+        if (!selectedFiaps.Any())
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Please select a FIAP to export");
+            return;
+        }
+
+        var confirmResult = await _dialogService.Confirm($"Are you sure you want to autocomplete  {selectedFiaps[0].Name} FIAP ?", "Confirm FIAP Autocomplete", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+        if (confirmResult.Value)
+        {
+            var stream = await exportService.ExportFiapAsync(selectedFiaps[0].Id);
+
+            if(stream != null)
+            {
+                var fileName = $"{selectedFiaps[0].Name}.docx";
+                using var StreamRef = new DotNetStreamReference(stream);
+                await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, StreamRef);
+
+
+            }
+            else
+            {
+                _notificationService.Notify(NotificationSeverity.Error, "Error exporting FIAP");
+            }
+        }
+    }
+}
