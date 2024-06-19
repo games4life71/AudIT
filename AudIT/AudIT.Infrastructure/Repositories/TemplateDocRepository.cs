@@ -1,6 +1,7 @@
 ﻿using AudIT.Applicationa.Contracts.AbstractRepositories;
 using AudiT.Domain.Entities;
 using AudIT.Domain.Misc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AudIT.Infrastructure.Repositories;
 
@@ -11,9 +12,13 @@ public class TemplateDocRepository(AudITContext context)
 
     public async Task<Result<TemplateDocument>> GetTemplateDocumentByName(string name)
     {
-        var result = _dbcContext.TemplateDocuments
-            .First(x => x.Name == name);
+        var result = await _dbcContext.TemplateDocuments
+            .FirstOrDefaultAsync(x => x.Name == name);
 
+        if (result == null)
+        {
+            return Result<TemplateDocument>.Failure("Document not found");
+        }
 
         if (result.Id == Guid.Empty)
         {

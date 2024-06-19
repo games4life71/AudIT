@@ -184,6 +184,19 @@
     {
         try
         {
+            if(_selectedDepartmentId == Guid.Empty || _selectedInstitutionId == Guid.Empty)
+            {
+                _notificationService.Notify(NotificationSeverity.Error, "Please select an institution and department");
+                return;
+            }
+            else if (_selectedFiles.Count == 0)
+            {
+                _notificationService.Notify(NotificationSeverity.Error, "Please select a file to upload");
+                return;
+            }
+
+
+
             if (!templateDocumentSelected)
             {
                 //upload a normal document

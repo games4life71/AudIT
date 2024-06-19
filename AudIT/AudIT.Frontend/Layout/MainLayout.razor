@@ -24,7 +24,10 @@
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
             <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)"/>
-            <RadzenLabel Text="AudIT App"/>
+            <RadzenLink Path="/">
+                <RadzenLabel Text="AudIT App"/>
+            </RadzenLink>
+
         </RadzenStack>
 
         <RadzenStack class="rz-mx-12" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
