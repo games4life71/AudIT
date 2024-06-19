@@ -4,18 +4,22 @@
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
 @using Frontend.Contracts.Abstract_Services.ExportService
+@using Frontend.Contracts.Abstract_Services.ObjectiveService
 @using Frontend.EntityDtos.AuditMission
 @using Frontend.EntityViewModels.Activity
 @using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
+@using Frontend.EntityViewModels.Objective
+@using Frontend.Pages.Components.Activity
 @using Orientation = Radzen.Orientation
 
-
+@inject IObjectiveService _objectiveService
 @inject NavigationManager _navigationManager
 @inject IExportService _exportService
 @inject IActivityService _activityService
 @inject ICurrentUserAuditMissionService _currentAuditMissionService
 @inject IAuditMissionService _auditMissionService
 @inject IJSRuntime _jsRuntime
+@inject DialogService _dialogService
 
 <RadzenStack Orientation="Orientation.Vertical">
 
@@ -93,10 +97,23 @@
     private ObservableCollection<BaseActivityViewmodel> _destinationActivities = [];
 
     BaseActivityViewmodel draggedItem;
+
+    private List<BaseObjectiveViewModel> _objectives = [];
 }
 
 @functions
 {
+    private async Task FetchObjectives()
+    {
+        var result = await _objectiveService.GetObjectivesByAuditMissionIdAsync(_auditMission.Id);
+
+        if (result.Success)
+        {
+            _objectives = result.DtoResponses;
+        }
+    }
+
+
     protected override async Task OnInitializedAsync()
     {
         await GetCurrentUserAuditMissionAsync();
@@ -174,8 +191,19 @@
         }
     }
 
-    private void NavigateAddActivity(MouseEventArgs obj)
+    private async Task  NavigateAddActivity(MouseEventArgs obj)
     {
-        _navigationManager.NavigateTo($"/add-activity");
+        await FetchObjectives();
+        _dialogService.Open<AddNewActivityFullDialog>(
+            "Add New Activity",
+            new Dictionary<string, object>
+            {
+                { "AuditMissionId", _currentAuditMission.AuditMissionId },
+                {"Objectives", _objectives},
+                {"OnActivityCreated", EventCallback.Factory.Create(this, () => FetchActivities())}
+            },
+            new DialogOptions { Width = "50%", Height = "70%" }
+
+            );
     }
 }

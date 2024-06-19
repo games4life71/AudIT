@@ -2,9 +2,12 @@
 @using Frontend.Contracts.Abstract_Services.ActivityService
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
+@using Frontend.Contracts.Abstract_Services.ObjectiveService
 @using Frontend.EntityDtos.AuditMission
 @using Frontend.EntityViewModels.Activity
 @using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
+@using Frontend.EntityViewModels.Objective
+@using Frontend.Pages.Components.Activity
 @using Orientation = Radzen.Orientation
 @inject DialogService DialogService
 @inject ICurrentUserAuditMissionService _currentUserAuditMissionService
@@ -12,7 +15,7 @@
 @inject IAuditMissionService _auditMissionService
 @inject NotificationService notificationService
 @inject NavigationManager NavigationManager
-
+@inject IObjectiveService _objectiveService
 
 <RadzenStack Orientation="Orientation.Vertical">
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
@@ -36,7 +39,7 @@
     </RadzenStack>
     <RadzenCard Variant="Variant.Outlined">
         <RadzenStack Orientation="Orientation.Vertical">
-            <RadzenDataGrid Data="_activities" TItem="BaseActivityViewmodel">
+            <RadzenDataGrid @ref="@grid" Data="_activities" TItem="BaseActivityViewmodel">
                 <Columns>
                     <RadzenDataGridColumn Title="Name" Property="Name"></RadzenDataGridColumn>
                     <RadzenDataGridColumn Title="Type" Property="Type"></RadzenDataGridColumn>
@@ -59,11 +62,16 @@
 
 @code {
 
+
+    RadzenDataGrid<BaseActivityViewmodel> grid;
+
     private CurrentUserAuditMissionViewModel _currentUserAuditMission { get; set; } = new CurrentUserAuditMissionViewModel();
 
     private BaseAuditMissionDto _auditMission { get; set; } = new BaseAuditMissionDto();
 
     private List<BaseActivityViewmodel> _activities { get; set; } = [];
+
+    private List<BaseObjectiveViewModel> _objectives { get; set; } = [];
 
 }
 
@@ -125,8 +133,43 @@
         }
     }
 
-    private void NavigateAddActivity(MouseEventArgs obj)
+    private async Task FetchObjectives()
     {
-        NavigationManager.NavigateTo($"/add-activity");
+        var result = await _objectiveService.GetObjectivesByAuditMissionIdAsync(_auditMission.Id);
+
+        if (result.Success)
+        {
+            _objectives = result.DtoResponses;
+        }
+    }
+
+    private async Task NavigateAddActivity(MouseEventArgs obj)
+    {
+        //open the add activity dialog
+        await FetchObjectives();
+        DialogService.Open<AddNewActivityFullDialog>(
+            "Add New Activity",
+            new Dictionary<string, object>
+            {
+                { "AuditMissionId", _auditMission.Id },
+                { "Objectives", _objectives },
+                {"OnActivityCreated", new EventCallback(this, OnActivityCreated)}
+            },
+            new DialogOptions()
+            {
+                Width = "50%",
+                Height = "70%"
+
+            }
+
+            );
+
+
+    }
+
+    private async Task OnActivityCreated()
+    {
+        await GetActivitiesAsync();
+        await grid.Reload();
     }
 }
