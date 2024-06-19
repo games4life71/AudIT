@@ -6,5 +6,7 @@ public interface IExportService
 
     public Task<Stream?> ExportActivitiesCSVAsync(List<Guid> activityIds);
 
-    public Task<Stream>? ExportFiapAsync(Guid fiapId);
+    public Task<Stream> ExportFiapAsync(Guid fiapId);
+
+    public Task<Stream?> ExportObjectivesFullAsync(Guid AuditMissionId);
 }

@@ -20,54 +20,61 @@ public class ExportObjAndActionsXLSHandler(
     public async Task<BaseDTOResponse<BaseExportDto>> Handle(ExportObjectivesAndActionsXLSCommand request,
         CancellationToken cancellationToken)
     {
-        var auditMission = await auditMissionRepository.FindByIdAsync(request.AuditMissionId);
-
-        if (!auditMission.IsSuccess)
+        try
         {
-            return new BaseDTOResponse<BaseExportDto>(
-                $"Could not find AuditMission with id {request.AuditMissionId}", false);
+            var auditMission = await auditMissionRepository.FindByIdAsync(request.AuditMissionId);
+
+            if (!auditMission.IsSuccess)
+            {
+                return new BaseDTOResponse<BaseExportDto>(
+                    $"Could not find AuditMission with id {request.AuditMissionId}", false);
+            }
+
+            var objectives = await objectiveRepository.FindAllByAuditMissionIdAsync(request.AuditMissionId);
+
+            if (!objectives.IsSuccess)
+                return new BaseDTOResponse<BaseExportDto>($"Could not find Objectives for  {request.AuditMissionId}",
+                    false);
+
+
+            //retrieve the ObjectiveActions for the Objective and add them to the export model
+            List<ObjectiveAndActionsExportModel> exportModels = [];
+
+            foreach (var objective in objectives.Value)
+            {
+                var objectiveActions = await objectiveActionRepository.FindAllByObjectiveIdAsync(objective.Id);
+
+                // if (objectiveActions.Value == null)
+                // {
+                //     return new BaseDTOResponse<BaseExportDto>(
+                //         $"Something went wrong with retrieving Objective Action for Objective with id  {objective.Id}",
+                //         false);
+                // }
+
+                exportModels.Add(new ObjectiveAndActionsExportModel(
+                    objective.Name,
+                    objectiveActions.Value,
+                    auditMission.Value
+                ));
+            }
+
+
+            var fileName = $"ObjectivesAndActions_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.xlsx";
+            var exportedObjectives = await exporterService.ExportMultipleAsync(exportModels, fileName);
+
+            if (!exportedObjectives.Item1)
+            {
+                return new BaseDTOResponse<BaseExportDto>(exportedObjectives.Item3, false);
+            }
+
+            var exportDTO = new BaseExportDto(ids: [request.AuditMissionId], exportType: "ObjectiveAndActions",
+                exportFormat: ExportType.Excel, exportedData: exportedObjectives.Item2);
+
+            return new BaseDTOResponse<BaseExportDto>(exportDTO, " Succesfully exported data", true);
         }
-
-        var objectives = await objectiveRepository.FindAllByAuditMissionIdAsync(request.AuditMissionId);
-
-        if (!objectives.Value.Any())
-            return new BaseDTOResponse<BaseExportDto>($"Could not find Objectives for  {request.AuditMissionId}",
-                false);
-
-
-        //retrieve the ObjectiveActions for the Objective and add them to the export model
-        List<ObjectiveAndActionsExportModel> exportModels = [];
-
-        foreach (var objective in objectives.Value)
+        catch (Exception e)
         {
-            var objectiveActions = await objectiveActionRepository.FindAllByObjectiveIdAsync(objective.Id);
-
-            // if (objectiveActions.Value == null)
-            // {
-            //     return new BaseDTOResponse<BaseExportDto>(
-            //         $"Something went wrong with retrieving Objective Action for Objective with id  {objective.Id}",
-            //         false);
-            // }
-
-            exportModels.Add(new ObjectiveAndActionsExportModel(
-                objective.Name,
-                objectiveActions.Value,
-                auditMission.Value
-            ));
+            return new BaseDTOResponse<BaseExportDto>($"An error occured while exporting data: {e.Message}", false);
         }
-
-
-        var fileName = $"ObjectivesAndActions_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.xlsx";
-        var exportedObjectives = await exporterService.ExportMultipleAsync(exportModels, fileName);
-
-        if (!exportedObjectives.Item1)
-        {
-            return new BaseDTOResponse<BaseExportDto>(exportedObjectives.Item3, false);
-        }
-
-        var exportDTO = new BaseExportDto(ids: [request.AuditMissionId], exportType: "ObjectiveAndActions",
-            exportFormat: ExportType.Excel, exportedData: exportedObjectives.Item2);
-
-        return new BaseDTOResponse<BaseExportDto>(exportDTO, " Succesfully exported data", true);
     }
 }

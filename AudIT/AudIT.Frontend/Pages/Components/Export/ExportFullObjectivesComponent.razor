@@ -1,0 +1,66 @@
+﻿@using Frontend.Contracts.Abstract_Services.ExportService
+@using Frontend.EntityDtos.AuditMission
+@using Orientation = Radzen.Orientation
+
+@inject IJSRuntime _jsRuntime
+@inject NotificationService _notificationService
+@inject DialogService _dialogService
+@inject IExportService _exportService
+
+
+<RadzenStack Orientation="Orientation.Vertical">
+    <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+        <RadzenLabel Text="Current Audit Mission:"></RadzenLabel>
+        <RadzenLabel Text="@_currentAuditMissionName"></RadzenLabel>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Vertical">
+
+        <RadzenLabel Text="Select another audit mission:"></RadzenLabel>
+        <RadzenDropDown Data="@Missions" TextProperty="Name" ValueProperty="Id" @bind-Value="@AuditMissionId"></RadzenDropDown>
+
+    </RadzenStack>
+    <RadzenButton Icon="download" Click="@ExportObjectives" ButtonStyle="ButtonStyle.Secondary" Text="Export Objectives and Risks "></RadzenButton>
+
+</RadzenStack>
+
+
+@code {
+
+    [Parameter] public Guid AuditMissionId { get; set; }
+    [Parameter] public List<BaseAuditMissionDto> Missions { get; set; }
+
+    private string _currentAuditMissionName = String.Empty;
+}
+
+
+@functions
+{
+
+    protected override Task OnInitializedAsync()
+    {
+        var currentAuditMissionName = Missions.Find(x => x.Id == AuditMissionId).Name;
+
+        if (currentAuditMissionName != null) _currentAuditMissionName = currentAuditMissionName;
+
+
+        return base.OnInitializedAsync();
+    }
+
+    private async Task ExportObjectives(MouseEventArgs obj)
+    {
+        var response = await _exportService.ExportObjectivesFullAsync(AuditMissionId);
+
+        if (response != null)
+        {
+            var fileName = $"Objectives_and_Actions_{_currentAuditMissionName}_{DateTime.Now}.xlsx";
+            using var StreamRef = new DotNetStreamReference(response);
+            await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, StreamRef);
+
+
+        }
+        else
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "No objectives found ", "This audit mission doesn't have any objectives.", 5000);
+        }
+    }
+}

@@ -3,6 +3,7 @@
 @using Frontend.Contracts.Abstract_Services.ObjectiveService
 @using Frontend.EntityDtos.AuditMission
 @using Frontend.EntityViewModels.Objective
+@using Frontend.Pages.Components.Export
 @using Frontend.Services.AuthentificationServices
 @using Microsoft.AspNetCore.Components.Authorization
 @using Orientation = Radzen.Orientation
@@ -98,16 +99,16 @@
                     <RadzenPanelMenuItem Icon="add" Text="Add Activity"></RadzenPanelMenuItem>
                     <RadzenPanelMenuItem Icon="list" Path="/activities" Text="List Activities"></RadzenPanelMenuItem>
                 </RadzenPanelMenuItem>
-                <RadzenPanelMenuItem  Icon="bookmark_border" class="rz-my-4" Text="Export">
-                    <RadzenPanelMenuItem  Path="/export-activities" class="rz-my-2" Icon="open_in_new_off" Text="Export Activities"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Path="/exprt-fiap" class="rz-my-4" Icon="article" Text="Autocomplete FIAP "></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem class="rz-my-2" Icon="edit_document" Text="Export Objectives and Risks "></RadzenPanelMenuItem>
+                <RadzenPanelMenuItem Icon="bookmark_border" class="rz-my-4" Text="Export">
+                    <RadzenPanelMenuItem Path="/export-activities" class="rz-my-2" Icon="open_in_new_off" Text="Export Activities"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Path="/export-fiap" class="rz-my-4" Icon="article" Text="Autocomplete FIAP "></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Click="@ExportFullObjectives" class="rz-my-2" Icon="edit_document" Text="Export Objectives and Risks "></RadzenPanelMenuItem>
                 </RadzenPanelMenuItem>
                 <RadzenPanelMenuItem class="rz-my-4" Icon="card_membership" Text="Acces control"></RadzenPanelMenuItem>
 
                 <RadzenPanelMenuItem class="rz-my-4" Icon="build" Text="Configure">
-                    <RadzenPanelMenuItem Path="/departments?institutionId=" Icon="book" Text="Configure Departments"   class="rz-my-2"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Icon="account_balance" class="rz-my-2"  Path="/institutions" Text="Configure Institutions"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Path="/departments?institutionId=" Icon="book" Text="Configure Departments" class="rz-my-2"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Icon="account_balance" class="rz-my-2" Path="/institutions" Text="Configure Institutions"></RadzenPanelMenuItem>
                 </RadzenPanelMenuItem>
             }
         </RadzenPanelMenu>
@@ -254,7 +255,7 @@
 
     private void NavigateToObjective()
     {
-        if(_selectedObjectiveId!=Guid.Empty)
+        if (_selectedObjectiveId != Guid.Empty)
         {
             NavigationManager.NavigateTo($"/objective/{_selectedObjectiveId}");
             _selectedObjectiveId = Guid.Empty;
@@ -262,5 +263,17 @@
         else
         {
         }
+    }
+
+    private void ExportFullObjectives(MenuItemEventArgs obj)
+    {
+        DialogService.Open<ExportFullObjectivesComponent>(
+            "Export Full Objectives",
+            new Dictionary<string, object>
+            {
+                { "AuditMissionId", _currentUserAuditMission },
+                { "Missions", _auditMissions }
+            },
+            new DialogOptions { Width = "50%", Height = "60%" });
     }
 }

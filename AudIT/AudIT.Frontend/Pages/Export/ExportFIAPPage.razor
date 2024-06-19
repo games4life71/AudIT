@@ -51,6 +51,17 @@
                     <RadzenDataGridColumn Title="Name" Property="Name"/>
                     <RadzenDataGridColumn Title="Problem" Property="Problem"/>
                     <RadzenDataGridColumn Title="Recommendation" Property="Recommendation"/>
+
+                    <RadzenDataGridColumn TItem="BaseObjActionFiapViewmodel" Title="Start Period" Property="AuditedPeriodStart">
+                        <Template Context="data">
+                            @data.AuditedPeriodStart.ToString("MM/dd/yyyy")
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="BaseObjActionFiapViewmodel" Title="End Period" Property="AuditedPeriodEnd">
+                        <Template Context="data">
+                            @data.AuditedPeriodEnd.ToString("MM/dd/yyyy")
+                        </Template>
+                    </RadzenDataGridColumn>
                 </Columns>
             </RadzenDataGrid>
             <RadzenButton Click="@ExportFiap" Icon="download" ButtonStyle="ButtonStyle.Dark" Text="Autocomplete & Download "></RadzenButton>
@@ -119,13 +130,11 @@
         {
             var stream = await exportService.ExportFiapAsync(selectedFiaps[0].Id);
 
-            if(stream != null)
+            if (stream != null)
             {
                 var fileName = $"{selectedFiaps[0].Name}.docx";
                 using var StreamRef = new DotNetStreamReference(stream);
                 await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, StreamRef);
-
-
             }
             else
             {

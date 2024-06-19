@@ -28,4 +28,16 @@ public class ExportService(HttpClient httpClient) : IExportService
 
         return null;
     }
+
+    public async Task<Stream?> ExportObjectivesFullAsync(Guid AuditMissionId)
+    {
+        var result = await httpClient.GetAsync($"{IExportService.ApiPath}/objectives-and-actions/xls/{AuditMissionId}");
+
+        if (result.IsSuccessStatusCode)
+        {
+            return await result.Content.ReadAsStreamAsync();
+        }
+
+        return null;
+    }
 }
