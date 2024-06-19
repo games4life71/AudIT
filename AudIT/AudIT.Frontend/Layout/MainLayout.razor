@@ -1,6 +1,7 @@
 ﻿@using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
 @using Frontend.Contracts.Abstract_Services.ObjectiveService
+@using Frontend.Contracts.Services
 @using Frontend.EntityDtos.AuditMission
 @using Frontend.EntityViewModels.Objective
 @using Frontend.Pages.Components.Activity
@@ -10,7 +11,7 @@
 @using Orientation = Radzen.Orientation
 @inherits LayoutComponentBase
 
-
+@inject ICurrentUserChangedMissionService _currentUserChangedMissionService
 @inject IObjectiveService _objectiveService
 @inject CustomAuthStateProvider customAuthState
 @inject ICurrentUserAuditMissionService _currentAuditMissionService
@@ -27,6 +28,7 @@
             <RadzenLink Path="/">
                 <RadzenLabel Text="AudIT App"/>
             </RadzenLink>
+
 
         </RadzenStack>
 
@@ -162,6 +164,7 @@
     protected override async Task OnInitializedAsync()
     {
         customAuthState.AuthenticationStateChanged += RefreshNavbar;
+        _currentUserChangedMissionService.CurrentUserChangedMission+= async () => await UpdateCurrentAutidMission();
         var authState = await customAuthState.GetAuthenticationStateAsync();
         isAuthenticated = authState.User.Identity is { IsAuthenticated: true };
 
@@ -170,6 +173,14 @@
         await FetchObjectives();
     }
 
+    private async Task UpdateCurrentAutidMission()
+    {
+        await FetchCurrentAuditMission();
+        await FetchObjectives();
+        await FetchAuditMissions();
+        StateHasChanged();
+
+    }
     private async Task FetchAuditMissions()
     {
         var auditMissions = await _auditMissionService.GetAuditMissionByOwnerId();
@@ -289,8 +300,9 @@
             new DialogOptions { Width = "50%", Height = "60%" });
     }
 
-    private void NavigateActivity(MenuItemEventArgs obj)
+    private async Task  NavigateActivity(MenuItemEventArgs obj)
     {
+        await FetchObjectives();
         DialogService.Open<AddNewActivityFullDialog>(
             "Add new Activity",
             new Dictionary<string, object>()

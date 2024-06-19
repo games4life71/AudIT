@@ -13,9 +13,11 @@ using Frontend.Contracts.Abstract_Services.InstitutionsService;
 using Frontend.Contracts.Abstract_Services.ObjectiveActionService;
 using Frontend.Contracts.Abstract_Services.ObjectiveService;
 using Frontend.Contracts.Abstract_Services.RecommendationService;
+using Frontend.Contracts.Services;
 using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel;
 using Frontend.Services.ActionRiskServices;
 using Frontend.Services.Activity;
+using Frontend.Services.AppServices;
 using Frontend.Services.AuditMission;
 using Frontend.Services.AuthentificationServices;
 using Frontend.Services.CurrentUserAuditMissionService;
@@ -63,6 +65,7 @@ public static class ServiceRegistration
         services.AddScoped<ICurrentUserAuditMissionService, CurrentUserAuditMissionService>();
         services.AddScoped<IRecommendationService, RecommendationService>();
         services.AddScoped<IExportService, ExportService>();
+        services.AddScoped<ICurrentUserChangedMissionService, CurrentUserChangedMissionService>();
         services.AddBlazoredLocalStorage();
 
         // services.AddScoped<ClaimsPrincipal>();

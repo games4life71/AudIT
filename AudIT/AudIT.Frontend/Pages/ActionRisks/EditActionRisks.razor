@@ -151,7 +151,7 @@ else
 
     private async void OnCreateDialogClose(ActionRiskViewModel newActionRisk)
     {
-        _objectiveActionViewModel.actionRisks.Add(newActionRisk);
+        await FetchObjectiveAction();
         await _dataGrid.Reload();
         StateHasChanged();
     }
@@ -170,6 +170,12 @@ else
         var responseConfirm = await _dialogService.Confirm("Are you sure you want to remove this action risk?", "Remove Action Risk", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
         if (responseConfirm.Value)
         {
+            if(actionRisk.id == null)
+            {
+                _notificationService.Notify(NotificationSeverity.Error, "Action Risk Not Found", "Action Risk not found");
+                return;
+            }
+
             var response = await _actionRiskService.DeleteActionRiskAsync(Guid.Parse(actionRisk.id));
 
             if (response.Success)

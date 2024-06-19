@@ -6,6 +6,7 @@
 @using Frontend.Contracts.Abstract_Services.DocumentService
 @using Frontend.Contracts.Abstract_Services.FiapService
 @using Frontend.Contracts.Abstract_Services.ObjectiveService
+@using Frontend.Contracts.Services
 @using Frontend.EntityDtos.AuditMission
 @using Frontend.EntityDtos.Department
 @using Frontend.EntityViewModels.Activity
@@ -28,6 +29,7 @@
 @inject IDepartmentService _departmentService
 @inject NavigationManager _navigationManager
 @inject ICurrentUserAuditMissionService _currentUserAuditMissionService
+@inject ICurrentUserChangedMissionService _currentUserChangedMissionService
 @if (_notFound == true)
 {
     <NotFound/>
@@ -448,6 +450,8 @@ else if (_notFound == false && _auditMissionDto != null)
         if (response.Value)
         {
              var result = await _currentUserAuditMissionService.SetCurrentUserAuditMissionAsync(_auditMissionDto.Id);
+
+             _currentUserChangedMissionService.NotifyCurrentUserChangedMission();
 
              if (result.Success)
              {
