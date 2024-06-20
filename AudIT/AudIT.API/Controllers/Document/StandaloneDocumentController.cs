@@ -25,6 +25,8 @@ public class StandaloneDocumentController(IDocumentManager documentManager) : Ba
     {
         try
         {
+
+
             //upload the document to s3 bucket
             StringBuilder key = new StringBuilder();
             var fileExtension = uploadDocument.FileName.Split('.').Last();

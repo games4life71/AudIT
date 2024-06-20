@@ -25,302 +25,305 @@
 @inject IDocumentService _documentService
 
 <RadzenCard>
-    <RadzenSteps>
 
-        <Steps>
-            <RadzenStepsItem Text="Name and Audit Mission">
-                <RadzenCard>
-                    <RadzenStack Orientation="Orientation.Vertical">
+<RadzenSteps>
 
-                        <RadzenLabel Component="forName" Text="Choose a name for new objective:"/>
-                        <RadzenTextBox Value="@_selectedObjectiveName" ValueChanged="@((value) => CheckValidName(value))" Name="forName" Placeholder="Objective name..."></RadzenTextBox>
-                        <RadzenText TextStyle="TextStyle.Subtitle1" Visible="@(!validObjName)" Text="Objective Name must only contain letter and digits"></RadzenText>
-                        <RadzenLabel Component="SelectAuditMission" Text="Select Audit Mission:"></RadzenLabel>
-                        <RadzenDropDownDataGrid PageSize="5" Placeholder="Select..." TValue="Guid" TextProperty="Name" AllowSorting="true" ValueChanged="@(args => SelectedAuditMission(args))" ValueProperty="Id" Data="@_auditMissions" Name="SelectAuditMission"/>
-                    </RadzenStack>
-                </RadzenCard>
-            </RadzenStepsItem>
+<Steps>
+<RadzenStepsItem Text="Name and Audit Mission">
+    <RadzenCard>
+        <RadzenStack Orientation="Orientation.Vertical">
 
-            <RadzenStepsItem Text="Add Objective Actions (optional)">
-                <RadzenRow>
+            <RadzenLabel Component="forName" Text="Choose a name for new objective:"/>
+            <RadzenTextBox Value="@_selectedObjectiveName" ValueChanged="@((value) => CheckValidName(value))" Name="forName" Placeholder="Objective name..."></RadzenTextBox>
+            <RadzenText TextStyle="TextStyle.Subtitle1" Visible="@(!validObjName)" Text="Objective Name must only contain letter and digits"></RadzenText>
+            <RadzenLabel Component="SelectAuditMission" Text="Select Audit Mission:"></RadzenLabel>
+            <RadzenDropDownDataGrid PageSize="5" Placeholder="Select..." TValue="Guid" TextProperty="Name" AllowSorting="true" ValueChanged="@(args => SelectedAuditMission(args))" ValueProperty="Id" Data="@_auditMissions" Name="SelectAuditMission"/>
+        </RadzenStack>
+    </RadzenCard>
+</RadzenStepsItem>
 
-                    @*Add new objective action form*@
-                    <RadzenColumn>
-                        <RadzenStack Orientation="Orientation.Vertical">
-                            <RadzenTemplateForm Data="@_newObjAction">
-                                <RadzenCard Variant="Variant.Outlined">
-                                    <RadzenStack class="rz-my-6" Orientation="Orientation.Vertical">
-                                        <RadzenLabel Text="Objective Action Name:" Component="forName"></RadzenLabel>
-                                        <RadzenTextBox @bind-Value="@_newObjAction.Name" Name="forName" Placeholder="Objective action name..."></RadzenTextBox>
-                                    </RadzenStack>
+<RadzenStepsItem Text="Add Objective Actions (optional)">
+    <RadzenRow>
 
-                                    <RadzenStack class="rz-my-6" Orientation="Orientation.Vertical">
-                                        <RadzenLabel Text="Internal Expected Controls:" Component="forControaleInterne1"></RadzenLabel>
-                                        <RadzenTextArea ValueChanged="@((value) => HandleIntern1(value))" Rows="3" Placeholder="Internal expected controls..." Name="forControaleInterne1"></RadzenTextArea>
-
-                                        @code
-                                        {
-                                            private void HandleIntern1(string value)
-                                            {
-                                                _updatedControl.ControaleInterneAsteptate.Add(value);
-                                            }
-
-                                            private void HandleIntern2(string value)
-                                            {
-                                                _updatedControl.ControaleInterneExistente.Add(value);
-                                            }
-                                        }
-
-                                    </RadzenStack>
-
-                                    <RadzenStack class="rz-my-6" Orientation="Orientation.Vertical">
-                                        <RadzenLabel Text="Internal Existing Controls:" Component="forControaleInterne2"></RadzenLabel>
-                                        <RadzenTextArea ValueChanged="@((value) => HandleIntern2(value))" Rows="3" Placeholder="Internal existing controls..." Name="forControaleInterne2"></RadzenTextArea>
-                                    </RadzenStack>
-                                    <RadzenStack class="rz-my-6" Orientation="Orientation.Horizontal">
-                                        <RadzenLabel Component="forSelected" Text="Selected in auditing: "></RadzenLabel>
-                                        <RadzenSwitch @bind-Valiue="@isSelectedSwitch">
-
-                                        </RadzenSwitch>
-                                    </RadzenStack>
-
-                                    <RadzenStack Orientation="Orientation.Horizontal">
-                                        <RadzenButton Click="@SaveObjectiveAction" ButtonType="ButtonType.Submit" Size="ButtonSize.Small" Icon="save" Text="Save"/>
-                                        <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Small" Icon="cancel" Text="Cancel" Click="@CancelObjActions"/>
-                                    </RadzenStack>
-                                </RadzenCard>
-                            </RadzenTemplateForm>
+        @*Add new objective action form*@
+        <RadzenColumn>
+            <RadzenStack Orientation="Orientation.Vertical">
+                <RadzenTemplateForm Data="@_newObjAction">
+                    <RadzenCard Variant="Variant.Outlined">
+                        <RadzenStack class="rz-my-6" Orientation="Orientation.Vertical">
+                            <RadzenLabel Text="Objective Action Name:" Component="forName"></RadzenLabel>
+                            <RadzenTextBox @bind-Value="@_newObjAction.Name" Name="forName" Placeholder="Objective action name..."></RadzenTextBox>
                         </RadzenStack>
 
-
-                    </RadzenColumn>
-
-                    @* Display added objective actions into a DataList*@
-                    <RadzenColumn>
-                        <RadzenCard class="rz-my-2" Variant="Variant.Outlined">
-                            <RadzenText class="rz-my-4" TextStyle="TextStyle.DisplayH6" Text="Added Objective Actions:"></RadzenText>
-
-                            <RadzenDataList Data="@_addedObjActions" TItem="CreateObjectiveActionDto">
-                                <Template Context="newObjAction">
-                                    <RadzenRow class="rz-my-2" JustifyContent="JustifyContent.SpaceBetween">
-                                        <RadzenColumn >
-                                            <RadzenText TextStyle="TextStyle.DisplayH6" Text="@newObjAction.Name"></RadzenText>
-                                        </RadzenColumn>
-                                        <RadzenColumn Style="display: flex; justify-content: flex-end;">
-                                            @* <RadzenButton Click="@RemoveObjAction(newObjAction)" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Danger" Text="Remove" Icon="delete"></RadzenButton> *@
-                                            <RadzenButton Click="@(async () => await RemoveObjActionHandler(newObjAction))" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Danger" Text="Remove" Icon="delete"></RadzenButton>
-                                        </RadzenColumn>
-
-                                    </RadzenRow>
-                                </Template>
-                            </RadzenDataList>
-                        </RadzenCard>
-
-
-                    </RadzenColumn>
-
-                </RadzenRow>
-            </RadzenStepsItem>
-            @* Attach documents*@
-
-            <RadzenStepsItem Text="Attach Documents (optional)">
-                @code{
-
-
-                public bool DepartmentDisabledCheck()
-                {
-                return _institutions.Count == 0 || _departments.Count == 0;
-                }
-
-
-                }
-                <RadzenRow>
-                    <RadzenColumn >
-                        <RadzenStack Orientation="Orientation.Vertical">
-                            <RadzenLabel Text="Institution: "></RadzenLabel>
-                            <RadzenDropDownDataGrid TValue="Guid"
-                                                    Value="_selectedInstitutionId"
-                                                    TextProperty="Name"
-                                                    ValueProperty="Id"
-                                                    Data="_institutions"
-                                                    ValueChanged="@((value) => FetchDepartments(value))"/>
-
-                            <RadzenLabel Text="Department: "></RadzenLabel>
-                            <RadzenDropDownDataGrid TValue="Guid"
-                                                    Disabled="DepartmentDisabledCheck()"
-                                                    TextProperty="Name"
-                                                    ValueProperty="Id"
-                                                    Data="_departments"
-                                                    @bind-Value="@_selectedDepartmentId"/>
-                        </RadzenStack>
-                    </RadzenColumn>
-
-                    <RadzenColumn>
-                        <RadzenStack Orientation="Orientation.Vertical">
-                            <RadzenToggleButton
-                                Click="@ToggleButtonClick"
-                                ToggleShade="Shade.Darker"
-                                Icon="toggle_on"
-                                Variant="Variant.Flat"
-                                Text="Template Document"></RadzenToggleButton>
-
-                            @if (templateDocumentSelected)
-                            {
-                                <RadzenLabel Text="Version" Component="version"></RadzenLabel>
-                                <RadzenNumeric TValue="int" @bind-Value="@documentVersion"></RadzenNumeric>
-
-                                <RadzenLabel Text="State" Component="state"></RadzenLabel>
-                                <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentTypeChanged" Data="@_documentTypes"/>
-
-
-
-                                <RadzenLabel Text="Type" Component="type"></RadzenLabel>
-                                @* <RadzenListBox  bind-Value="@_selectedDocumentState" Name="state" Data="_documentStates"/> *@
-                                <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentStateChanged" Data="@_documentStates"/>
-                            }
-
-                        </RadzenStack>
-
-                    </RadzenColumn>
-
-                </RadzenRow>
-                <RadzenRow>
-                    <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Vertical">
-                        <RadzenLabel Text="Uplod Document"></RadzenLabel>
-                        <RadzenUpload @ref="@uploadForm"
-                                      Multiple="true"
-
-                                      Icon="uploads"
-                                      MaxFileCount="5"
-                                      Change="@((args) => ChangeSelectedFiles(args))">
-
-                        </RadzenUpload>
-
-                    </RadzenStack>
-                </RadzenRow>
-                @* <RadzenStack class="rz-my-4" Orientation="Orientation.Vertical"> *@
-                @*     <RadzenButton Click="@UploadFiles" IsBusy="isBusySubmit" Text="Submit" ButtonStyle="ButtonStyle.Success"></RadzenButton> *@
-                @* </RadzenStack> *@
-
-                @code{
-                private bool templateDocumentSelected { get; set; } = false;
-
-                private void ToggleButtonClick(MouseEventArgs obj)
-                {
-                templateDocumentSelected = !templateDocumentSelected;
-                }
-
-                void OnDocumentTypeChanged(string newType)
-                {
-                Console.WriteLine($"Selected activity type: {newType}");
-                _selectedDocumentType = newType;
-                }
-
-                void OnDocumentStateChanged(string newState)
-                {
-                Console.WriteLine($"Selected activity type: {newState}");
-                _selectedDocumentState = newState;
-                }
-                }
-
-
-                @*Summary and confirm step *@
-            </RadzenStepsItem>
-            <RadzenStepsItem Text="Summary and confirm">
-                <RadzenRow class="rz-my-6">
-                    <RadzenText TextStyle="TextStyle.H3" Text="Summary of Objective creation "></RadzenText>
-                </RadzenRow>
-
-                <RadzenRow>
-                    <RadzenCard class="rz-my-4 " Variant="Variant.Outlined">
-
-
-                        <RadzenStack Orientation="Orientation.Vertical">
-                            <RadzenStack Orientation="Orientation.Horizontal">
-                                <RadzenLabel Text="New Objective Name:"></RadzenLabel>
-                                <RadzenText TextStyle="TextStyle.DisplayH6" Text="@($"{_selectedObjectiveName}")"></RadzenText>
-                            </RadzenStack>
+                        <RadzenStack class="rz-my-6" Orientation="Orientation.Vertical">
+                            <RadzenLabel Text="Internal Expected Controls:" Component="forControaleInterne1"></RadzenLabel>
+                            <RadzenTextArea ValueChanged="@((value) => HandleIntern1(value))" Rows="3" Placeholder="Internal expected controls..." Name="forControaleInterne1"></RadzenTextArea>
 
                             @code
                             {
-
-                                private string GetAuditMissionName()
+                                private void HandleIntern1(string value)
                                 {
-                                    BaseAuditMissionDto auditMission = _auditMissions.FirstOrDefault(a => a.Id == _selectedAuditMissionId);
-                                    return auditMission?.Name;
+                                    _updatedControl.ControaleInterneAsteptate.Add(value);
+                                }
+
+                                private void HandleIntern2(string value)
+                                {
+                                    _updatedControl.ControaleInterneExistente.Add(value);
                                 }
                             }
 
-                            <RadzenStack Orientation="Orientation.Horizontal">
+                        </RadzenStack>
 
+                        <RadzenStack class="rz-my-6" Orientation="Orientation.Vertical">
+                            <RadzenLabel Text="Internal Existing Controls:" Component="forControaleInterne2"></RadzenLabel>
+                            <RadzenTextArea ValueChanged="@((value) => HandleIntern2(value))" Rows="3" Placeholder="Internal existing controls..." Name="forControaleInterne2"></RadzenTextArea>
+                        </RadzenStack>
+                        <RadzenStack class="rz-my-6" Orientation="Orientation.Horizontal">
+                            <RadzenLabel Component="forSelected" Text="Selected in auditing: "></RadzenLabel>
+                            <RadzenSwitch @bind-Valiue="@isSelectedSwitch">
 
-                                <RadzenLabel Text="Selected Audit Mission :"></RadzenLabel>
-                                <RadzenText TextStyle="TextStyle.DisplayH6" Text="@($"{GetAuditMissionName()}")"></RadzenText>
-                            </RadzenStack>
+                            </RadzenSwitch>
+                        </RadzenStack>
+
+                        <RadzenStack Orientation="Orientation.Horizontal">
+                            <RadzenButton Click="@SaveObjectiveAction" ButtonType="ButtonType.Submit" Size="ButtonSize.Small" Icon="save" Text="Save"/>
+                            <RadzenButton ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Small" Icon="cancel" Text="Cancel" Click="@CancelObjActions"/>
                         </RadzenStack>
                     </RadzenCard>
-                </RadzenRow>
-                <RadzenRow>
-                    <RadzenColumn>
-                        <RadzenCard Variant="Variant.Outlined">
-                            <RadzenText class="rz-mb-4" TextStyle="TextStyle.DisplayH5" Text="Created Objective Actions:"></RadzenText>
-                            @if (_addedObjActions.Count > 0)
-                            {
-                                <RadzenCard Variant="Variant.Outlined">
-                                    <RadzenDataList Data="@_addedObjActions" TItem="CreateObjectiveActionDto">
-                                        <Template Context="newObjAction">
-                                            <RadzenRow class="rz-my-2" JustifyContent="JustifyContent.SpaceBetween">
-                                                <RadzenColumn >
-                                                    <RadzenText TextStyle="TextStyle.DisplayH6" Text="@newObjAction.Name"></RadzenText>
-                                                </RadzenColumn>
-                                            </RadzenRow>
-                                        </Template>
-                                    </RadzenDataList>
+                </RadzenTemplateForm>
+            </RadzenStack>
 
-                                </RadzenCard>
-                            }
-                            else
-                            {
-                                <RadzenText TextStyle="TextStyle.DisplayH6" TextAlign="TextAlign.Center" Text="No Objective Actions Added"></RadzenText>
-                            }
-                        </RadzenCard>
-                    </RadzenColumn>
 
-                    <RadzenColumn>
-                        <RadzenCard Variant="Variant.Outlined">
-                            <RadzenText TextStyle="TextStyle.DisplayH5" Text="Attachd Documents:"></RadzenText>
-                            @if(_selectedFiles.Count > 0)
-                            {
-                                <RadzenCard Variant="Variant.Outlined">
-                                    <RadzenDataList Data="_selectedFiles" TItem="FileInfo">
-                                        <Template Context="file">
-                                            <RadzenRow class="rz-my-2" JustifyContent="JustifyContent.SpaceBetween">
-                                                <RadzenColumn >
-                                                    <RadzenText TextStyle="TextStyle.DisplayH6" Text="@file.Name"></RadzenText>
-                                                </RadzenColumn>
-                                            </RadzenRow>
-                                        </Template>
-                                    </RadzenDataList>
-                                </RadzenCard>
-                            }
-                            else
-                            {
+        </RadzenColumn>
 
-                                <RadzenText TextStyle="TextStyle.DisplayH6" TextAlign="TextAlign.Center" Text="No documents attached"></RadzenText>
-                            }
-                        </RadzenCard>
-                    </RadzenColumn>
+        @* Display added objective actions into a DataList*@
+        <RadzenColumn>
+            <RadzenCard class="rz-my-2" Variant="Variant.Outlined">
+                <RadzenText class="rz-my-4" TextStyle="TextStyle.DisplayH6" Text="Added Objective Actions:"></RadzenText>
 
-                </RadzenRow>
-                <RadzenStack class="rz-mt-6" Orientation="Orientation.Vertical" >
-                    <RadzenButton IsBusy="@submitButtonBusy" Click="@SumbitCreation" Size="ButtonSize.Large" ButtonStyle="ButtonStyle.Success" Text="Submit"></RadzenButton>
+                <RadzenDataList Data="@_addedObjActions" TItem="CreateObjectiveActionDto">
+                    <Template Context="newObjAction">
+                        <RadzenRow class="rz-my-2" JustifyContent="JustifyContent.SpaceBetween">
+                            <RadzenColumn >
+                                <RadzenText TextStyle="TextStyle.DisplayH6" Text="@newObjAction.Name"></RadzenText>
+                            </RadzenColumn>
+                            <RadzenColumn Style="display: flex; justify-content: flex-end;">
+                                @* <RadzenButton Click="@RemoveObjAction(newObjAction)" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Danger" Text="Remove" Icon="delete"></RadzenButton> *@
+                                <RadzenButton Click="@(async () => await RemoveObjActionHandler(newObjAction))" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Danger" Text="Remove" Icon="delete"></RadzenButton>
+                            </RadzenColumn>
+
+                        </RadzenRow>
+                    </Template>
+                </RadzenDataList>
+            </RadzenCard>
+
+
+        </RadzenColumn>
+
+    </RadzenRow>
+</RadzenStepsItem>
+@* Attach documents*@
+
+<RadzenStepsItem Text="Attach Documents (optional)">
+
+    @code{
+
+
+        public bool DepartmentDisabledCheck()
+        {
+            return _institutions.Count == 0 || _departments.Count == 0;
+        }
+
+
+    }
+
+    <RadzenRow>
+        <RadzenColumn >
+            <RadzenStack Orientation="Orientation.Vertical">
+                <RadzenLabel Text="Institution: "></RadzenLabel>
+                <RadzenDropDownDataGrid TValue="Guid"
+                                        Value="_selectedInstitutionId"
+                                        TextProperty="Name"
+                                        ValueProperty="Id"
+                                        Data="_institutions"
+                                        ValueChanged="@((value) => FetchDepartments(value))"/>
+
+                <RadzenLabel Text="Department: "></RadzenLabel>
+                <RadzenDropDownDataGrid TValue="Guid"
+                                        Disabled="DepartmentDisabledCheck()"
+                                        TextProperty="Name"
+                                        ValueProperty="Id"
+                                        Data="_departments"
+                                        @bind-Value="@_selectedDepartmentId"/>
+            </RadzenStack>
+        </RadzenColumn>
+
+        <RadzenColumn>
+            <RadzenStack Orientation="Orientation.Vertical">
+                <RadzenToggleButton
+                    Click="@ToggleButtonClick"
+                    ToggleShade="Shade.Darker"
+                    Icon="toggle_on"
+                    Variant="Variant.Flat"
+                    Text="Template Document"></RadzenToggleButton>
+
+                @if (templateDocumentSelected)
+                {
+                    <RadzenLabel Text="Version" Component="version"></RadzenLabel>
+                    <RadzenNumeric TValue="int" @bind-Value="@documentVersion"></RadzenNumeric>
+
+                    <RadzenLabel Text="State" Component="state"></RadzenLabel>
+                    <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentTypeChanged" Data="@_documentTypes"/>
+
+
+
+                    <RadzenLabel Text="Type" Component="type"></RadzenLabel>
+                    @* <RadzenListBox  bind-Value="@_selectedDocumentState" Name="state" Data="_documentStates"/> *@
+                    <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentStateChanged" Data="@_documentStates"/>
+                }
+
+            </RadzenStack>
+
+        </RadzenColumn>
+
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Vertical">
+            <RadzenLabel Text="Uplod Document"></RadzenLabel>
+            <RadzenUpload @ref="@uploadForm"
+                          Multiple="true"
+                          Icon="uploads"
+                          MaxFileCount="5"
+                          Change="@((args) => ChangeSelectedFiles(args))">
+
+            </RadzenUpload>
+            <RadzenButton Click="@UploadFiles" ButtonStyle="ButtonStyle.Success" Text="Upload Files "></RadzenButton>
+        </RadzenStack>
+    </RadzenRow>
+    @* <RadzenStack class="rz-my-4" Orientation="Orientation.Vertical"> *@
+    @*     <RadzenButton Click="@UploadFiles" IsBusy="isBusySubmit" Text="Submit" ButtonStyle="ButtonStyle.Success"></RadzenButton> *@
+    @* </RadzenStack> *@
+
+    @code{
+        private bool templateDocumentSelected { get; set; } = false;
+
+        private void ToggleButtonClick(MouseEventArgs obj)
+        {
+            templateDocumentSelected = !templateDocumentSelected;
+        }
+
+        void OnDocumentTypeChanged(string newType)
+        {
+            Console.WriteLine($"Selected activity type: {newType}");
+            _selectedDocumentType = newType;
+        }
+
+        void OnDocumentStateChanged(string newState)
+        {
+            Console.WriteLine($"Selected activity type: {newState}");
+            _selectedDocumentState = newState;
+        }
+
+    }
+
+
+    @*Summary and confirm step *@
+</RadzenStepsItem>
+<RadzenStepsItem Text="Summary and confirm">
+    <RadzenRow class="rz-my-6">
+        <RadzenText TextStyle="TextStyle.H3" Text="Summary of Objective creation "></RadzenText>
+    </RadzenRow>
+
+    <RadzenRow>
+        <RadzenCard class="rz-my-4 " Variant="Variant.Outlined">
+
+
+            <RadzenStack Orientation="Orientation.Vertical">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenLabel Text="New Objective Name:"></RadzenLabel>
+                    <RadzenText TextStyle="TextStyle.DisplayH6" Text="@($"{_selectedObjectiveName}")"></RadzenText>
                 </RadzenStack>
 
-            </RadzenStepsItem>
+                @code
+                {
+
+                    private string GetAuditMissionName()
+                    {
+                        BaseAuditMissionDto auditMission = _auditMissions.FirstOrDefault(a => a.Id == _selectedAuditMissionId);
+                        return auditMission?.Name;
+                    }
+                }
+
+                <RadzenStack Orientation="Orientation.Horizontal">
 
 
-        </Steps>
-    </RadzenSteps>
+                    <RadzenLabel Text="Selected Audit Mission :"></RadzenLabel>
+                    <RadzenText TextStyle="TextStyle.DisplayH6" Text="@($"{GetAuditMissionName()}")"></RadzenText>
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenCard>
+    </RadzenRow>
+    <RadzenRow>
+        <RadzenColumn>
+            <RadzenCard Variant="Variant.Outlined">
+                <RadzenText class="rz-mb-4" TextStyle="TextStyle.DisplayH5" Text="Created Objective Actions:"></RadzenText>
+                @if (_addedObjActions.Count > 0)
+                {
+                    <RadzenCard Variant="Variant.Outlined">
+                        <RadzenDataList Data="@_addedObjActions" TItem="CreateObjectiveActionDto">
+                            <Template Context="newObjAction">
+                                <RadzenRow class="rz-my-2" JustifyContent="JustifyContent.SpaceBetween">
+                                    <RadzenColumn >
+                                        <RadzenText TextStyle="TextStyle.DisplayH6" Text="@newObjAction.Name"></RadzenText>
+                                    </RadzenColumn>
+                                </RadzenRow>
+                            </Template>
+                        </RadzenDataList>
+
+                    </RadzenCard>
+                }
+                else
+                {
+                    <RadzenText TextStyle="TextStyle.DisplayH6" TextAlign="TextAlign.Center" Text="No Objective Actions Added"></RadzenText>
+                }
+            </RadzenCard>
+        </RadzenColumn>
+
+        <RadzenColumn>
+            <RadzenCard Variant="Variant.Outlined">
+                <RadzenText TextStyle="TextStyle.DisplayH5" Text="Attachd Documents:"></RadzenText>
+                @if (_attachedDocuments.Count>0)
+                {
+                    <RadzenCard Variant="Variant.Outlined">
+                        <RadzenDataList Data="_attachedDocuments" TItem="string">
+                            <Template Context="file">
+                                <RadzenRow class="rz-my-2" JustifyContent="JustifyContent.SpaceBetween">
+                                    <RadzenColumn >
+                                        <RadzenText TextStyle="TextStyle.DisplayH6" Text="@file"></RadzenText>
+                                    </RadzenColumn>
+                                </RadzenRow>
+                            </Template>
+                        </RadzenDataList>
+                    </RadzenCard>
+                }
+                else
+                {
+
+                    <RadzenText TextStyle="TextStyle.DisplayH6" TextAlign="TextAlign.Center" Text="No documents attached"></RadzenText>
+                }
+            </RadzenCard>
+        </RadzenColumn>
+
+    </RadzenRow>
+    <RadzenStack class="rz-mt-6" Orientation="Orientation.Vertical">
+        <RadzenButton IsBusy="@submitButtonBusy" Click="@SumbitCreation" Size="ButtonSize.Large" ButtonStyle="ButtonStyle.Success" Text="Submit"></RadzenButton>
+    </RadzenStack>
+
+</RadzenStepsItem>
+
+
+</Steps>
+</RadzenSteps>
 
 
 </RadzenCard>
@@ -343,6 +346,7 @@
 
     private List<string> _documentTypes = Enum.GetNames(typeof(TemplateTypeStage)).ToList();
     private List<string> _documentStates = Enum.GetNames(typeof(DocumentState)).ToList();
+
     private List<FileInfo> _selectedFiles = [];
 
     private RadzenUpload uploadForm;
@@ -364,6 +368,8 @@
 
     private List<UpdateObjActionControlsSelectedDto> _updatedControls = [];
     private bool validObjName;
+
+    private List<string> _attachedDocuments = new List<string>();
 }
 
 @functions
@@ -510,8 +516,8 @@
             submitButtonBusy = false;
             _notificationService.Notify(NotificationSeverity.Error, "Failed to create objective", "The objective was not created successfully");
         }
-        //save the documents
-        UploadFiles();
+
+
 
 
     }
@@ -594,6 +600,15 @@
     {
         try
         {
+            //add the selected files to the attached documents list
+            // _attachedDocuments.AddRange(_selectedFiles.Select(f => f.Name));
+
+            if(_selectedFiles.Count == 0)
+            {
+                _notificationService.Notify(NotificationSeverity.Error, "No files selected", "Please select at least one file to upload");
+                return;
+            }
+
             if (!templateDocumentSelected)
             {
                 //upload a normal document
@@ -642,6 +657,7 @@
                     else
                     {
                         _notificationService.Notify(NotificationSeverity.Error, "Document upload failed");
+
                     }
                 }
             }
@@ -679,14 +695,15 @@
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+           _notificationService.Notify(NotificationSeverity.Error, e.Message);
+           Console.WriteLine(e.Message);
         }
     }
 
     private Task ChangeSelectedFiles(UploadChangeEventArgs args)
     {
         _selectedFiles = args.Files.ToList();
+        _attachedDocuments.AddRange(_selectedFiles.Select(f => f.Name));
         return Task.CompletedTask;
     }
 

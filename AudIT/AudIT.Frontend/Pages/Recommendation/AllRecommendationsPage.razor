@@ -1,7 +1,10 @@
 ﻿@page "/recommendations"
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
 @using Frontend.Contracts.Abstract_Services.RecommendationService
+@using Frontend.EntityDtos.AuditMission
 @using Frontend.EntityDtos.Recommendation
+@using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
 @using Frontend.EntityViewModels.Recommendation
 @using Microsoft.AspNetCore.WebUtilities
 @using Orientation = Radzen.Orientation
@@ -12,10 +15,27 @@
 @inject NavigationManager _navigationManager
 @inject IRecommendationService _recommendationService
 @inject ICurrentUserAuditMissionService _currentUserAuditMissionService
+@inject IAuditMissionService _auditMissionService
 
 <RadzenCard Variant="Variant.Outlined">
     <RadzenStack Orientation="Orientation.Vertical">
 
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenText Text="Recommendations" TextStyle="TextStyle.DisplayH5"/>
+            @if (_auditMission.Id != Guid.Empty)
+            {
+            <RadzenLink Path="@($"/audit-mission/{_auditMission.Id}")">
+                <RadzenText Text="@($"Selected Audit Mission: {_auditMission.Name}")"></RadzenText>
+            </RadzenLink>
+            }
+            else
+            {
+            <RadzenLink Path="@($"/audit-missions")">
+                <RadzenText Text="Please select an audit mission "></RadzenText>
+            </RadzenLink>
+            }
+
+        </RadzenStack>
         <RadzenDataGrid
             Data="_recommendations"
             TItem="BaseRecommendationViewModel">
@@ -136,13 +156,27 @@
 
     private string selectedStatus = "";
 
+    private CurrentUserAuditMissionViewModel _currentUserAuditMission { get; set; } = new CurrentUserAuditMissionViewModel();
+    private BaseAuditMissionDto _auditMission { get; set; } = new BaseAuditMissionDto();
+
 }
 
 @functions
 {
 
+    public async Task GetCurrentUserAuditMissionAsync()
+    {
+        var result = await _currentUserAuditMissionService.GetCurrentUserAuditMissionAsync();
+
+        if (result is { Success: true, DtoResponse: not null }) _currentUserAuditMission = result.DtoResponse;
+        var auditMissionResult = await _auditMissionService.GetAuditMissionById(_currentUserAuditMission.AuditMissionId);
+
+        if (auditMissionResult is { Success: true, DtoResponse: not null }) _auditMission = auditMissionResult.DtoResponse;
+    }
+
     protected override async Task OnInitializedAsync()
     {
+        await GetCurrentUserAuditMissionAsync();
         await FetchAuditMissionParameter();
         await FetchRecommendations();
     }
