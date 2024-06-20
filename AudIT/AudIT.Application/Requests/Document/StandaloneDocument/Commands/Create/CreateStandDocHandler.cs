@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 namespace AudIT.Applicationa.Requests.Document.StandaloneDocument.Commands.Create;
 
 public class CreateStandDocHandler(
-    UserManager<User> _userManager,
+    UserManager<AudiT.Domain.Entities.User> _userManager,
     IDepartmentRepository _departmentRepository,
     IStandaloneDocRepository _standaloneDocumentRepository,
     IMapper _mapper

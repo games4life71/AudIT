@@ -13,6 +13,7 @@ using Frontend.Contracts.Abstract_Services.InstitutionsService;
 using Frontend.Contracts.Abstract_Services.ObjectiveActionService;
 using Frontend.Contracts.Abstract_Services.ObjectiveService;
 using Frontend.Contracts.Abstract_Services.RecommendationService;
+using Frontend.Contracts.Abstract_Services.UserService;
 using Frontend.Contracts.Services;
 using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel;
 using Frontend.Services.ActionRiskServices;
@@ -30,6 +31,7 @@ using Frontend.Services.Misc;
 using Frontend.Services.ObjectiveActionServices;
 using Frontend.Services.ObjectiveServices;
 using Frontend.Services.Recommendation;
+using Frontend.Services.UserService;
 using Havit.Blazor.Components.Web;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -66,6 +68,8 @@ public static class ServiceRegistration
         services.AddScoped<IRecommendationService, RecommendationService>();
         services.AddScoped<IExportService, ExportService>();
         services.AddScoped<ICurrentUserChangedMissionService, CurrentUserChangedMissionService>();
+        services.AddScoped<IUserService, UserService>();
+
         services.AddBlazoredLocalStorage();
 
         // services.AddScoped<ClaimsPrincipal>();

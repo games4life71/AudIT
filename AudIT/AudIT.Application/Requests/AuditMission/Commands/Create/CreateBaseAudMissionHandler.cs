@@ -11,7 +11,7 @@ namespace AudIT.Applicationa.Requests.AuditMission.Commands.Create;
 public class
     CreateBaseAudMissionHandler(
         IAuditMissionRepository _auditRepo,
-        UserManager<User> _userManager,
+        UserManager<AudiT.Domain.Entities.User> _userManager,
         IDepartmentRepository _departmentRepo,
         IMapper _mapper
     )

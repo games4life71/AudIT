@@ -10,7 +10,7 @@ namespace AudIT.Applicationa.Requests.Document.TemplateDocument.Commands.Create;
 
 public class CreateTemplateDocHandler(
     ITemplateDocRepository docRepository,
-    UserManager<User> _userManager,
+    UserManager<AudiT.Domain.Entities.User> _userManager,
     IMapper _mapper) : IRequestHandler<CreateTemplateDocCommand, BaseDTOResponse<BaseTemplateDocDto>>
 {
     public async Task<BaseDTOResponse<BaseTemplateDocDto>> Handle(CreateTemplateDocCommand request,

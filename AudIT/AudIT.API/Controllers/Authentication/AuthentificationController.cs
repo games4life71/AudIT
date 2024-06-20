@@ -1,7 +1,10 @@
-﻿using AudIT.Applicationa.Contracts.EmailServices;
+﻿using System.Security.Claims;
+using AudIT.Applicationa.Contracts.EmailServices;
 using AudIT.Applicationa.Contracts.Identity;
 using AudIT.Applicationa.Models.AuthDTO;
 using AudIT.Applicationa.Models.Misc;
+using AudIT.Applicationa.Requests.User.Commands.UpdateUserInfo;
+using AudIT.Applicationa.Requests.User.Queries.GetInformation;
 using AudiT.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
@@ -21,10 +24,11 @@ public class AuthentificationController : ControllerBase
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IMediator _mediator;
 
     public AuthentificationController(IAuthService authService, IEmailService emailService,
         IAuthorization authorizationService, UserManager<User> userManager, SignInManager<User> signInManager,
-        IHttpContextAccessor httpContextAccessor)
+        IHttpContextAccessor httpContextAccessor, IMediator mediator)
     {
         _httpContextAccessor = httpContextAccessor;
         _authService = authService;
@@ -32,7 +36,60 @@ public class AuthentificationController : ControllerBase
         _authorizationService = authorizationService;
         _userManager = userManager;
         _signInManager = signInManager;
+        _mediator = mediator;
     }
+
+
+    [HttpGet]
+    [Route("get-user-information")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetUserInformation()
+    {
+        try
+        {
+            var userId = this.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var userInformation = await _mediator.Send(new GetUserInformationQuery(userId));
+
+            if (userInformation.Success)
+            {
+                return Ok(userInformation);
+            }
+
+            return BadRequest(userInformation.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
+    [HttpPatch]
+    [Route("update-user-information")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> UpdateUserInformation(UpdateUserInfoCommand command)
+    {
+        try
+        {
+
+            var userId = this.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            command.Id = userId;
+            var result = await _mediator.Send(command);
+
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+
+            return BadRequest(result.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        }
+    }
+
 
     [HttpGet]
     [Route("get-user-claims")]
@@ -189,6 +246,4 @@ public class AuthentificationController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
         }
     }
-
-
 }

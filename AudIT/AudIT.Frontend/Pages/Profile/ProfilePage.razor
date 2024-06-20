@@ -1,0 +1,211 @@
+﻿@page "/profile"
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
+@using Frontend.Contracts.Abstract_Services.UserService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityDtos.User
+@using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
+@using Frontend.EntityViewModels.User
+@using ButtonType = Radzen.ButtonType
+@using Orientation = Radzen.Orientation
+
+@inject ICurrentUserAuditMissionService _currentUserAuditMissionService
+@inject IAuditMissionService _auditMissionService
+@inject IUserService _userService
+@inject NotificationService _notificationService
+<RadzenStack Orientation="Orientation.Vertical">
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenText Text="Your profile information:" TextStyle="TextStyle.DisplayH5"/>
+        @if (_auditMission.Id != Guid.Empty)
+        {
+            <RadzenLink Path="@($"/audit-mission/{_auditMission.Id}")">
+                <RadzenText Text="@($"Selected Audit Mission: {_auditMission.Name}")"></RadzenText>
+            </RadzenLink>
+        }
+        else
+        {
+            <RadzenLink Path="@($"/audit-missions")">
+                <RadzenText Text="Please select an audit mission "></RadzenText>
+            </RadzenLink>
+        }
+    </RadzenStack>
+
+    @code{
+
+        private bool _editDisabled = true;
+
+        private void EditProfileClicked(MouseEventArgs obj)
+        {
+            _editDisabled = !_editDisabled;
+        }
+
+        private void CancelClicked(MouseEventArgs obj)
+        {
+            _editDisabled = true;
+            _user = new BaseUserViewModel
+            {
+                Username = _originalUser.Username,
+                FirstEmail = _originalUser.FirstEmail,
+                SecondEmail = _originalUser.SecondEmail,
+                Adress = _originalUser.Adress,
+                PhoneNumber = _originalUser.PhoneNumber,
+                OfficePhoneNumber = _originalUser.OfficePhoneNumber,
+                Functie = _originalUser.Functie
+            };
+            // Reset the user to the original values
+
+        }
+
+
+    }
+
+    <RadzenCard Variant="Variant.Outlined">
+
+        <RadzenStack Style="width: 100%;" Orientation="Orientation.Vertical">
+        <RadzenTemplateForm Submit="@SubmitChanges" Data="_user" TItem="BaseUserViewModel" >
+            <RadzenStack JustifyContent="JustifyContent.SpaceEvenly" Orientation="Orientation.Horizontal">
+
+                <RadzenStack Orientation="Orientation.Vertical">
+                    <RadzenLabel Component="forUsername" Text="Username: "></RadzenLabel>
+                    <RadzenTextBox Name="forUsername" Disabled="_editDisabled" @bind-Value="@_user.Username"></RadzenTextBox>
+                    <RadzenRequiredValidator Text="Username is required" Component="forUsername" ></RadzenRequiredValidator>
+                    <RadzenCustomValidator Component="forUsername" Text="Username cannot contain spaces" Validator="@(()=>ValidateUsername(_user.Username))"></RadzenCustomValidator>
+
+                    <RadzenLabel Text="First email: "></RadzenLabel>
+                    <RadzenTextBox Disabled="true" ReadOnly="true" @bind-Value="@_user.FirstEmail"></RadzenTextBox>
+
+                    <RadzenLabel Component="forEmail" Text="Second email: "></RadzenLabel>
+                    <RadzenTextBox  Name="forEmail" Disabled="_editDisabled" @bind-Value="@_user.SecondEmail"></RadzenTextBox>
+                    <RadzenRequiredValidator Component="forEmail" Text="Email is required"></RadzenRequiredValidator>
+                    <RadzenEmailValidator Component="forEmail" Text="Provide a valid email address"></RadzenEmailValidator>
+
+                </RadzenStack>
+
+
+                <RadzenStack Orientation="Orientation.Vertical">
+                    <RadzenLabel Component="forAddress" Text="Address: "></RadzenLabel>
+                    <RadzenTextBox Name="forAddress" Disabled="_editDisabled" @bind-Value="@_user.Adress"></RadzenTextBox>
+                    <RadzenRequiredValidator Text="Address is required" Component="forAddress" ></RadzenRequiredValidator>
+
+
+                    <RadzenLabel Component="forPhone" Text="Phone number: "></RadzenLabel>
+                    <RadzenMask Name="forPhone" Mask="(***) ***-****" Pattern="[^0-9]"
+                                Placeholder="0000-000-000"
+                                Disabled="_editDisabled"
+                                @bind-Value="@_user.PhoneNumber"/>
+                    <RadzenRequiredValidator Text="Phone is required" Component="forPhone"></RadzenRequiredValidator>
+
+
+                    <RadzenLabel Component="forHome" Text="Office phone number: "></RadzenLabel>
+                    <RadzenMask Name="forHome" Mask="(***) ***-****" Pattern="[^0-9]"
+                                Placeholder="0000-000-000"
+                                Disabled="_editDisabled"
+                                @bind-Value="@_user.OfficePhoneNumber"/>
+                    <RadzenRequiredValidator Text="Office Phone value is required" Component="forHome"></RadzenRequiredValidator>
+                </RadzenStack>
+            </RadzenStack>
+            @if (_editDisabled)
+            {
+                <RadzenButton Click="@EditProfileClicked" class="rz-mt-6" Text="Edit profile" ButtonStyle="ButtonStyle.Warning"></RadzenButton>
+            }
+            else
+            {
+                <RadzenButton Click="@CancelClicked" class="rz-mt-2" Text="Cancel" ButtonStyle="ButtonStyle.Secondary"></RadzenButton>
+                <RadzenButton IsBusy="@submitBusy" ButtonType="ButtonType.Submit" Text="Submit" ButtonStyle="ButtonStyle.Success"></RadzenButton>
+            }
+        </RadzenTemplateForm>
+
+        </RadzenStack>
+    </RadzenCard>
+
+</RadzenStack>
+
+
+@code {
+
+    private bool submitBusy { get; set; } = false;
+
+    private CurrentUserAuditMissionViewModel _currentUserAuditMission { get; set; } = new CurrentUserAuditMissionViewModel();
+    private BaseAuditMissionDto _auditMission { get; set; } = new BaseAuditMissionDto();
+
+    private BaseUserViewModel _user { get; set; } = new BaseUserViewModel();
+
+    private BaseUserViewModel _originalUser { get; set; } = new BaseUserViewModel();
+}
+
+
+@functions
+{
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCurrentUserAuditMissionAsync();
+        await FetchUserInfo();
+    }
+
+    public async Task GetCurrentUserAuditMissionAsync()
+    {
+        var result = await _currentUserAuditMissionService.GetCurrentUserAuditMissionAsync();
+
+        if (result is { Success: true, DtoResponse: not null }) _currentUserAuditMission = result.DtoResponse;
+        var auditMissionResult = await _auditMissionService.GetAuditMissionById(_currentUserAuditMission.AuditMissionId);
+
+        if (auditMissionResult is { Success: true, DtoResponse: not null }) _auditMission = auditMissionResult.DtoResponse;
+    }
+
+    private async Task FetchUserInfo()
+    {
+        var response = await _userService.GetUserInformationAsync();
+
+        if (response is { Success: true, DtoResponse: not null })
+        {
+            _user = response.DtoResponse;
+            _originalUser = response.DtoResponse;
+            // Do something with the user
+        }
+    }
+
+    private async Task SubmitChanges()
+    {
+        submitBusy = true;
+
+        var updateCommand = new UpdateUserInfoDto();
+
+        updateCommand.Username = _user.Username;
+        updateCommand.SecondEmail = _user.SecondEmail;
+        updateCommand.Adress = _user.Adress;
+        updateCommand.PhoneNumber = _user.PhoneNumber;
+        updateCommand.OfficePhoneNumber = _user.OfficePhoneNumber;
+        updateCommand.Functie = _user.Functie;
+
+        var response = await _userService.UpdateUserInfoAsync(updateCommand);
+
+        if (response is { Success: true })
+        {
+            submitBusy = false;
+            _editDisabled = true;
+            var newUser = response.DtoResponse;
+
+            _user.SecondEmail = newUser.SecondEmail;
+            _user.Adress = newUser.Adress;
+            _user.PhoneNumber = newUser.PhoneNumber;
+            _user.OfficePhoneNumber = newUser.OfficePhoneNumber;
+            _user.Functie = newUser.Functie;
+            _user.Username = newUser.Username;
+
+            _notificationService.Notify(NotificationSeverity.Success, "Success", "Profile updated successfully");
+        }
+
+        else
+        {
+            submitBusy = false;
+            _notificationService.Notify(NotificationSeverity.Error, "Error", "Failed to update profile");
+        }
+    }
+
+    private bool ValidateUsername(string username)
+    {
+        return !username.Contains(" ");
+    }
+}

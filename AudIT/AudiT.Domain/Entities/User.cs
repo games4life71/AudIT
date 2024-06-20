@@ -43,7 +43,6 @@ public class User : IdentityUser
         string functie,
         string officephone,
         Department department
-
     )
     {
         // Id = Guid.NewGuid().ToString();
@@ -56,11 +55,10 @@ public class User : IdentityUser
         Functie = functie;
         OfficePhoneNumber = officephone;
         Department = department;
-
     }
 
     public static Result<User> Create(string username, string firstEmail, string adress,
-        string phoneNumber,  Department department = null, string functie = "not set",
+        string phoneNumber, Department department = null, string functie = "not set",
         string secondEmail = "not set",
         string officephone = "not set")
     {
@@ -112,5 +110,14 @@ public class User : IdentityUser
         return Verified;
     }
 
-
+    public void UpdateUserInfo(string secondEmail, string adress, string phoneNumber, string officePhoneNumber,
+        string functie,string username)
+    {
+        SecondEmail = secondEmail;
+        Adress = adress;
+        PhoneNumber = phoneNumber;
+        OfficePhoneNumber = officePhoneNumber;
+        Functie = functie;
+        UserName = username;
+    }
 }

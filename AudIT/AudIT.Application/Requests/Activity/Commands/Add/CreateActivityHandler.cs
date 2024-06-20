@@ -11,7 +11,7 @@ namespace AudIT.Applicationa.Requests.Activity.Commands.Add;
 public class CreateActivityHandler(
     IActivityRepository _activityRepository,
     IDepartmentRepository _departmentRepository,
-    UserManager<User> _userManager,
+    UserManager<AudiT.Domain.Entities.User> _userManager,
     IAuditMissionRepository _auditMissionRepository,
     IMapper mapper
 )
