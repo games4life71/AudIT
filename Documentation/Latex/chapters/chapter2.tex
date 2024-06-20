@@ -1,5 +1,5 @@
 \chapter{Arhitectura platformei}
-Fiind pus in fata cu provocarea de a elabora o platforma web destinata atat auditorilor publici cat si reprentatilor institutiilor din administratia publica, a fost nevoie de o arhitectura dinamica, modulara si usor de marit in cazul adaugarii a noi functionalitati.\\
+ Provocarea de a elabora o platforma web destinata atat auditorilor publici cat si reprentatilor institutiilor din administratia publica  a impus nevoie de crea o arhitectura dinamica, modulara si usor de marit in cazul adaugarii a noi functionalitati.\\
 De asemenea, un numar mare de functionalitati necesita implementarea si a diferite \textit{design pattern-uri}, care se asigura ca modulule definite comunica intr-un mod cat mai eficient intre ele si promoveaza reutilizarea codului deja scris.\\
 Acest capitol incearca sa descrie motivatia pentru alegerile facute in materie de tehnologii folosite pentru a dezvolta componentele cheie ale aplicatiei: frontend, backend stocarea datelor si cateva aspecte legate de securitatea de baza a platformei; cat si o comparatie sumara intre potentialii competetitori ai alegerilor facute.
 
@@ -68,7 +68,7 @@ Alegerea acestui tip de arhitectura a fost motivata de mai multe avantaje cheie 
 	
 	\item  depistarea erorilor si rezolvarea lor este mult mai rapida.
 \end{itemize}
-Ca in orice alegere pe care o facem, trebuie sa punem in balanta avantajele si dezavantajele pe care aceasta le ofera si sa le comparam strict cu nevoile si problemele pe care incercam sa le rezolvam. Privind in ansamblu si pe termen lung, arhitectura de tip \textit{monolith} prezinta si ea unele dezavantaje : 
+Conform oricare alegeri, trebuie puse in balanta avantajele si dezavantajele pe care aceasta le ofera si  sa se compare strict cu nevoile si problemele care se incearca a rezolva. Privind in ansamblu si pe termen lung, arhitectura de tip \textit{monolith} prezinta si ea unele dezavantaje : 
 
 \begin{itemize}
 
@@ -188,7 +188,34 @@ Prin acest model, comunicarea dintre module se realizeaza prin intermediul contr
 	\includegraphics[width=0.8\textwidth]{c2/repository_pattern}
 	\caption{Diagrama \textit{repository pattern}}
 \end{figure}
+\subsection*{Descriere \textit{endpoint-uri} utilizare}
+\textit{Endpoint-urile} sunt componentele de baza ale comunicarii aplicatiilor prin intermediul internetului si a \textit{API-urilor}. Partea de server expune informatii si facilitati clientilor prin intermediul acestor \textit{endpoint-uri}, astfel acestia avand posiblitatea de a comunica prin intermediul acestor puncte cu aplicatia si cu logica interna a acesteia.\\
+\textit{Endpoint-urile} create de server sunt organizate conform fiecarei entitati din \textit{Domeniul} aplicatiei , pentru o mai buna navigare si intelgere a structurii in ansamblu, cat si avand in vedere actiunea pe care clientul doreste sa o realizeze.\\
+Principalele \textit{endpoint-uri} pe care partea de server le expune clientilor sunt :
 
+\begin{itemize}
+	
+	\item \textit{endpoint-ul} care gestioneaza actiunile utilizatorului legate de autentificare: inregistrare, autentificare, iesire din cont, verificare email cat si actualizare a informatiilor contului de utilizator.Aceste \textit{endpoint-uri} sunt centrate in jurul entitatii de Utilizator;
+	
+	\item \textit{endpoint-urile} care se ocupa de logica gestionarii entitatilor de tip Misiune de audit, astfel permitand crearea, listarea, stergerea acestora cat si actualizarea informatiilor si obtinerea de informatii partajate cu alte entitati;
+	
+	\item \textit{endpoint-urile} care gestioneaza obiectivele unei misiuni de audit;
+	
+	\item \textit{endpoint-urile} care trateaza actiunile unui obiectiv respectiv riscurile acestuia;
+	
+	\item \textit{endpoint-urile} care administreaza actiunile referitoare la entitatile de tip Recomandare;
+	
+	\item punct de accees asupra entitatilor de tip Document, existand posibilitatea de a crea, a incarca, descarca si a sterge documente salvate pe platforma;
+	
+	\item \textit{endpoint-urile} care gestioneaza actiunile de export de date si de autocompletare a unor documente de tip sablon cu date de pe platforma;
+	
+	\item \textit{endpoint-urile} care permit configurarea institutiilor si a departamentelor de pe platforma.
+	
+\end{itemize} 
+
+
+	
+ 
 
 \subsection*{Tehnologii utilizate}
 In dezvoltarea partii de server s-a utilizat \textit{framework-ul } ASP.NET Core impreuna cu limbajul C\#.\\
