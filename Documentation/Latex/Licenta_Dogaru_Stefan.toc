@@ -31,9 +31,11 @@
 \contentsline {section}{\numberline {2.3}Arhitectura interfatei grafice}{37}{section.2.3}%
 \contentsline {section}{\numberline {2.4}Stocarea datelor}{40}{section.2.4}%
 \contentsline {section}{\numberline {2.5}Aspecte de securitate}{43}{section.2.5}%
-\contentsline {chapter}{\numberline {3}Scenarii de utilizare }{46}{chapter.3}%
-\contentsline {section}{\numberline {3.1}Crearea misiunilor de audit}{46}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Identificare si evaluarea riscuri}{47}{section.3.2}%
-\contentsline {section}{\numberline {3.3}Sistemul de export}{47}{section.3.3}%
-\contentsline {chapter}{Concluzii}{48}{chapter*.35}%
-\contentsline {section}{\numberline {3.4}Concluzii asupra solutiei propuse}{48}{section.3.4}%
+\contentsline {chapter}{\numberline {3}Scenarii de utilizare }{47}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Gestionarea misiunilor de audit}{47}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Gestionarea obiectivelor si a actiunilor}{48}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Gestionarea recomandarilor}{51}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Gestionarea documentelor}{52}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Sistemul de export}{53}{section.3.5}%
+\contentsline {chapter}{Concluzii}{55}{chapter*.50}%
+\contentsline {section}{\numberline {3.6}Concluzii asupra solutiei propuse}{55}{section.3.6}%

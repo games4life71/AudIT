@@ -34,7 +34,7 @@
 
                         <RadzenLabel Component="forName" Text="Choose a name for new objective:"/>
                         <RadzenTextBox Value="@_selectedObjectiveName" ValueChanged="@((value) => CheckValidName(value))" Name="forName" Placeholder="Objective name..."></RadzenTextBox>
-                        <RadzenText TextStyle="TextStyle.Subtitle1" Visible="@(!validObjName)" Text="Audit Mission Name must only contain letter and digits"></RadzenText>
+                        <RadzenText TextStyle="TextStyle.Subtitle1" Visible="@(!validObjName)" Text="Objective Name must only contain letter and digits"></RadzenText>
                         <RadzenLabel Component="SelectAuditMission" Text="Select Audit Mission:"></RadzenLabel>
                         <RadzenDropDownDataGrid PageSize="5" Placeholder="Select..." TValue="Guid" TextProperty="Name" AllowSorting="true" ValueChanged="@(args => SelectedAuditMission(args))" ValueProperty="Id" Data="@_auditMissions" Name="SelectAuditMission"/>
                     </RadzenStack>

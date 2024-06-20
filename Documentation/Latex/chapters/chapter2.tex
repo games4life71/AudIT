@@ -191,11 +191,11 @@ Prin acest model, comunicarea dintre module se realizeaza prin intermediul contr
 \subsection*{Descriere \textit{endpoint-uri} utilizare}
 \textit{Endpoint-urile} sunt componentele de baza ale comunicarii aplicatiilor prin intermediul internetului si a \textit{API-urilor}. Partea de server expune informatii si facilitati clientilor prin intermediul acestor \textit{endpoint-uri}, astfel acestia avand posiblitatea de a comunica prin intermediul acestor puncte cu aplicatia si cu logica interna a acesteia.\\
 \textit{Endpoint-urile} create de server sunt organizate conform fiecarei entitati din \textit{Domeniul} aplicatiei , pentru o mai buna navigare si intelgere a structurii in ansamblu, cat si avand in vedere actiunea pe care clientul doreste sa o realizeze.\\
-Principalele \textit{endpoint-uri} pe care partea de server le expune clientilor sunt :
+Principalele \textit{endpoint-uri} expuse clientilor pe partea de server sunt :
 
 \begin{itemize}
 	
-	\item \textit{endpoint-ul} care gestioneaza actiunile utilizatorului legate de autentificare: inregistrare, autentificare, iesire din cont, verificare email cat si actualizare a informatiilor contului de utilizator.Aceste \textit{endpoint-uri} sunt centrate in jurul entitatii de Utilizator;
+	\item \textit{endpoint-urile} care gestioneaza actiunile utilizatorului legate de autentificare: inregistrare, autentificare, iesire din cont, verificare email cat si actualizare a informatiilor contului de utilizator.Aceste \textit{endpoint-uri} sunt centrate in jurul entitatii de Utilizator;
 	
 	\item \textit{endpoint-urile} care se ocupa de logica gestionarii entitatilor de tip Misiune de audit, astfel permitand crearea, listarea, stergerea acestora cat si actualizarea informatiilor si obtinerea de informatii partajate cu alte entitati;
 	
@@ -212,6 +212,8 @@ Principalele \textit{endpoint-uri} pe care partea de server le expune clientilor
 	\item \textit{endpoint-urile} care permit configurarea institutiilor si a departamentelor de pe platforma.
 	
 \end{itemize} 
+
+De asemenea, \textit{server-ul} expune prin intermediul altor \textit{ endpoint-uri} functionalitati cum ar fi configurarea accesului la resurse partajate, gestionarea activitatilor desfasurate pe platforma cat si un sistem de notificari ce permite actualizarea informatiilor disponibile pe aplicatie in timp real.
 
 
 	
@@ -243,8 +245,8 @@ Interfata grafica dezvoltata in acest proiect este realizata in \textit{framewor
 
 \newpage
 \subsection*{Web assembly} 
-Cum ne putem da seama si din numele pe care aceasta tehnologie o poarta, este vorba despre \textit{byte-code} (cod-masina) care este executat de \textit{engine-ul} JavaScript direct in \textit{browser}.\\
-\textit{Wasm} nu este un limbaj, ci mai degraba produsul compilarii codului scris intr-un limbaj de programare in cod-masina executabil. Majoritatea limbajelor de programare moderne  suporta compilarea codului direct intr-un fisier  binar de tip .wasm . Dupa o compilare cu succes, fisierele binare .wasm sunt incarcate in \textit{browser} unde sunt executate de catre motorul JavaScript specific intr-o instanta virtuala izolata si securizata.\\
+Cum ne putem da seama si din numele pe care aceasta tehnologie o poarta, este vorba despre \textit{byte-code} (cod-masina) care este executat de o componenta separata din \textit{browser} ,numita \textit{Wasm engine}.\\
+\textit{Wasm} nu este un limbaj, ci mai degraba produsul compilarii codului scris intr-un limbaj de programare in cod-masina executabil. Majoritatea limbajelor de programare moderne  suporta compilarea codului direct intr-un fisier  binar de tip .wasm . Dupa o compilare cu succes, fisierele binare .wasm sunt incarcate in \textit{browser} cu ajutorul Javascript, urmand sa fie executate de catre componenta mentionata intr-o instanta virtuala izolata si securizata.\\
 
 \vspace{1cm}
 \begin{figure}[h]
@@ -313,7 +315,7 @@ Pentru autentificare si autorizarea activitatilor utilizatorilor, se utilizeaza 
 \begin{figure}[h]
 	\centering
 	
-	\includegraphics[width=0.7\textwidth]{c2/db1}
+	\includegraphics[width=1\textwidth]{c2/db1}
 	\caption{Structura tabele autentificare si autorizare}
 \end{figure}
 
@@ -323,7 +325,7 @@ Pentru organizarea si dezvoltarea functionalitatilor in ceea ce priviste misiuni
 \begin{figure}[h]
 	\centering
 	
-	\includegraphics[width=0.7\textwidth]{c2/db2}
+	\includegraphics[width=1\textwidth]{c2/db2}
 	\caption{Structura tabele gestiune misiuni de audit}
 \end{figure}
 
@@ -333,7 +335,7 @@ Pentru gestionarea institutiilor si a departamentelor acestora, cat si a documen
 \begin{figure}[h]
 	\centering
 	
-	\includegraphics[width=0.7\textwidth]{c2/db3}
+	\includegraphics[width=1\textwidth]{c2/db3}
 	\caption{Structura tabelelor de gestiune a institutiilor si a departamentelor}
 \end{figure}
 
@@ -343,7 +345,7 @@ In cele din urma pentru oferirea functionalitatilor principale,cum ar fi gestion
 \begin{figure}[h]
 	\centering
 	
-	\includegraphics[width=0.7\textwidth]{c2/db4}
+	\includegraphics[width=1\textwidth]{c2/db4}
 	\caption{Structura tabelelor functionalitati principale}
 \end{figure}
 
