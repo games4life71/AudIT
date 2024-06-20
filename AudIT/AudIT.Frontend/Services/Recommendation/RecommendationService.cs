@@ -75,4 +75,20 @@ public class RecommendationService(HttpClient httpClient) : IRecommendationServi
 
         return result ?? new BaseDTOResponse<BaseRecommendationViewModel>("Failed to create", false);
     }
+
+    public async Task<BaseDTOResponse<BaseRecommendationViewModel>> GetAllRecentByUserAsync()
+    {
+        var response = await httpClient.GetAsync($"{IRecommendationService.ApiPath}/get-recent-by-user");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return new BaseDTOResponse<BaseRecommendationViewModel>("Failed to fetch", false);
+        }
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseRecommendationViewModel>>(content);
+
+        return result ?? new BaseDTOResponse<BaseRecommendationViewModel>("Failed to fetch", false);
+    }
 }

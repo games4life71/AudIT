@@ -1,0 +1,248 @@
+﻿@page "/"
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
+@using Frontend.Contracts.Abstract_Services.ObjectiveService
+@using Frontend.Contracts.Abstract_Services.RecommendationService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
+@using Frontend.EntityViewModels.Objective
+@using Frontend.EntityViewModels.Recommendation
+@using Frontend.Services.AuthentificationServices
+@using Orientation = Radzen.Orientation
+
+
+@inject IObjectiveService _objectiveService
+@inject NavigationManager _navigationManager
+@inject ICurrentUserAuditMissionService _currentUserAuditMissionService
+@inject CustomAuthStateProvider _authStateProvider
+@inject IAuditMissionService _auditMissionService
+@inject IRecommendationService _recommendationService
+
+<RadzenStack Orientation="Orientation.Vertical">
+
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+        <RadzenText Text="@($"Welcome, {currentUserName} !")" TextStyle="TextStyle.DisplayH5"/>
+        @if (_auditMission.Id != Guid.Empty)
+        {
+            <RadzenLink Path="@($"/audit-mission/{_auditMission.Id}")">
+                <RadzenText Text="@($"Selected Audit Mission: {_auditMission.Name}")"></RadzenText>
+            </RadzenLink>
+        }
+        else
+        {
+            <RadzenLink Path="@($"/audit-missions")">
+                <RadzenText Text="No audit mission currently selected "></RadzenText>
+            </RadzenLink>
+        }
+
+    </RadzenStack>
+
+    @*Audit Mission and Objectives tables *@
+    <RadzenCard class="rz-mt-10" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" class="rz-mt-4" JustifyContent="JustifyContent.SpaceAround">
+
+            @*Audit Mission table and search*@
+            <RadzenStack Orientation="Orientation.Vertical">
+                <RadzenText TextStyle="TextStyle.H5" TextAlign="TextAlign.Center" Text="Your active Audit Missions: "></RadzenText>
+                <RadzenText Text="@($"Count:{_auditMissions.Count.ToString()}")"></RadzenText>
+                <RadzenDataGrid
+                    AllowPaging="true"
+                    PageSize="5"
+                    AllowColumnResize="true"
+                    Data="_auditMissions"
+                    SelectionMode="DataGridSelectionMode.Single"
+                    TItem="BaseAuditMissionDto"
+                    AllowFiltering="true"
+                    AllowSorting="true"
+                    ValueChanged="@((value) => AuditMissionSelected(value))">
+                    <Columns>
+                        <RadzenDataGridColumn Title="Name" Property="Name"/>
+                        <RadzenDataGridColumn Title="Status" Property="Status"/>
+                        <RadzenDataGridColumn Title="Last Modified Date" Property="LastModifiedDate"/>
+                        <RadzenDataGridColumn>
+                            <Template Context="auditMission">
+                                <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Vertical">
+                                    <RadzenButton Click="@(() => NavigateAuditMission(auditMission))" ButtonStyle="ButtonStyle.Secondary" Text="Details"></RadzenButton>
+                                </RadzenStack>
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+
+                </RadzenDataGrid>
+
+            </RadzenStack>
+
+            @*Objectives table and search*@
+            <RadzenStack Orientation="Orientation.Vertical">
+                <RadzenText TextStyle="TextStyle.H5" TextAlign="TextAlign.Center" Text="Active Objectives: "></RadzenText>
+
+
+                <RadzenText Text="@($"Count:{_objectives.Count.ToString()}")"></RadzenText>
+
+                <RadzenDataGrid
+                    Data="_objectives"
+                    TItem="BaseObjectiveViewModel"
+                    AllowFiltering="true"
+                    AllowPaging="true"
+                    AllowColumnResize="true"
+                    PageSize="5"
+                    AllowSorting="true">
+
+                    <Columns>
+                        <RadzenDataGridColumn Title="Name" Property="Name"/>
+                        <RadzenDataGridColumn>
+                            <Template Context="objective">
+                                <RadzenStack Orientation="Orientation.Vertical">
+                                    <RadzenButton Click="@(() => NavigateObjective(objective))" ButtonStyle="ButtonStyle.Secondary" Text="Details"></RadzenButton>
+                                </RadzenStack>
+
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+
+
+                </RadzenDataGrid>
+            </RadzenStack>
+
+        </RadzenStack>
+    </RadzenCard>
+
+    @*Recent Recommendations table*@
+    <RadzenCard class="rz-my-6" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenText class="rz-my-4" TextStyle="TextStyle.H5" TextAlign="TextAlign.Center" Text="Recent Recommendations"></RadzenText>
+        <RadzenDataGrid
+            Data="_recommendations"
+            AllowPaging="true"
+            PageSize="5"
+            AllowColumnResize="true"
+            TItem="BaseRecommendationViewModel"
+            AllowFiltering="true"
+            AllowSorting="true">
+
+            <Columns>
+                <RadzenDataGridColumn Title="Name" Property="Description"/>
+                <RadzenDataGridColumn Title="Status" Property="Status"/>
+                <RadzenDataGridColumn Title="Due Date" Property="DueDate"/>
+                <RadzenDataGridColumn>
+                    <Template Context="recommendation">
+                        <RadzenStack Orientation="Orientation.Vertical">
+                            <RadzenButton Click="@(() => NavigateRecommendation(recommendation))" ButtonStyle="ButtonStyle.Secondary" Text="Details"/>
+                        </RadzenStack>
+
+                    </Template>
+                </RadzenDataGridColumn>
+
+
+            </Columns>
+
+        </RadzenDataGrid>
+        <RadzenButton Click="@NavigateRecommendations" ButtonStyle="ButtonStyle.Dark" Text="See more ..."></RadzenButton>
+        </RadzenStack>
+    </RadzenCard>
+</RadzenStack>
+
+
+@code {
+
+    private CurrentUserAuditMissionViewModel _currentUserAuditMission { get; set; } = new CurrentUserAuditMissionViewModel();
+    private BaseAuditMissionDto _auditMission { get; set; } = new BaseAuditMissionDto();
+
+    private string currentUserName { get; set; }
+
+    private List<BaseAuditMissionDto> _auditMissions { get; set; } = [];
+
+    private List<BaseObjectiveViewModel> _objectives { get; set; } = [];
+
+    private List<BaseRecommendationViewModel> _recommendations { get; set; } = [];
+}
+
+@functions
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCurrentUserAuditMissionAsync();
+        var user = await _authStateProvider.GetAuthenticationStateAsync();
+
+        if (user.User.Identity.IsAuthenticated)
+        {
+            currentUserName = user.User.Identity.Name;
+        }
+
+        await FetchAuditMissions();
+        await FetchRecommendations();
+    }
+
+
+    private async Task GetCurrentUserAuditMissionAsync()
+    {
+        var result = await _currentUserAuditMissionService.GetCurrentUserAuditMissionAsync();
+
+        if (result is { Success: true, DtoResponse: not null }) _currentUserAuditMission = result.DtoResponse;
+        var auditMissionResult = await _auditMissionService.GetAuditMissionById(_currentUserAuditMission.AuditMissionId);
+
+        if (auditMissionResult is { Success: true, DtoResponse: not null }) _auditMission = auditMissionResult.DtoResponse;
+    }
+
+
+    private async Task FetchAuditMissions()
+    {
+        var result = await _auditMissionService.GetAuditMissionByOwnerId();
+        if (result is { Success: true, DtoResponses: not null })
+        {
+            _auditMissions = result.DtoResponses;
+        }
+    }
+
+    private async Task FetchRecommendations()
+    {
+        var result = await _recommendationService.GetAllRecentByUserAsync();
+
+        if(result is {Success: true, DtoResponses: not null})
+        {
+            _recommendations = result.DtoResponses;
+        }
+
+    }
+
+    private Task NavigateAuditMission(BaseAuditMissionDto auditMission)
+    {
+        _navigationManager.NavigateTo($"/audit-mission/{auditMission.Id}");
+        return Task.CompletedTask;
+    }
+
+    private async Task AuditMissionSelected(IList<BaseAuditMissionDto> value)
+    {
+        if (value.Any())
+        {
+            //fetch the objectives of the selected audit mission
+
+            var response = await _objectiveService.GetObjectivesByAuditMissionIdAsync(value[0].Id);
+
+            if (response.Success)
+            {
+                //navigate to the objectives page
+                _objectives = response.DtoResponses;
+            }
+        }
+    }
+
+    private Task NavigateObjective(BaseObjectiveViewModel objective)
+    {
+        _navigationManager.NavigateTo($"/objective/{objective.Id}");
+        return Task.CompletedTask;
+    }
+
+
+    private Task NavigateRecommendation(BaseRecommendationViewModel recommendation)
+    {
+        _navigationManager.NavigateTo($"/recommendations");
+        return Task.CompletedTask;
+    }
+
+    private void NavigateRecommendations(MouseEventArgs obj)
+    {
+        _navigationManager.NavigateTo($"/recommendations");
+
+    }
+}

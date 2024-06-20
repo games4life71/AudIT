@@ -18,4 +18,6 @@ public interface IRecommendationService
 
     public Task<BaseDTOResponse<BaseRecommendationViewModel>> CreateRecommendationAsync(CreateRecommendationDto createRecommendationDto);
 
+    public Task<BaseDTOResponse<BaseRecommendationViewModel>> GetAllRecentByUserAsync();
+
 }
