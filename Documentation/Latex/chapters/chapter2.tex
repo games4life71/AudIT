@@ -1,10 +1,13 @@
 \chapter{Arhitectura platformei}
- Provocarea de a elabora o platforma web destinata atat auditorilor publici cat si reprentatilor institutiilor din administratia publica  a impus nevoie de crea o arhitectura dinamica, modulara si usor de marit in cazul adaugarii a noi functionalitati.\\
-De asemenea, un numar mare de functionalitati necesita implementarea si a diferite \textit{design pattern-uri}, care se asigura ca modulule definite comunica intr-un mod cat mai eficient intre ele si promoveaza reutilizarea codului deja scris.\\
+ Provocarea de a elabora o platforma web destinata atat auditorilor publici cat si reprentatilor institutiilor din administratia publica  a impus nevoie de crea o arhitectura dinamica, modulara si usor de marit in cazul adaugarii a noi functionalitati.
+ 
+De asemenea, un numar mare de functionalitati necesita implementarea si a diferite \textit{design pattern-uri}, care se asigura ca modulule definite comunica intr-un mod cat mai eficient intre ele si promoveaza reutilizarea codului deja scris.
+
 Acest capitol incearca sa descrie motivatia pentru alegerile facute in materie de tehnologii folosite pentru a dezvolta componentele cheie ale aplicatiei: frontend, backend stocarea datelor si cateva aspecte legate de securitatea de baza a platformei; cat si o comparatie sumara intre potentialii competetitori ai alegerilor facute.
 
 \section {Arhitectura generala}
-Arhitectura generala a fost gandita de la inceput intr-un mod care permite adaugarea de noi functionalitati in aplicatie fara a deteriora structura sau functionalitatile deja implementate.\\
+Arhitectura generala a fost gandita de la inceput intr-un mod care permite adaugarea de noi functionalitati in aplicatie fara a deteriora structura sau functionalitatile deja implementate.
+
 Acestea fiind zise, proiectul este impartit in doua mari componente (client si server)  care comunica intre ele prin intermediul \textit{request-urilor HTTPS} ,si anume:
 
 \begin{itemize}
@@ -68,7 +71,7 @@ Alegerea acestui tip de arhitectura a fost motivata de mai multe avantaje cheie 
 	
 	\item  depistarea erorilor si rezolvarea lor este mult mai rapida.
 \end{itemize}
-Conform oricare alegeri, trebuie puse in balanta avantajele si dezavantajele pe care aceasta le ofera si  sa se compare strict cu nevoile si problemele care se incearca a rezolva. Privind in ansamblu si pe termen lung, arhitectura de tip \textit{monolith} prezinta si ea unele dezavantaje : 
+Conform oricare alegeri, trebuie puse in balanta avantajele si dezavantajele pe care aceasta le ofera si  sa se compare strict cu nevoile si problemele care se incearca a rezolva. Privind in ansamblu si pe termen lung, arhitectura de tip \textit{monolith} prezinta si unele dezavantaje: 
 
 \begin{itemize}
 
@@ -126,7 +129,8 @@ Utilizare lor conduce la o buna mentananta a codului scris, posbilitatea de a re
 In implementarea aplicatiei au fost folosite \textit{desing pattern-uri} din diferite categorii astfel incat in aceasta subsectiune se vor discuta cateva exemple utilizate.
 
 \subsection*{\textit{Optional pattern}}
-Acesta este un model de proiectare care ajuta la gestionarea valorilor care pot sau nu fi prezente, astfel avand valoarea \textit{null}. \textit{Pattern-ul} se asigura ca este eliminata valoarea \textit{null}, care de cele mai multe ori este o sursa comuna in erori la rularea codului (\textit{runtime}).\\
+Acesta este un model de proiectare care ajuta la gestionarea valorilor care pot sau nu fi prezente, astfel avand valoarea \textit{null}. \textit{Pattern-ul} se asigura ca este eliminata valoarea \textit{null}, care de cele mai multe ori este o sursa comuna in erori la rularea codului (\textit{runtime}).
+
 Solutia prezentata de acest model este crearea unei clase \textit{template} care incapsuleaza valoarea propriu zisa a entitatii pe care o construim. Spre exemplu, in cazul in care vrem sa cream o noua entitate de tipul \textit{User} dar la \textit{runtime} apare o eroare, executia programului nu se va opri, iar valoarea entitatii va fi incapsulata intr-un tip   \textit{Result\textless User\textgreater}
 
  cu parametrul \textit{Succes} setat pe fals, indicand astfel ca procesul de creare a esuat.\\
@@ -139,7 +143,8 @@ Solutia prezentata de acest model este crearea unei clase \textit{template} care
 \end{figure}
 
 \subsection*{\textit{Mediator pattern}}
-Acest \textit{design pattern} este unul de tip comportamental si se asigura ca nu exista dependente haotice intre entitatile/clasele din codul scris. Modelul restrictioneaza comunicarea directa intre obiecte si le obliga sa interactioneaze doar prin intermediul unui \textit{mediator}.\\
+Acest \textit{design pattern} este unul de tip comportamental si se asigura ca nu exista dependente haotice intre entitatile/clasele din codul scris. Modelul restrictioneaza comunicarea directa intre obiecte si le obliga sa interactioneaze doar prin intermediul unui \textit{mediator}.
+
 Acest model este implementat prin utilizarea unei interfate sau clase abstracte care stie toate referintele la componentele care vor sa comunice. In acest mod, in loc sa trimita solicitari directe, un obiect comunica prin intermediul mediatorului, acesta stiind unde sa redirectioneaze cererea primita.
 
 
@@ -153,7 +158,8 @@ Acest model este implementat prin utilizarea unei interfate sau clase abstracte 
 	\newpage
 \subsection*{\textit{Command pattern}}	
 
-Acest \textit{design pattern} este de asemenea unul de tip comportamental si se utilizeaza partial de \textit{design pattern-ul Mediator}, transformand astfel o comanda, spre exemplu o cerere de creare a unei noi entitati, intr-un obiect independent, acesta ulterior fiind trimis catre mediator si executat in \textit{handler-ul} corespunzator acestuia, de obicei numit \textit{receiver}.\\
+Acest \textit{design pattern} este de asemenea unul de tip comportamental si se utilizeaza partial de \textit{design pattern-ul Mediator}, transformand astfel o comanda, spre exemplu o cerere de creare a unei noi entitati, intr-un obiect independent, acesta ulterior fiind trimis catre mediator si executat in \textit{handler-ul} corespunzator acestuia, de obicei numit \textit{receiver}.
+
 In contextul dezvoltarii partii de server a aplicatiei AudIT, acesta este utiliat, impreuna cu modelul Mediator pentru a delega orice comanda (\textit{request}) primita catre obiectul care stie sa o execute. In acest mod, se elimina dependente stranse intre obiecte, promovand un cod cat mai bine organizat si elegant.\\
 
 \vspace{1cm}
@@ -177,7 +183,8 @@ In contextul dezvoltarii partii de server a aplicatiei AudIT, acesta este utilia
 
 \subsection*{\textit{Repository pattern}}
 
-Folosit in special in dezvoltarea aplicatiilor web, acest \textit{design pattern} separa logica interna a aplicatiei de accesul direct la date (baza de date). Acesta se utilizeaza de interfate pentru a crea un strat separator intre declararea abstracta a acestor constracte si implementarea concreta a functiilor care acceseaza datele la nivel de baza.\\
+Folosit in special in dezvoltarea aplicatiilor web, acest \textit{design pattern} separa logica interna a aplicatiei de accesul direct la date (baza de date). Acesta se utilizeaza de interfate pentru a crea un strat separator intre declararea abstracta a acestor constracte si implementarea concreta a functiilor care acceseaza datele la nivel de baza.
+
 Prin acest model, comunicarea dintre module se realizeaza prin intermediul contractului foarte bine stabilit, astfel eliminand posibilitatea ca un modul abstract sa acceseze direct un modul de acces de date.\\
 
 
@@ -189,8 +196,10 @@ Prin acest model, comunicarea dintre module se realizeaza prin intermediul contr
 	\caption{Diagrama \textit{repository pattern}}
 \end{figure}
 \subsection*{Descriere \textit{endpoint-uri} utilizare}
-\textit{Endpoint-urile} sunt componentele de baza ale comunicarii aplicatiilor prin intermediul internetului si a \textit{API-urilor}. Partea de server expune informatii si facilitati clientilor prin intermediul acestor \textit{endpoint-uri}, astfel acestia avand posiblitatea de a comunica prin intermediul acestor puncte cu aplicatia si cu logica interna a acesteia.\\
-\textit{Endpoint-urile} create de server sunt organizate conform fiecarei entitati din \textit{Domeniul} aplicatiei , pentru o mai buna navigare si intelgere a structurii in ansamblu, cat si avand in vedere actiunea pe care clientul doreste sa o realizeze.\\
+\textit{Endpoint-urile} sunt componentele de baza ale comunicarii aplicatiilor prin intermediul internetului si a \textit{API-urilor}. Partea de server expune informatii si facilitati clientilor prin intermediul acestor \textit{endpoint-uri}, astfel acestia avand posiblitatea de a comunica prin intermediul acestor puncte cu aplicatia si cu logica interna a acesteia.
+
+\textit{Endpoint-urile} create de server sunt organizate conform fiecarei entitati din \textit{Domeniul} aplicatiei , pentru o mai buna navigare si intelgere a structurii in ansamblu, cat si avand in vedere actiunea pe care clientul doreste sa o realizeze.
+
 Principalele \textit{endpoint-uri} expuse clientilor pe partea de server sunt :
 
 \begin{itemize}
@@ -221,9 +230,12 @@ De asemenea, \textit{server-ul} expune prin intermediul altor \textit{ endpoint-
 
 \subsection*{Tehnologii utilizate}
 In dezvoltarea partii de server s-a utilizat \textit{framework-ul } ASP.NET Core impreuna cu limbajul C\#.\\
-Alegerea facuta se bazeaza pe faptul ca \textit{framework-ul} este unul de tip \textit{open-source}, dezvoltat in principal de Microsoft, un actor important pe piata actuala IT,\textit{framework-ul} oferind functionalitati robuste si eficiente pentru dezvoltarea aplicatiilor web, acestea putand fi rulate pe Windows, Linux cat si MacOS.\\
-De asemenea, C\# este un limbaj de programare multi-paradigma \textit{high-end} matur, care ofera diverse functionalitati si solutii foarte bine puse la punct atat din punct de vedere al eficientei cat si al sustenabilitatii codului.\\
-Mai mult de atat, integrarea celor doua tehnologii cu alte servicii Microsoft este una foarte usor de realizat, acest lucru aducand un motiv in plus in alegerea facuta, pe langa ecosistemul bogat din care acestea fac parte, oferind suport pentru o gama larga de biblioteci si unelte deja integrate in functionalitatile limbajului si a \textit{framework-ului}.\\
+Alegerea facuta se bazeaza pe faptul ca \textit{framework-ul} este unul de tip \textit{open-source}, dezvoltat in principal de Microsoft, un actor important pe piata actuala IT,\textit{framework-ul} oferind functionalitati robuste si eficiente pentru dezvoltarea aplicatiilor web, acestea putand fi rulate pe Windows, Linux cat si MacOS.
+
+De asemenea, C\# este un limbaj de programare multi-paradigma \textit{high-end} matur, care ofera diverse functionalitati si solutii foarte bine puse la punct atat din punct de vedere al eficientei cat si al sustenabilitatii codului.
+
+Mai mult de atat, integrarea celor doua tehnologii cu alte servicii Microsoft este una foarte usor de realizat, acest lucru aducand un motiv in plus in alegerea facuta, pe langa ecosistemul bogat din care acestea fac parte, oferind suport pentru o gama larga de biblioteci si unelte deja integrate in functionalitatile limbajului si a \textit{framework-ului}.
+
 In plus, s-au utilizat diferite biblioteci pentru dezvoltarea anumitor servicii, cum ar fi :
 \begin{itemize}
 	\item  AWSSDK.Core pentru integrarea serviciilor AWS de trimiterea a unui email sau de stocare a datelor si a fisierelor in S3 Bucket;
@@ -245,7 +257,8 @@ Interfata grafica dezvoltata in acest proiect este realizata in \textit{framewor
 
 \newpage
 \subsection*{Web assembly} 
-Cum ne putem da seama si din numele pe care aceasta tehnologie o poarta, este vorba despre \textit{byte-code} (cod-masina) care este executat de o componenta separata din \textit{browser} ,numita \textit{Wasm engine}.\\
+Cum ne putem da seama si din numele pe care aceasta tehnologie o poarta, este vorba despre \textit{byte-code} (cod-masina) care este executat de o componenta separata din \textit{browser} ,numita \textit{Wasm engine}.
+
 \textit{Wasm} nu este un limbaj, ci mai degraba produsul compilarii codului scris intr-un limbaj de programare in cod-masina executabil. Majoritatea limbajelor de programare moderne  suporta compilarea codului direct intr-un fisier  binar de tip .wasm . Dupa o compilare cu succes, fisierele binare .wasm sunt incarcate in \textit{browser} cu ajutorul Javascript, urmand sa fie executate de catre componenta mentionata intr-o instanta virtuala izolata si securizata.\\
 
 \vspace{1cm}
@@ -272,6 +285,7 @@ Paginile web create in acest mod combina codul C\# cu HTML pentru a crea compone
 \end{figure}
 
 O functionalitate foarte importanta pe care o ofera, este utilizarea asa ziselor componente, parti fundamentale care impreuna alcatuiesc pagina web afisata utilizatorului. O componenta poate fi vazuta ca o piesa esentiala de puzzle care contribuie la afisarea finala a unei pagini web, piesa de puzzle care la randul sau poate fi creata din mai multe astfel de componente, si asa mai departe.
+
 Un avantaj pe care Blazor il ofera dezvoltatorilor este acela ca elimina pe cat posibil utilizarea de functii si \textit{script-uri }JavaScript in crearea paginilor web. Blazor se foloseste de cod scris in C\# impreuna cu HTML si CSS pentru a elabora pagini si componente web interactive si fluide.\\
 
 \subsection*{Radzen Components}
@@ -293,7 +307,8 @@ De asemenea, pentru o stilizare si o reutilizare a componentelor, s-a folosit li
 	\end{itemize} 
  
  \subsection*{Entity Framework Core}
-Entity Framework Core este o tehnologie dezvoltata de Microsoft in cadrul \textit{framework-ului} .NET Core care permite dezvoltatorilor sa interactioneze cu entitatile si tabelele din baza de date prin intermediul obiectelor, eliminand astfel necesitatea de a scrie interogari clasice pentru a comunica facil cu baza de date si cu obiectele sale.\\
+Entity Framework Core este o tehnologie dezvoltata de Microsoft in cadrul \textit{framework-ului} .NET Core care permite dezvoltatorilor sa interactioneze cu entitatile si tabelele din baza de date prin intermediul obiectelor, eliminand astfel necesitatea de a scrie interogari clasice pentru a comunica facil cu baza de date si cu obiectele sale.
+
 Aceasta tehnologie dispune de o serie de caracteristici si functionalitati care o fac o alegere cruciala in ceea ce priveste comunicarea intr-un mod eficient cu baza de date:
 \begin{itemize}
 	
@@ -350,12 +365,14 @@ In cele din urma pentru oferirea functionalitatilor principale,cum ar fi gestion
 \end{figure}
 
 \section{Aspecte de securitate}
-Simpla dezvoltare a unei aplicatii web ce ofera utilizatorului numeroase functionalitati nu este suficienta daca aceasta aplicatie nu dispune de un set de reguli si aspecte ce  fac experienta utilizatorilor pe platforma una cat mai sigura, in care le este asigurata integritatea, confidentialitatea cat si disponibilitatea datelor si actiunilor acestora.\\
+Simpla dezvoltare a unei aplicatii web ce ofera utilizatorului numeroase functionalitati nu este suficienta daca aceasta aplicatie nu dispune de un set de reguli si aspecte ce  fac experienta utilizatorilor pe platforma una cat mai sigura, in care le este asigurata integritatea, confidentialitatea cat si disponibilitatea datelor si actiunilor acestora.
+
 In dezvoltarea platformei AudIT s-a incercat utilizarea a cat mai multor standarde in ceea ce priveste securitatea actiunilor pe care un potential utilizator poate sa le faca in aplicatie, precum si a datelor si informatiilor cu care acesta lucreaza.
 
 \subsection*{Autentificarea actiunilor}
 
-Atat pe partea de server cat si in cea de client, sunt implementate functionalitati ce previn utilizarea \textit{endpoint-urilor} si accesarea paginilor web cand un utilizator nu este autentificat pe aplicatie. Mai mult de atat, accesul la anumite functionalitati este restrictionat doar unor categorii de utilizatori, cu un rol specific, astfel un utilizator cu rolul de reprezentant al unei institutii nu va putea accesa paginile specifice crearii si actualizarii unei misiuni de audit, intrucat rolul pe care acesta il detine nu are nivel de permisiune necesar pentru aceasta actiune.\\
+Atat pe partea de server cat si in cea de client, sunt implementate functionalitati ce previn utilizarea \textit{endpoint-urilor} si accesarea paginilor web cand un utilizator nu este autentificat pe aplicatie. Mai mult de atat, accesul la anumite functionalitati este restrictionat doar unor categorii de utilizatori, cu un rol specific, astfel un utilizator cu rolul de reprezentant al unei institutii nu va putea accesa paginile specifice crearii si actualizarii unei misiuni de audit, intrucat rolul pe care acesta il detine nu are nivel de permisiune necesar pentru aceasta actiune.
+
 Modalitatea prin care este verificata prin atribuirea unui \textit{token} de tip JWT (\textit{JSON web token}) fiecarui utilizator in momentul in care acesta se autentifica pe platforma, ulterior la fiecare actiune (\textit{request}) facut de acesta, fiind trimis si acest \textit{token}.\\
 
 
@@ -390,8 +407,10 @@ Utilizarea HTTPS atat in partea de server, cat si in cea de client impune mai mu
 
 \subsection*{Restrictionarea inregistrarii pe platforma}
 
-O alta modalitate prin care se mentine un nivel ridicat de securitate pe platforma o defineste restrictionarea utilizatorilor de a se inregistra pe platforma.\\
-La pasul de creare a unui cont nou, utilizatorilor le este  impusa folosirea unei adrese de email care contine domeniul unei institutii inregistrate si configurate pe platforma. Dupa crearea cu succes a unui cont nou, acesta nu are nici o permisiune, contul fiind nevoit a fi verificat de catre o persoana cu drepturi elevate (administratorul institutiei).\\ 
+O alta modalitate prin care se mentine un nivel ridicat de securitate pe platforma o defineste restrictionarea utilizatorilor de a se inregistra pe platforma.
+
+La pasul de creare a unui cont nou, utilizatorilor le este  impusa folosirea unei adrese de email care contine domeniul unei institutii inregistrate si configurate pe platforma. Dupa crearea cu succes a unui cont nou, acesta nu are nici o permisiune, contul fiind nevoit a fi verificat de catre o persoana cu drepturi elevate (administratorul institutiei).
+
 Verificarea se face pe baza unui email primit de acesta in care se cere validarea identitatii noul cont creat, astfel minimizand riscul crearii a unor conturi false respectiv a unor false identitati.
 
 \newpage
