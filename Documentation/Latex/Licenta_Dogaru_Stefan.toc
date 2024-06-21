@@ -17,7 +17,7 @@
 \contentsline {subsection}{\numberline {1.3.10}Vizualizarea obiectivelor}{17}{subsection.1.3.10}%
 \contentsline {subsection}{\numberline {1.3.11}Pagina detalii actiune}{17}{subsection.1.3.11}%
 \contentsline {subsection}{\numberline {1.3.12}Salvarea documentelor necesare pe platforma}{19}{subsection.1.3.12}%
-\contentsline {subsection}{\numberline {1.3.13}Accesarea documentelor necesare pe platforma}{20}{subsection.1.3.13}%
+\contentsline {subsection}{\numberline {1.3.13}Accesarea documentelor necesare pe platforma}{19}{subsection.1.3.13}%
 \contentsline {subsection}{\numberline {1.3.14}Completarea documentelor tip sablon}{20}{subsection.1.3.14}%
 \contentsline {subsection}{\numberline {1.3.15}Bara de navigare}{20}{subsection.1.3.15}%
 \contentsline {subsection}{\numberline {1.3.16}Gestionarea accesului la resurse partajate}{22}{subsection.1.3.16}%
@@ -33,9 +33,9 @@
 \contentsline {section}{\numberline {2.5}Aspecte de securitate}{43}{section.2.5}%
 \contentsline {chapter}{\numberline {3}Scenarii de utilizare }{47}{chapter.3}%
 \contentsline {section}{\numberline {3.1}Gestionarea misiunilor de audit}{47}{section.3.1}%
-\contentsline {section}{\numberline {3.2}Gestionarea obiectivelor si a actiunilor}{48}{section.3.2}%
-\contentsline {section}{\numberline {3.3}Gestionarea recomandarilor}{51}{section.3.3}%
-\contentsline {section}{\numberline {3.4}Gestionarea documentelor}{52}{section.3.4}%
-\contentsline {section}{\numberline {3.5}Sistemul de export}{53}{section.3.5}%
-\contentsline {chapter}{Concluzii}{55}{chapter*.50}%
-\contentsline {section}{\numberline {3.6}Concluzii asupra solutiei propuse}{55}{section.3.6}%
+\contentsline {section}{\numberline {3.2}Gestionarea obiectivelor si a actiunilor}{49}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Gestionarea recomandarilor}{53}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Gestionarea documentelor}{56}{section.3.4}%
+\contentsline {section}{\numberline {3.5}Sistemul de export}{59}{section.3.5}%
+\contentsline {chapter}{Concluzii}{63}{chapter*.50}%
+\contentsline {section}{\numberline {3.6}Concluzii asupra solutiei propuse}{63}{section.3.6}%

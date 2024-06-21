@@ -41,6 +41,7 @@
         <RadzenCard Variant="Variant.Outlined">
             <RadzenStack Orientation="Orientation.Vertical">
                 <RadzenDataGrid AllowFiltering="true" AllowPaging="true"
+                                @ref="_objectiveDataGrid"
                                 Data="@_objectiveFullViewModels" TItem="ObjectiveFullViewModel" ExpandMode="DataGridExpandMode.Multiple">
                     <Template Context="objective">
                         <RadzenTabs>
@@ -109,6 +110,7 @@
 @code
 {
 
+    private RadzenDataGrid<ObjectiveFullViewModel> _objectiveDataGrid;
     private Guid _currentUserAuditMission = Guid.Empty;
     private List<BaseAuditMissionDto> _auditMissions = [];
     private Guid _selectedAuditMissionId = Guid.Empty;
@@ -242,7 +244,8 @@
             {
                 _objectiveFullViewModels.Remove(objective);
                 _notificationService.Notify(NotificationSeverity.Success, "Success", "Objective deleted successfully", 3000);
-                StateHasChanged();
+                await _objectiveDataGrid.Reload();
+
             }
             else
             {
