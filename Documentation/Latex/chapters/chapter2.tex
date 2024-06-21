@@ -6,9 +6,9 @@ De asemenea, un număr mare de functionalități necesită implementarea și a d
 Acest capitol incearcă să descrie motivația pentru alegerile făcute în materie de tehnologii folosite pentru a dezvolta componentele cheie ale aplicației: frontend, backend stocarea datelor și câteva aspecte legate de securitatea de bază a platformei.
 
 \section {Arhitectura generală}
-Arhitectura generală a fost gândita de la început într-un mod care permite adăugarea de noi funcționalități în aplicație fără a deteriora structura sau funcționalitățile deja implementate.
+Arhitectura generală a fost gândita de la început într-un mod care permite adăugarea de noi funcționalități în aplicație fără a deteriora Structură sau funcționalitățile deja implementate.
 
-Acestea fiind zise, proiectul este împărțit în două mari componente (client si server)  care comunică între ele prin intermediul \textit{request-urilor HTTPS}, și anume:
+Acestea fiind zise, proiectul este împărțit în două mari componente (client și server)  care comunică între ele prin intermediul \textit{request-urilor HTTPS}, și anume:
 
 \begin{itemize}
 	
@@ -66,18 +66,18 @@ Alegerea acestui tip de arhitectură a fost motivată de mai multe avantaje chei
 \begin{itemize}
 	\item simplitatea dezvoltării în cadrul arhitecturii de tip monolith permite lucrul pe o singură bază de cod , ceea ce simplică major procesul de dezvoltare, testare și de depistare a erorilor, fiind esențială în fazele de început al unui proiect;
 	
-	\item  performanța sporită în cadrul unei aplicații care răspunde \textit{request-urilor}, astfel un singur \textit{API} poate răspunde la toate cererile, eliminând nevoia de a activa si alte \textit{API-uri} externe pentru îndeplinirea sarcinii, ca în cazul arhitecturii de micro-servicii;
+	\item  performanța sporită în cadrul unei aplicații care răspunde \textit{request-urilor}, astfel un singur \textit{API} poate răspunde la toate cererile, eliminând nevoia de a activa și alte \textit{API-uri} externe pentru îndeplinirea sarcinii, ca în cazul arhitecturii de micro-servicii;
 	
 	\item ușurința testării de tip \textit{unit-testing} cât și \textit{integration-testing} întrucat toate modulele sunt în același loc;
 	
 	\item  depistarea erorilor și rezolvarea lor este mult mai rapidă.
 \end{itemize}
 
-Conform oricărei alegeri făcute, trebuie puse în balanță avantajele și dezavantajele pe care această le oferă și  să se compare strict cu nevoile și problemele care se incearcă a se rezolva. Privind in ansamblu și pe termen lung, arhitectura de tip \textit{monolith} prezintă și unele dezavantaje: 
+Conform oricărei alegeri făcute, trebuie puse în balanță avantajele și dezavantajele pe care această le oferă și  să se compare strict cu nevoile și problemele care se incearcă a se rezolva. Privind în ansamblu și pe termen lung, arhitectura de tip \textit{monolith} prezintă și unele dezavantaje: 
 
 \begin{itemize}
 
- \item dezvoltarea încetinita în momentul în care funcționalitățile pe care dorim să le implementăm cresc ca si număr, întrucat toate modulele sunt comasate într-un singur loc;
+ \item dezvoltarea încetinita în momentul în care funcționalitățile pe care dorim să le implementăm cresc ca și număr, întrucat toate modulele sunt comasate într-un singur loc;
  
  \item \textit{scalabilitate redusă} datorită strânsei legături dintre componentele prezente în aplicație;
  
@@ -94,7 +94,7 @@ Arhitectura \textit{Clean Code } este bazată pe ideea principală precum că st
 	\centering
 	
 	\includegraphics[width=0.6\textwidth]{c2/clean_architecture.png}
-	\caption{Structura arhitecturii \textit{Clean code}}
+	\caption{Structură arhitecturii \textit{Clean code}}
 \end{figure}
 
 Adoptarea acestui tip de arhitectură împreună cu cea de tip \textit{monolith} include mai multe beneficii cum ar fi:
@@ -113,12 +113,12 @@ Adoptarea acestui tip de arhitectură împreună cu cea de tip \textit{monolith}
 Modul în care arhitectura de tip \textit{Clean Code} a fost implementată în aceste proiect constă în separarea straturilor aplicației, astfel încât avem:
 
 \begin{itemize}
-	\item  \textit{Core Layer} fiind structura principală ce conferă logica internă a aplicației. Acesta cuprinde \textit{Domain} unde sunt modelate entitățile aplicației respectiv \textit{Application} unde este definită toată logica internă a serverului,
+	\item  \textit{Core Layer} fiind Structură principală ce conferă logica internă a aplicației. Acesta cuprinde \textit{Domain} unde sunt modelate entitățile aplicației respectiv \textit{Application} unde este definită toată logica internă a serverului,
 	de la declarațiile abstracte ale interfațelor la definerea serviciilor proprii de care se vor folosi ulterior straturile externe ale arhitecturii;
 	
 	\item \textit{API Layer} este partea structurală care definește \textit{endpoint-urile} aplicației prin diferite \textit{controllere}, expunând astfel funcționalitățile aplicației la internet;
 	
-  	\item \textit{UI Layer} definește structura de prezentare a aplicației și este formată din partea de \textit{Frontend} a platformei;
+  	\item \textit{UI Layer} definește Structură de prezentare a aplicației și este formată din partea de \textit{Frontend} a platformei;
   
  	 \item \textit{Infrastructure Layer} în care găsim logica ce se ocupă de comunicarea cu serviciile externe cum ar fi baza de date, AWS sau servicii de identitate.
  	 
@@ -128,7 +128,7 @@ Modul în care arhitectura de tip \textit{Clean Code} a fost implementată în a
 
 \textit{Design pattern-urile}, potrivit definiției, sunt soluții generale și reutilizabile asupra problemelor comune ce pot apărea în decursul dezvoltării unei aplicații software.
 
-Utilizarea lor conduce la o buna mentananță a codului scris, posbilitatea de a reutiliza module deja scrise, îmbunătațește comunicarea și legăturile dintre module și încurajează un stil de cod cat mai elegant și ușor de înțeles.\\
+Utilizarea lor conduce la o buna mentananță a codului scris, posbilitatea de a reutiliza module deja scrise, îmbunătațește comunicarea și legăturile dintre module și încurajează un stil de cod cât mai elegant și ușor de înțeles.\\
 În implementarea aplicației au fost folosite \textit{desing pattern-uri} din diferite categorii astfel încât în această subsecțiune se vor discuta câteva exemple utilizate.
 
 \subsection*{\textit{Optional pattern}}
@@ -144,31 +144,31 @@ Soluția prezentată de acest model este crearea unei clase \textit{template} ca
 \end{figure}
 
 \subsection*{\textit{Mediator pattern}}
-Acest \textit{design pattern} este unul de tip comportamental si se asigura ca nu exista dependente haotice intre entitatile/clasele din codul scris. Modelul restrictioneaza comunicarea directa intre obiecte si le obliga sa interactioneaze doar prin intermediul unui \textit{mediator}.
+Acest \textit{design pattern} este unul de tip comportamental și se asigură că nu există dependențe haotice între entitățile/clasele din codul scris. Modelul restrictionează comunicarea directă între obiecte și le obligă să interacționeze doar prin intermediul unui \textit{mediator}.
 
-Acest model este implementat prin utilizarea unei interfate sau clase abstracte care stie toate referintele la componentele care vor sa comunice. In acest mod, in loc sa trimita solicitari directe, un obiect comunica prin intermediul mediatorului, acesta stiind unde sa redirectioneaze cererea primita.
+Acest model este implementat prin utilizarea unei interfațe sau clase abstracte care știe toate referințele la componentele care vor să comunice. În acest mod, în loc să trimită solicitări directe, un obiect comunică prin intermediul mediatorului, acesta știind unde să redirecționeaze cererea primită.
 
 
 \begin{figure}[h]
 	\centering
 	
 	\includegraphics[width=0.6\textwidth]{c2/mediator_pattern}
-	\caption{Ilustratie \textit{mediator pattern}}
+	\caption{Ilustrație \textit{mediator pattern}}
 \end{figure}
 
 	\newpage
 \subsection*{\textit{Command pattern}}	
 
-Acest \textit{design pattern} este de asemenea unul de tip comportamental si se utilizeaza partial de \textit{design pattern-ul Mediator}, transformand astfel o comanda, spre exemplu o cerere de creare a unei noi entitati, intr-un obiect independent, acesta ulterior fiind trimis catre mediator si executat in \textit{handler-ul} corespunzator acestuia, de obicei numit \textit{receiver}.
+Acest \textit{design pattern} este de asemenea unul de tip comportamental și se utilizează parțial de \textit{design pattern-ul Mediator}, transformând astfel o comandâ, spre exemplu o cerere de creare a unei noi entități, într-un obiect independent, acesta ulterior fiind trimis către mediator și executat în \textit{handler-ul} corespunzător acestuia, de obicei numit \textit{receiver}.
 
-In contextul dezvoltarii partii de server a aplicatiei AudIT, acesta este utiliat, impreuna cu modelul Mediator pentru a delega orice comanda (\textit{request}) primita catre obiectul care stie sa o execute. In acest mod, se elimina dependente stranse intre obiecte, promovand un cod cat mai bine organizat si elegant.\\
+În contextul dezvoltării părții de server a aplicației AudIT, acesta este utilizat, împreună cu modelul Mediator pentru a delega orice comandă (\textit{request}) primită către obiectul care știe să o execute. În acest mod, se elimină dependențe strânse între obiecte, promovând un cod cât mai bine organizat și elegant.\\
 
 \vspace{1cm}
 \begin{figure}[h]
 	\centering
 	
 	\includegraphics[width=0.7\textwidth]{c2/command_pattern1}
-	\caption{Exemplu clasa de tip \textit{Command}}
+	\caption{Exemplu clasă de tip \textit{Command}}
 \end{figure}
 
 
@@ -178,15 +178,15 @@ In contextul dezvoltarii partii de server a aplicatiei AudIT, acesta este utilia
 	\centering
 	
 	\includegraphics[width=0.7\textwidth]{c2/command_pattern2}
-	\caption{Exemplu clasa de tip \textit{Handler/Receiver}}
+	\caption{Exemplu clasă de tip \textit{Handler/Receiver}}
 \end{figure}
 
 
 \subsection*{\textit{Repository pattern}}
 
-Folosit in special in dezvoltarea aplicatiilor web, acest \textit{design pattern} separa logica interna a aplicatiei de accesul direct la date (baza de date). Acesta se utilizeaza de interfate pentru a crea un strat separator intre declararea abstracta a acestor constracte si implementarea concreta a functiilor care acceseaza datele la nivel de baza.
+Folosit în special în dezvoltarea aplicațiilor web, acest \textit{design pattern} separă logica internă a aplicației de accesul direct la date (baza de date). Acesta se utilizează de interfațe pentru a crea un strat separator între declararea abstractă a acestor constracte și implementarea concretă a funcțiilor care accesează datele la nivel de bază.
 
-Prin acest model, comunicarea dintre module se realizeaza prin intermediul contractului foarte bine stabilit, astfel eliminand posibilitatea ca un modul abstract sa acceseze direct un modul de acces de date.\\
+Prin acest model, comunicarea dintre module se realizează prin intermediul contractului foarte bine stabilit, astfel eliminând posibilitatea ca un modul abstract să acceseze direct un modul de acces de date.\\
 
 
 \vspace{1cm}
@@ -194,73 +194,74 @@ Prin acest model, comunicarea dintre module se realizeaza prin intermediul contr
 	\centering
 	
 	\includegraphics[width=0.8\textwidth]{c2/repository_pattern}
-	\caption{Diagrama \textit{repository pattern}}
+	\caption{Diagramă \textit{repository pattern}}
 \end{figure}
+
 \subsection*{Descriere \textit{endpoint-uri} utilizare}
-\textit{Endpoint-urile} sunt componentele de baza ale comunicarii aplicatiilor prin intermediul internetului si a \textit{API-urilor}. Partea de server expune informatii si facilitati clientilor prin intermediul acestor \textit{endpoint-uri}, astfel acestia avand posiblitatea de a comunica prin intermediul acestor puncte cu aplicatia si cu logica interna a acesteia.
+\textit{Endpoint-urile} sunt componentele de bază ale comunicării aplicațiilor prin intermediul internetului și a \textit{API-urilor}. Partea de server expune informații și facilități clienților prin intermediul acestor \textit{endpoint-uri}, astfel aceștia având posiblitatea de a comunica prin intermediul acestor puncte cu aplicația și cu logica internă a acesteia.
 
-\textit{Endpoint-urile} create de server sunt organizate conform fiecarei entitati din \textit{Domeniul} aplicatiei , pentru o mai buna navigare si intelgere a structurii in ansamblu, cat si avand in vedere actiunea pe care clientul doreste sa o realizeze.
+\textit{Endpoint-urile} create de server sunt organizate conform fieăarei entități din \textit{Domeniul} aplicației , pentru o mai bună navigare și înțelgere a structurii în ansamblu, cât și având în vedere acțiunea pe care clientul dorește să o realizeze.
 
-Principalele \textit{endpoint-uri} expuse clientilor pe partea de server sunt :
+Principalele \textit{endpoint-uri} expuse clienților pe partea de server sunt :
 
 \begin{itemize}
 	
-	\item \textit{endpoint-urile} care gestioneaza actiunile utilizatorului legate de autentificare: inregistrare, autentificare, iesire din cont, verificare email cat si actualizare a informatiilor contului de utilizator.Aceste \textit{endpoint-uri} sunt centrate in jurul entitatii de Utilizator;
+	\item \textit{endpoint-urile} care gestionează acțiunile utilizatorului legate de autentificare: înregistrare, autentificare, ieșire din cont, verificare email cât și actualizare a informațiilor contului de utilizator. Aceste \textit{endpoint-uri} sunt centrate în jurul entității de Utilizator;
 	
-	\item \textit{endpoint-urile} care se ocupa de logica gestionarii entitatilor de tip Misiune de audit, astfel permitand crearea, listarea, stergerea acestora cat si actualizarea informatiilor si obtinerea de informatii partajate cu alte entitati;
+	\item \textit{endpoint-urile} care se ocupă de logica gestionării entităților de tip Misiune de audit, astfel permițând crearea, listarea, ștergerea acestora cât și actualizarea informațiilor și obținerea de informații partajate cu alte entități;
 	
-	\item \textit{endpoint-urile} care gestioneaza obiectivele unei misiuni de audit;
+	\item \textit{endpoint-urile} care gestionează obiectivele unei misiuni de audit;
 	
-	\item \textit{endpoint-urile} care trateaza actiunile unui obiectiv respectiv riscurile acestuia;
+	\item \textit{endpoint-urile} care tratează acțiunile unui obiectiv respectiv riscurile acestuia;
 	
-	\item \textit{endpoint-urile} care administreaza actiunile referitoare la entitatile de tip Recomandare;
+	\item \textit{endpoint-urile} care administrează acțiunile referitoare la entitățile de tip Recomandare;
 	
-	\item punct de accees asupra entitatilor de tip Document, existand posibilitatea de a crea, a incarca, descarca si a sterge documente salvate pe platforma;
+	\item punct de accees asupra entităților de tip Document, existând posibilitatea de a crea, a încărca, descărca și a sterge documente salvate pe platformă;
 	
-	\item \textit{endpoint-urile} care gestioneaza actiunile de export de date si de autocompletare a unor documente de tip sablon cu date de pe platforma;
+	\item \textit{endpoint-urile} care gestionează acțiunile de export de date și de autocompletare a unor documente de tip șablon cu date de pe platformă;
 	
-	\item \textit{endpoint-urile} care permit configurarea institutiilor si a departamentelor de pe platforma.
+	\item \textit{endpoint-urile} care permit configurarea instituțiilor și a departamentelor de pe platformă.
 	
 \end{itemize} 
 
-De asemenea, \textit{server-ul} expune prin intermediul altor \textit{ endpoint-uri} functionalitati cum ar fi configurarea accesului la resurse partajate, gestionarea activitatilor desfasurate pe platforma cat si un sistem de notificari ce permite actualizarea informatiilor disponibile pe aplicatie in timp real.
+De asemenea, \textit{server-ul} expune prin intermediul altor \textit{ endpoint-uri} funcționalități cum ar fi configurarea accesului la resurse partajate, gestionarea activităților desfășurate pe platformă cât și un sistem de notificări ce permite actualizarea informațiilor disponibile pe aplicație în timp real.
 
 
 	
  
 
 \subsection*{Tehnologii utilizate}
-In dezvoltarea partii de server s-a utilizat \textit{framework-ul } ASP.NET Core impreuna cu limbajul C\#.\\
-Alegerea facuta se bazeaza pe faptul ca \textit{framework-ul} este unul de tip \textit{open-source}, dezvoltat in principal de Microsoft, un actor important pe piata actuala IT,\textit{framework-ul} oferind functionalitati robuste si eficiente pentru dezvoltarea aplicatiilor web, acestea putand fi rulate pe Windows, Linux cat si MacOS.
+În dezvoltarea părții de server s-a utilizat \textit{framework-ul } ASP.NET Core împreună cu limbajul C\#.\\
+Alegerea făcută se bazează pe faptul că \textit{framework-ul} este unul de tip \textit{open-source}, dezvoltat în principal de Microsoft, un actor important pe piața actuală IT,\textit{framework-ul} oferind funcționalități robuste și eficiente pentru dezvoltarea aplicațiilor web, acestea putând fi rulate pe Windows, Linux cât și MacOS.
 
-De asemenea, C\# este un limbaj de programare multi-paradigma \textit{high-end} matur, care ofera diverse functionalitati si solutii foarte bine puse la punct atat din punct de vedere al eficientei cat si al sustenabilitatii codului.
+De asemenea, C\# este un limbaj de programare multi-paradigmă \textit{high-end} matur, care oferă diverse funcționalități și solutii foarte bine puse la punct atat din punct de vedere al eficientei cât și al sustenabilitatii codului.
 
-Mai mult de atat, integrarea celor doua tehnologii cu alte servicii Microsoft este una foarte usor de realizat, acest lucru aducand un motiv in plus in alegerea facuta, pe langa ecosistemul bogat din care acestea fac parte, oferind suport pentru o gama larga de biblioteci si unelte deja integrate in functionalitatile limbajului si a \textit{framework-ului}.
+Mai mult de atat, integrarea celor două tehnologii cu alte servicii Microsoft este una foarte ușor de realizat, acest lucru aducănd un motiv în plus în alegerea facută, pe langă ecosistemul bogat din care acestea fac parte, oferind suport pentru o gamă largă de biblioteci și unelte deja integrate în funcționalitățile limbajului și a \textit{framework-ului}.
 
-In plus, s-au utilizat diferite biblioteci pentru dezvoltarea anumitor servicii, cum ar fi :
+În plus, s-au utilizat diferite biblioteci pentru dezvoltarea anumitor servicii, cum ar fi :
 \begin{itemize}
-	\item  AWSSDK.Core pentru integrarea serviciilor AWS de trimiterea a unui email sau de stocare a datelor si a fisierelor in S3 Bucket;
+	\item  AWSSDK.Core pentru integrarea serviciilor AWS de trimitere a a unui email sau de stocare a datelor și a fișierelor în S3 Bucket;
 	
-	\item  MediatR care ofera functionalitatile \textit{design pattern-ului} Mediator;
+	\item  MediatR care oferă funcționalitățile \textit{design pattern-ului} Mediator;
 	
-	\item ASP.NET Identity, serviciu pentru integrarea functionalitatilor de autentificare si autorizare in aplicatie, facilitand accesul si autorizarea utilizatorilor pe platforma;
+	\item ASP.NET Identity, serviciu pentru integrarea funcționalităților de autentificare și autorizare în aplicație, facilitănd accesul și autorizarea utilizatorilor pe platformă;
 	
 	
-	\item AutoMapper este o bibilioteca externa utilizata pentru a transforma diferitele tipuri de obiecte intre ele, eliminand astfel codul \textit{boilerplate} necesar pentru a copia datele de la  o entitate la alta;
+	\item AutoMapper este o bibiliotecă externă utilizată pentru a transforma diferitele tipuri de obiecte între ele, eliminănd astfel codul \textit{boilerplate} necesar pentru a copia datele de la o entitate la alta;
 	
-	\item OpenXML este o biblioteca \textit{open-source} care permite manipularea fisierelor Office de tipul .XLSX sau .DOCS. Este integrata pentru a oferi utilizatorilor functionalitatea de a putea edita sau exporta pe platforma documente oficiale tip sablon.
+	\item OpenXML este o bibliotecă \textit{open-source} care permite manipularea fișierelor Office de tipul .XLSX sau .DOCS. Este integrată pentru a oferi utilizatorilor funcționalitatea de a putea edita sau exporta pe platformă documente oficiale tip șablon.
 	
 \end{itemize}
    
 
 \section{Arhitectura interfatei grafice}
-Interfata grafica dezvoltata in acest proiect este realizata in \textit{framework-ul} .NET Blazor, mai exact o aplicatie de tipul \textit{WASM (Web Assembly)} care ruleaza in \textit{browser-ul} utilizatorului. Alegerea a fost facuta intrucat acest nou model arhitectural permite rularea codului direct in \textit{browser}, nemaifiind nevoie de librarii sau extensii suplimentare necesare.\\
+Interfața grafică dezvoltată în acest proiect este realizată în \textit{framework-ul} .NET Blazor, mai exact o aplicație de tipul \textit{WASM (Web Assembly)} care rulează în \textit{browser-ul} utilizatorului. Alegerea a fost facută întrucât acest nou model arhitectural permite rularea codului direct în \textit{browser}, nemaifiind nevoie de librării sau extensii suplimentare necesare.\\
 
 \newpage
 \subsection*{Web assembly} 
-Cum ne putem da seama si din numele pe care aceasta tehnologie o poarta, este vorba despre \textit{byte-code} (cod-masina) care este executat de o componenta separata din \textit{browser} ,numita \textit{Wasm engine}.
+Cum se poate da seama și din numele pe care această tehnologie o poartă, este vorba despre \textit{byte-code} (cod-mașină) care este executat de o componentă separată din \textit{browser}, numită \textit{Wasm engine}.
 
-\textit{Wasm} nu este un limbaj, ci mai degraba produsul compilarii codului scris intr-un limbaj de programare in cod-masina executabil. Majoritatea limbajelor de programare moderne  suporta compilarea codului direct intr-un fisier  binar de tip .wasm . Dupa o compilare cu succes, fisierele binare .wasm sunt incarcate in \textit{browser} cu ajutorul Javascript, urmand sa fie executate de catre componenta mentionata intr-o instanta virtuala izolata si securizata.\\
+\textit{Wasm} nu este un limbaj, ci mai degrabă produsul compilării codului scris într-un limbaj de programare în cod-masină executabil. Majoritatea limbajelor de programare moderne  suportă compilarea codului direct într-un fișier  binar de tip .wasm . După o compilare cu succes, fișierele binare .wasm sunt încărcate în \textit{browser} cu ajutorul Javascript, urmând să fie executate de către componenta menționată într-o instanță virtuală izolată și securizată.\\
 
 \vspace{1cm}
 \begin{figure}[h]
@@ -270,12 +271,14 @@ Cum ne putem da seama si din numele pe care aceasta tehnologie o poarta, este vo
 	\caption{Diagrama mod functionare \textit{Web Assembly}}
 \end{figure}
 
-Un avantaj cheie al utilizarii acestei tehnologii il constituie viteza si eficienta de care da dovada. Codul ruleaza cat se poate de aproape de limitarile \textit{hardware} ale computer-ului, astfel rezultand in performante crescute si un nivel al utilizarii memoriei mai mic.\\
-Pe de alta parte, exista si dezavantaje in utilizarea acestuia, intrucat momentan nu este implementat un sistem de \textit{garbage collector} care sa elimine din memorie functiile si instantele care nu mai sunt folosite in firul executiei.
+Un avantaj cheie al utilizarii acestei tehnologii îl constituie viteza și eficiența de care dă dovadă. Codul rulează cât se poate de aproape de limitările \textit{hardware} ale computer-ului, astfel rezultând în performanțe crescute și un nivel al utilizării memoriei mai mic.
+
+Pe de altă parte, există și dezavantaje în utilizarea acestuia, intrucat momentan nu este implementat un sistem de \textit{garbage collector} care să elimine din memorie funcțiile și instanțele care nu mai sunt folosite în firul execuției.
 
 \subsection*{.NET Blazor}
-Pentru dezvoltarea paginilor web, s-a utilizat tehnologia .NET Blazor, un \textit{framework} relativ nou aparut, dar care promite performante crescute alaturi de un mediu de lucru bine pus la punct si eficient din punct de vedere al productivitatii dezvolarii interfatelor interactive si bogate.\\
-Paginile web create in acest mod combina codul C\# cu HTML pentru a crea componente reutilizabile ce sunt  afisate si actualizate in DOM-ul virtual din \textit{browser}.\\
+Pentru dezvoltarea paginilor web, s-a utilizat tehnologia .NET Blazor, un \textit{framework} relativ nou apărut, dar care promite performanțe crescute alături de un mediu de lucru bine pus la punct și eficient din punct de vedere al productivității dezvoltării interfațelor interactive și bogate.
+
+Paginile web create în acest mod combină codul C\# cu HTML pentru a crea componente reutilizabile ce sunt  afișate și actualizate în DOM-ul virtual din \textit{browser}.\\
 
 \vspace{1cm}
 \begin{figure}[h]
@@ -285,133 +288,136 @@ Paginile web create in acest mod combina codul C\# cu HTML pentru a crea compone
 	\caption{Diagrama mod functionare \textit{Blazor WebAssembly}}
 \end{figure}
 
-O functionalitate foarte importanta pe care o ofera, este utilizarea asa ziselor componente, parti fundamentale care impreuna alcatuiesc pagina web afisata utilizatorului. O componenta poate fi vazuta ca o piesa esentiala de puzzle care contribuie la afisarea finala a unei pagini web, piesa de puzzle care la randul sau poate fi creata din mai multe astfel de componente, si asa mai departe.
+O funcționalitate foarte importantă pe care o oferă, este utilizarea componentelor, părți fundamentale care împreună alcătuiesc pagina web afișată utilizatorului. O componentă poate fi vazută ca o piesă esențială de puzzle care contribuie la afisarea finală a unei pagini web, piesă de puzzle care la rândul său poate fi creată din mai multe astfel de componente, și asa mai departe.
 
-Un avantaj pe care Blazor il ofera dezvoltatorilor este acela ca elimina pe cat posibil utilizarea de functii si \textit{script-uri }JavaScript in crearea paginilor web. Blazor se foloseste de cod scris in C\# impreuna cu HTML si CSS pentru a elabora pagini si componente web interactive si fluide.\\
+Un avantaj pe care Blazor îl oferă dezvoltatorilor este acela că elimină pe cât posibil utilizarea de funcții și \textit{script-uri }JavaScript în crearea paginilor web. Blazor se folosește de cod scris în C\# împreună cu HTML și CSS pentru a elabora pagini și componente web interactive și fluide.\\
 
 \subsection*{Radzen Components}
-De asemenea, pentru o stilizare si o reutilizare a componentelor, s-a folosit libraria Radzen Components pentru a folosi controale si componente cum ar fi : tabele, butoane stilizate, teme grafice de inalta calitate, \textit{form-uri} si multe altele.\\
- Libraria Radzen Components este una de tip \textit{open-source} si ofera suport dedicat din partea comunitatii active, impreuna cu documentatie detaliata asupra tuturor functionalitatilor oferite.
+De asemenea, pentru o stilizare și o reutilizare a componentelor, s-a folosit librăria Radzen Components pentru a reutiliza controale și componente cum ar fi : tabele, butoane stilizate, teme grafice de înaltă calitate, \textit{form-uri} și multe altele.
+
+Librăria Radzen Components este una de tip \textit{open-source} și oferă suport dedicat din partea comunității active, împreună cu documentația detaliată asupra tuturor funcționalităților oferite.
 
 
 \section{Stocarea datelor}
 
  \subsection*{Baza de date MySQL}
-	MySQL este un sistem de gestionare a bazelor de date relationare open-source si reprezinta alegerea pentru care am optat a fi folosita pentru stocarea datelor in acest proiect.Acest sistem este una dintre cele mai populare solutii cand vine vorba de stocare intr-un mod relational al datelor, astfel incat acesta ofera diferite beneficii: 
+	MySQL este un sistem de gestionare a bazelor de date relaționale open-source și reprezintă alegerea pentru care s-a optat a fi folosită pentru stocarea datelor în proiect. Acest sistem este una dintre cele mai populare soluții când vine vorba de stocare într-un mod relațional al datelor, astfel încât acesta oferă diferite beneficii: 
 	\begin{itemize}
 		
-		\item simplitatea cand vine vorba de utilizarea acestuia, folosindu-se de un dialect comun in interogarile sale, este foate usor de utilizat;
+		\item simplitatea când vine vorba de utilizarea acestuia, folosindu-se de un dialect comun în interogările sale, este foate ușor de utilizat;
 		
-		\item securitatea datelor oferita de MySQL prin integrarea unui sistem solid de privilegii si de restrictionarea a accesului bazat pe roluri;
+		\item securitatea datelor oferită de MySQL prin integrarea unui sistem solid de privilegii și de restricționare a accesului bazat pe roluri;
 		
-		\item flexibilitatea si functionalitatile pe care acesta le ofera sporesc productivitatea dezvoltarii aplicatiilor.
+		\item flexibilitatea și funcționalitățile pe care aceasta le oferă sporesc productivitatea dezvoltării aplicațiilor.
+		
 	\end{itemize} 
  
  \subsection*{Entity Framework Core}
-Entity Framework Core este o tehnologie dezvoltata de Microsoft in cadrul \textit{framework-ului} .NET Core care permite dezvoltatorilor sa interactioneze cu entitatile si tabelele din baza de date prin intermediul obiectelor, eliminand astfel necesitatea de a scrie interogari clasice pentru a comunica facil cu baza de date si cu obiectele sale.
+Entity Framework Core este o tehnologie dezvoltată de Microsoft în cadrul \textit{framework-ului} .NET Core care permite dezvoltatorilor să interacționeze cu entitățile și tabelele din baza de date prin intermediul obiectelor, eliminând astfel necesitatea de a scrie interogări clasice pentru a comunica facil cu baza de date și cu obiectele sale.
 
-Aceasta tehnologie dispune de o serie de caracteristici si functionalitati care o fac o alegere cruciala in ceea ce priveste comunicarea intr-un mod eficient cu baza de date:
+Aceasta tehnologie dispune de o serie de caracteristici și funcționalități care o fac o alegere crucială în ceea ce privește comunicarea într-un mod eficient cu baza de date:
 \begin{itemize}
 	
-	\item sistemul de \textit{migratii} similar unui \textit{version-control} al versiunii bazei de date si a relatiilor acesteia, permite dezvoltatorilor sa tina evidenta versiunii bazei de date, eventual existand posibilitatea in cazul unor erori sa se intoarca la ultima versiune stabila;
+	\item sistemul de \textit{migrații} similar unui \textit{version-control} al versiunii bazei de date și a relațiilor acesteia, permite dezvoltatorilor să țină evidența versiunii bazei de date, eventual existând posibilitatea în cazul unor erori să se întoarcă la ultima versiune stabilă;
 	
-	\item \textit{code-first} este functionalitatea ce permite actualizarea modelului din baza de date pe baza schimbarilor din codul scris si a modificarilor din entitatile declare in codul sursa;
+	\item \textit{code-first} este funcționalitatea ce permite actualizarea modelului din baza de date pe baza schimbărilor din codul scris și a modificărilor din entitățile declarate în codul sursă;
 	
-	\item suportul pentru majoritatea bazelor de date existente in momentul de fata, primind constant actualizari;
+	\item suportul pentru majoritatea bazelor de date existente în momentul de față, primind constant actualizări;
 	
-	\item performanta interogarilor, astfel incat sistemul este optimizat sa colecteze intr-un mod eficient rezultatele interogarilor.
+	\item performanța interogărilor, astfel încat sistemul este optimizat să colecteze într-un mod eficient rezultatele interogărilor.
 	 
 \end{itemize}
 
-\subsection*{Structura bazei de date}
+\subsection*{Structură bazei de date}
 
-Pentru autentificare si autorizarea activitatilor utilizatorilor, se utilizeaza biblioteca .NET Identity Core, care pune la dispozitia dezvoltatorilor o solutie deja implementata in materie de tabele si a relatiilor dintre ele, astfel incat dezvoltatorul sa se ocupe doar de logica utilizarii acestora.
+Pentru autentificarea și autorizarea activităților utilizatorilor, se utilizează biblioteca .NET Identity Core, care pune la dispoziția dezvoltatorilor o soluție deja implementată în materie de tabele și a relațiilor dintre ele, astfel încat dezvoltatorul să se ocupe doar de logica utilizării acestora.
  
 \vspace{1cm}
 \begin{figure}[h]
 	\centering
 	
 	\includegraphics[width=1\textwidth]{c2/db1}
-	\caption{Structura tabele autentificare si autorizare}
+	\caption{Structură tabele autentificare și autorizare}
 \end{figure}
 
-Pentru organizarea si dezvoltarea functionalitatilor in ceea ce priviste misiunile de audit, sunt o serie de tabele care gestioneaza misiunile de audit, obiectivele acesteia, recomandarile aduse cat si documentele asociate cu respectiva misiune de audit.
+Pentru organizarea și dezvoltarea funcționalităților în ceea ce priviște misiunile de audit, sunt o serie de tabele care gestionează misiunile de audit, obiectivele acesteia, recomandările aduse cât și documentele asociate cu respectiva misiune de audit.
 
 \vspace{1cm}
 \begin{figure}[h]
 	\centering
 	
 	\includegraphics[width=1\textwidth]{c2/db2}
-	\caption{Structura tabele gestiune misiuni de audit}
+	\caption{Structură tabele gestiune misiuni de audit}
 \end{figure}
 
 \newpage
-Pentru gestionarea institutiilor si a departamentelor acestora, cat si a documentelor de baza ce apartin acestora se folosec urmatoarele tabele si relatiile dintre ele.
+Pentru gestionarea instituțiilor și a departamentelor acestora, cât și a documentelor de baza ce aparțin acestora se folosec urmatoarele tabele și relațiile dintre ele.
 \vspace{1cm}
 \begin{figure}[h]
 	\centering
 	
 	\includegraphics[width=1\textwidth]{c2/db3}
-	\caption{Structura tabelelor de gestiune a institutiilor si a departamentelor}
+	\caption{Structura tabelelor de gestiune a institutiilor și a departamentelor}
 \end{figure}
 
-In cele din urma pentru oferirea functionalitatilor principale,cum ar fi gestionarea obiectivelor, a actiunilor acestora precum si a riscurilor si recomandarilor se utilizeaza urmatoarele tabele si relatii pe care acestea le prezinta.
+În cele din urmă, pentru oferirea funcționalităților principale, cum ar fi gestionarea obiectivelor, a acțiunilor acestora precum și a riscurilor și recomandărilor se utilizează următoarele tabele și relații pe care acestea le prezintă.
 
 \vspace{1cm}
 \begin{figure}[h]
 	\centering
 	
 	\includegraphics[width=1\textwidth]{c2/db4}
-	\caption{Structura tabelelor functionalitati principale}
+	\caption{Structura tabelelor funcționalități principale}
 \end{figure}
 
 \section{Aspecte de securitate}
-Simpla dezvoltare a unei aplicatii web ce ofera utilizatorului numeroase functionalitati nu este suficienta daca aceasta aplicatie nu dispune de un set de reguli si aspecte ce  fac experienta utilizatorilor pe platforma una cat mai sigura, in care le este asigurata integritatea, confidentialitatea cat si disponibilitatea datelor si actiunilor acestora.
 
-In dezvoltarea platformei AudIT s-a incercat utilizarea a cat mai multor standarde in ceea ce priveste securitatea actiunilor pe care un potential utilizator poate sa le faca in aplicatie, precum si a datelor si informatiilor cu care acesta lucreaza.
+Simpla dezvoltare a unei aplicații web ce oferă utilizatorului numeroase funcționalități nu este suficientă dacă această aplicație nu dispune de un set de reguli și aspecte ce  fac experiența utilizatorilor pe platformă una cât mai sigură, în care le este asigurată integritatea, confidențialitatea cât și disponibilitatea datelor și actiunilor acestora.
+
+În dezvoltarea platformei AudIT s-a încercat utilizarea a cât mai multor standarde în ceea ce priveste securitatea acțiunilor pe care un potențial utilizator poate să le facă în aplicație, precum și a datelor și informațiilor cu care acesta lucrează.
 
 \subsection*{Autentificarea actiunilor}
 
-Atat pe partea de server cat si in cea de client, sunt implementate functionalitati ce previn utilizarea \textit{endpoint-urilor} si accesarea paginilor web cand un utilizator nu este autentificat pe aplicatie. Mai mult de atat, accesul la anumite functionalitati este restrictionat doar unor categorii de utilizatori, cu un rol specific, astfel un utilizator cu rolul de reprezentant al unei institutii nu va putea accesa paginile specifice crearii si actualizarii unei misiuni de audit, intrucat rolul pe care acesta il detine nu are nivel de permisiune necesar pentru aceasta actiune.
+Atat pe partea de server cât și în cea de client, sunt implementate funcționalități ce previn utilizarea \textit{endpoint-urilor} și accesarea paginilor web când un utilizator nu este autentificat pe aplicație. Mai mult de atat, accesul la anumite funcționalități este restricționat doar unor categorii de utilizatori, cu un rol specific, astfel un utilizator cu rolul de reprezentant al unei instituții nu va putea accesa paginile specifice creării și actualizării unei misiuni de audit, întrucat rolul pe care acesta îl detine nu are nivel de permisiune necesar pentru această acțiune.
 
-Modalitatea prin care este verificata prin atribuirea unui \textit{token} de tip JWT (\textit{JSON web token}) fiecarui utilizator in momentul in care acesta se autentifica pe platforma, ulterior la fiecare actiune (\textit{request}) facut de acesta, fiind trimis si acest \textit{token}.\\
+Modalitatea prin care este verificată este prin atribuirea unui \textit{token} de tip JWT (\textit{JSON web token}) fiecărui utilizator în momentul în care acesta se autentifică pe platformă, ulterior la fiecare acțiune (\textit{request}) facută de acesta, fiind trimis și acest \textit{token}.\\
 
 
 
-\textbf{Stocarea} acestui \textit{token} de acces se face intr-o maniera securizata in \textit{browser-ul} clientului sub forma unui \textit{cookie http-only}, care previne citirea acestuia de orice \textit{script} sau librarie externa din \textit{browser}, fiind utilizat doar in componenta unui \textit{request} prin HTTP, astfel protejand aplicatie si utilizatorii sai impotriva atacurilor de tip XSS(\textit{cross-site-scripting}).
+\textbf{Stocarea} acestui \textit{token} de acces se face într-o manieră securizată în \textit{browser-ul} clientului sub forma unui \textit{cookie http-only}, care previne citirea acestuia de orice \textit{script} sau librărie externă din \textit{browser}, fiind utilizat doar în componența unui \textit{request} prin HTTP, astfel protejând aplicația și utilizatorii săi împotriva atacurilor de tip XSS(\textit{cross-site-scripting}).
 
 \vspace{1cm}
 \begin{figure}[h]
 	\centering
 	
 	\includegraphics[width=0.7\textwidth]{c2/jwt.jpg}
-	\caption{Diagrama mod functionare \textit{Web Assembly}}
+	\caption{Diagramă mod functionare \textit{Web Assembly}}
 \end{figure}
 
-Pentru verificarea rolurilor si \textit{claim-urilor} pe care un utilizator le detine, este creat un \textit{endpoint} special, securizat astfel incat sa poata fi accesat doar daca in componenta \textit{request-ului} este prezent acel \textit{cookie}, care ofera informatii despre rolurile si \textit{claim-urile} specifice utilizatorului care a facut cererea. Pe baza acestora, i se permite sau i se interzice accesul la anumite pagini si actiuni pe care acesta le doreste a face.
+Pentru verificarea rolurilor și \textit{claim-urilor} pe care un utilizator le deține, este creat un \textit{endpoint} special, securizat astfel încat să poată fi accesat doar dacă în componența \textit{request-ului} este prezent acel \textit{cookie}, care oferă informatii despre rolurile și \textit{claim-urile} specifice utilizatorului care a făcut cererea. Pe baza acestora, i se permite sau i se interzice accesul la anumite pagini și acțiuni pe care acesta le dorește a face.
 
 
 \subsection*{Utilizarea HTTPS}
 
-Utilizarea HTTPS atat in partea de server, cat si in cea de client impune mai multe aspecte benefice in ceea ce priveste securitatea platformei:
+Utilizarea HTTPS atât în partea de server, cât și în cea de client impune mai multe aspecte benefice în ceea ce priveste securitatea platformei:
 
 \begin{itemize}
 	
-	\item confidentialitatea datelor, https cripteaza informatia transmisa intre server si client, astfel se asigura de faptul ca sansele de interceptare si citire a  comunicatiei sunt aproape de zero;
+	\item confidențialitatea datelor, https criptează informația transmisă între server și client, astfel se asigură de faptul că șansele de interceptare și citire a  comunicației sunt aproape de zero;
 	
-	\item integritatea datelor este asigurata tot prin mecanismul de criptare a acestora, astfel asigurandu-se de faptul ca acestea ajung la destinatie neschimbate;
+	\item integritatea datelor este asigurată tot prin mecanismul de criptare a acestora, astfel asigurându-se de faptul că acestea ajung la destinație neschimbate;
 	
-	\item autententificarea, https folosindu-se de certificate digitiale (SSL si TLS) pentru a verifica identitatea serverelor, reducand riscul unor atacuri malitioase; 
+	\item autententificarea, https folosindu-se de certificate digitiale (SSL și TLS) pentru a verifica identitatea serverelor, reducănd riscul unor atacuri malițioase; 
 	
 \end{itemize}
 
 
-\subsection*{Restrictionarea inregistrarii pe platforma}
+\subsection*{Restricționarea înregistrării pe platformă}
 
-O alta modalitate prin care se mentine un nivel ridicat de securitate pe platforma o defineste restrictionarea utilizatorilor de a se inregistra pe platforma.
+O altă modalitate prin care se menține un nivel ridicat de securitate pe platformă o definește restricționarea utilizatorilor de a se înregistra pe platformă.
 
-La pasul de creare a unui cont nou, utilizatorilor le este  impusa folosirea unei adrese de email care contine domeniul unei institutii inregistrate si configurate pe platforma. Dupa crearea cu succes a unui cont nou, acesta nu are nici o permisiune, contul fiind nevoit a fi verificat de catre o persoana cu drepturi elevate (administratorul institutiei).
+La pasul de creare a unui cont nou, utilizatorilor le este  impusă folosirea unei adrese de email care conține domeniul unei instituții înregistrate și configurate pe platformă. Dupa crearea cu succes a unui cont nou, acesta nu are nici o permisiune, contul fiind nevoit a fi verificat de către o persoană cu drepturi elevate (administratorul instituției).
 
-Verificarea se face pe baza unui email primit de acesta in care se cere validarea identitatii noul cont creat, astfel minimizand riscul crearii a unor conturi false respectiv a unor false identitati.
+Verificarea se face pe baza unui email primit de acesta în care se cere validarea identității noului cont creat, astfel minimizând riscul creării a unor conturi false respectiv a unor false identități.
 
 \newpage

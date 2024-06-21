@@ -30,7 +30,7 @@
 \contentsline {section}{\numberline {2.2}Arhitectura serverului}{29}{section.2.2}%
 \contentsline {section}{\numberline {2.3}Arhitectura interfatei grafice}{37}{section.2.3}%
 \contentsline {section}{\numberline {2.4}Stocarea datelor}{40}{section.2.4}%
-\contentsline {section}{\numberline {2.5}Aspecte de securitate}{43}{section.2.5}%
+\contentsline {section}{\numberline {2.5}Aspecte de securitate}{42}{section.2.5}%
 \contentsline {chapter}{\numberline {3}Scenarii de utilizare }{47}{chapter.3}%
 \contentsline {section}{\numberline {3.1}Gestionarea misiunilor de audit}{47}{section.3.1}%
 \contentsline {section}{\numberline {3.2}Gestionarea obiectivelor si a actiunilor}{49}{section.3.2}%
