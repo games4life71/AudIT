@@ -1,40 +1,40 @@
 \chapter{Arhitectura platformei}
- Provocarea de a elabora o platforma web destinata atat auditorilor publici cat si reprentatilor institutiilor din administratia publica  a impus nevoie de crea o arhitectura dinamica, modulara si usor de marit in cazul adaugarii a noi functionalitati.
+ Provocarea de a elabora o platformă web destinată atât auditorilor publici cât și reprezentanților instituțiilor din administrația publică  a impus nevoiea de crea o arhitectură dinamică, modulară și usor de mărit în cazul adaugării a noi funcționalități.
  
-De asemenea, un numar mare de functionalitati necesita implementarea si a diferite \textit{design pattern-uri}, care se asigura ca modulule definite comunica intr-un mod cat mai eficient intre ele si promoveaza reutilizarea codului deja scris.
+De asemenea, un număr mare de functionalități necesită implementarea și a diferite \textit{design pattern-uri}, care se asigură că modulule definite comunică într-un mod cât mai eficient între ele și promovează reutilizarea codului deja scris.
 
-Acest capitol incearca sa descrie motivatia pentru alegerile facute in materie de tehnologii folosite pentru a dezvolta componentele cheie ale aplicatiei: frontend, backend stocarea datelor si cateva aspecte legate de securitatea de baza a platformei; cat si o comparatie sumara intre potentialii competetitori ai alegerilor facute.
+Acest capitol incearcă să descrie motivația pentru alegerile făcute în materie de tehnologii folosite pentru a dezvolta componentele cheie ale aplicației: frontend, backend stocarea datelor și câteva aspecte legate de securitatea de bază a platformei.
 
-\section {Arhitectura generala}
-Arhitectura generala a fost gandita de la inceput intr-un mod care permite adaugarea de noi functionalitati in aplicatie fara a deteriora structura sau functionalitatile deja implementate.
+\section {Arhitectura generală}
+Arhitectura generală a fost gândita de la început într-un mod care permite adăugarea de noi funcționalități în aplicație fără a deteriora structura sau funcționalitățile deja implementate.
 
-Acestea fiind zise, proiectul este impartit in doua mari componente (client si server)  care comunica intre ele prin intermediul \textit{request-urilor HTTPS} ,si anume:
+Acestea fiind zise, proiectul este împărțit în două mari componente (client si server)  care comunică între ele prin intermediul \textit{request-urilor HTTPS}, și anume:
 
 \begin{itemize}
 	
-	\item componenta de server, este alcatuita din diferite \textit{endpoint-uri}  Web API care ofera functionalitati clientilor sai, aceasta comunicand si cu mediul de stocare al datelor, o baza de date MySQL;
+	\item componenta de server, este alcatuită din diferite \textit{endpoint-uri}  Web API care oferă funcționalități clienților săi, aceasta comunicând și cu mediul de stocare al datelor, o bază de date MySQL;
 	
-	\item componenta client, sau interfata grafica a platformei, este o aplicatie web interactiva de tipul SPA (\textit{Single page application}), oferind functionalitatile descrise prin intermediul \textit{request-urilor} catre server, urmand ca mai apoi sa fie afisate pe pagina web prin intermediul \textit{WebAssembly}.
+	\item componenta client, sau interfața grafică a platformei, este o aplicație web interactivă de tipul SPA (\textit{Single page application}), oferind funcționalitățile descrise prin intermediul \textit{request-urilor} către server, urmând ca mai apoi să fie afișate pe pagina web prin intermediul \textit{WebAssembly-ului}.
 \end{itemize}  
 
 \subsection*{Diagrame de context C4 }
 
-Diagramele de context C4 reprezinta un stadard in ceea ce priveste o vedere de ansamblu, dar care merge inspectata in detaliu pentru fiecare component al aplicatiei, astfel promovand o ierarhizarea si o intelegere a intreg sistemului mai buna.\\
+Diagramele de context C4 reprezintă un stadard în ceea ce privește o vedere de ansamblu, dar care merge inspectată în detaliu pentru fiecare component al aplicației, astfel promovând o ierarhizarea și o înțelegere a întreg sistemului mai bună.\\
 
 
 \subsection*{Nivelul 1}
-Primnul nivel al diagramelor de context ofera o viziune de ansamblu asupra sistemelor ce compun solutia descrisa.
+Primnul nivel al diagramelor de context oferă o viziune de ansamblu asupra sistemelor ce compun solutia descrisă.
 \vspace{1cm}
 \begin{figure}[h]
 	\centering
 	
 	\includegraphics[width=0.6\textwidth]{c2/C4_level1}
-	\caption{Primul nivel diagrama C4}
+	\caption{Primul nivel diagramă C4}
 \end{figure}
 
 \newpage
 \subsection*{Nivelul 2}
-Al doilea nivel prezinta \textit{containerele} principale ale fiecaurui sistem din nivelul anterior, astfel oferind o viziune mai clara asupra arhitecturii generale a platformei si a functionalitatilor sale.
+Al doilea nivel prezintă  \textit{containerele} principale ale fiecăurui sistem din nivelul anterior, astfel oferind o viziune mai clară asupra arhitecturii generale a platformei și a funcționalităților sale.
 \vspace{1cm}
 \begin{figure}[h]
 	\centering
@@ -44,7 +44,7 @@ Al doilea nivel prezinta \textit{containerele} principale ale fiecaurui sistem d
 \end{figure}
 
 \subsection*{Nivelul 3}
-Al treilea nivel ofera o viziune mult mai detaliata asupra componentelor ce apartin \textit{container-ului} de la nivelul secund, oferind abstractii cat mai apropiate de codul ce urmeaza a fi scris pentru a le implementa.
+Al treilea nivel oferă o viziune mult mai detaliată asupra componentelor ce aparțin \textit{container-ului} de la nivelul secund, oferind abstractii cât mai apropiate de codul ce urmează a fi scris pentru a le implementa.
 
 \vspace{1cm}
 \begin{figure}[h]
@@ -60,33 +60,35 @@ Al treilea nivel ofera o viziune mult mai detaliata asupra componentelor ce apar
 
 \subsection*{Arhitectura \textit{monolith}}
 
-Arhitectura generala a serverului este una de tip \textit{monolith} traditional, impartita pe module, cu dependente slabe intre ele, care comunica intre prin intermediul unor contracte (interfete) bine definte.\\
-Alegerea acestui tip de arhitectura a fost motivata de mai multe avantaje cheie ale acesteia: 
+Arhitectura generală a serverului este una de tip \textit{monolith} tradițional, împartită pe module, cu dependențe slabe între ele, care comunică prin intermediul unor contracte (interfațe) bine definte.
+
+Alegerea acestui tip de arhitectură a fost motivată de mai multe avantaje cheie ale acesteia: 
 \begin{itemize}
-	\item simplitatea dezvoltarii in cadrul arhitecturii de tip monolith permite lucrul pe o singura baza de cod , ceea ce simplica major procesul de dezvoltare, testare si de depistare a erorilor, fiind esentiala in fazele de inceput al unui proiect;
+	\item simplitatea dezvoltării în cadrul arhitecturii de tip monolith permite lucrul pe o singură bază de cod , ceea ce simplică major procesul de dezvoltare, testare și de depistare a erorilor, fiind esențială în fazele de început al unui proiect;
 	
-	\item  performanta sporita in cadrul unui aplicatii care raspunde \textit{request-urilor}, astfel un singur \textit{API} poate raspunde la toate cererile, eliminand nevoia de a activa si alte \textit{API-uri} externe pentru indeplinirea sarcinii, ca in cazul arhitecturii de micro-servicii;
+	\item  performanța sporită în cadrul unei aplicații care răspunde \textit{request-urilor}, astfel un singur \textit{API} poate răspunde la toate cererile, eliminând nevoia de a activa si alte \textit{API-uri} externe pentru îndeplinirea sarcinii, ca în cazul arhitecturii de micro-servicii;
 	
-	\item usurinta testarii de tip \textit{unit-testing} cat si \textit{integration-testing} intrucat toate modulele sunt in acelasi loc;
+	\item ușurința testării de tip \textit{unit-testing} cât și \textit{integration-testing} întrucat toate modulele sunt în același loc;
 	
-	\item  depistarea erorilor si rezolvarea lor este mult mai rapida.
-\end{itemize}
-Conform oricare alegeri, trebuie puse in balanta avantajele si dezavantajele pe care aceasta le ofera si  sa se compare strict cu nevoile si problemele care se incearca a rezolva. Privind in ansamblu si pe termen lung, arhitectura de tip \textit{monolith} prezinta si unele dezavantaje: 
-
-\begin{itemize}
-
- \item dezvoltarea incetinita in momentul in care functionalitatile pe care dorim sa le implementam cresc ca si numar, intrucat toate modulele sunt comasate intr-un singur loc;
- 
- \item \textit{scalabilitate redusa} datorita stransei legaturi dintre componentele prezente in aplicatie;
- 
- \item 	orice schimbare adusa in materie de noi functionalitati necesita lansarii intregii aplicatii, nu doar a unui singur modul.
-
+	\item  depistarea erorilor și rezolvarea lor este mult mai rapidă.
 \end{itemize}
 
-Pentru a diminua efectele negative pe care aceste dezavantaje le au asupra intregului proces de dezvoltare a aplicatiei, am incercat implementarea diferitelor solutii in materie de arhitectura, \textit{desing pattern-uri} cretionale, arhitecturale cat si a numeroase practici bune comune in scrierea si mentenanta codului.
+Conform oricărei alegeri făcute, trebuie puse în balanță avantajele și dezavantajele pe care această le oferă și  să se compare strict cu nevoile și problemele care se incearcă a se rezolva. Privind in ansamblu și pe termen lung, arhitectura de tip \textit{monolith} prezintă și unele dezavantaje: 
+
+\begin{itemize}
+
+ \item dezvoltarea încetinita în momentul în care funcționalitățile pe care dorim să le implementăm cresc ca si număr, întrucat toate modulele sunt comasate într-un singur loc;
+ 
+ \item \textit{scalabilitate redusă} datorită strânsei legături dintre componentele prezente în aplicație;
+ 
+ \item 	orice schimbare adusă în materie de noi funcționalități necesită lansarea întregii aplicații, nu doar a unui singur modul.
+
+\end{itemize}
+
+Pentru a diminua efectele negative pe care aceste dezavantaje le au asupra întregului proces de dezvoltare a aplicației, s-a încercat implementarea diferitelor soluții în materie de arhitectură,  \textit{desing pattern-uri} creaționale, arhitecturale cât și a numeroase practici bune comune în scrierea și mentenanța codului.
 
 \subsection*{Arhitectura \textit{Clean Code}}
-Arhitectura \textit{Clean Code } este bazata pe ideea principala precum ca stratul de logica interna (\textit{business layer}) este situat central in diagrama circulara, astfel acesta este protejat de schimbari externe. Aceasta proprietate poate fi reformulata astfel incat se defineste \textbf{Regula Dependentei} care presupune ca dependintele pot sa fie orientate doar inspre interiorul cercului, astfel niciunul din modulele interioare nu ar trebui sa fie legat in orice fel de un modul exterior acestuia.
+Arhitectura \textit{Clean Code } este bazată pe ideea principală precum că stratul de logică internă (\textit{business layer}) este situat central în diagrama circulară, astfel acesta este protejat de schimbări externe. Această proprietate poate fi reformulată astfel încât se definește \textbf{Regula Dependenței} care presupune că dependențele pot să fie orientate doar înspre interiorul cercului, astfel niciunul din modulele interioare nu ar trebui să fie legat în orice fel de un modul exterior acestuia.
 
 \begin{figure}[h]
 	\centering
@@ -95,51 +97,50 @@ Arhitectura \textit{Clean Code } este bazata pe ideea principala precum ca strat
 	\caption{Structura arhitecturii \textit{Clean code}}
 \end{figure}
 
-Adoptarea acestui tip de arhitectura impreuna cu cea de tip \textit{monolith} include mai multe beneficii cum ar fi:
+Adoptarea acestui tip de arhitectură împreună cu cea de tip \textit{monolith} include mai multe beneficii cum ar fi:
 
 \begin{itemize}
 
-	\item mentenanta sporita datorata faptului ca modulele sau straturile principale ale aplicatiei si logica ce le faciliteaza comnunicarea eficienta sunt separate, incurajand astfel si o intelegere mai detaliata si simplificata a intregului sistem;
+	\item mentenanța sporită datorată faptului că modulele sau straturile principale ale aplicației și logica ce le facilitează comnunicarea eficientă sunt separate, încurajând astfel și o înțelegere mai detaliată și simplificată a întregului sistem;
 	
-	\item flexibilitate din punct de vedere al schimbarii tehnologiilor exterioare, stratul de logica interna este independent de ceea ce se intampla in exteriorul sau;
+	\item flexibilitate din punct de vedere al schimbării tehnologiilor exterioare, stratul de logică internă este independent de ceea ce se întâmplă în exteriorul său;
 	
-	\item testarea componentelor se poate face atat individual cat si in relatie cu alte module, astfel eliminand nevoia de testare a intregii aplicatii;
+	\item testarea componentelor se poate face atât individual cât și în relație cu alte module, astfel eliminând nevoia de testare a întregii aplicații;
 	
-	\item stratul de logica interna este independent de baza de date folosita, asftel serverul de stocare al datelor poate fi schimbat cu usurinta.
+	\item stratul de logică internă este independent de baza de date folosită, asftel serverul de stocare al datelor poate fi schimbat cu ușurință.
 
 \end{itemize} 
-Modul in care arhitectura de tip \textit{Clean Code} a fost implementata in aceste proiect consta in separarea straturilor aplicatiei, astfel incat avem:
+Modul în care arhitectura de tip \textit{Clean Code} a fost implementată în aceste proiect constă în separarea straturilor aplicației, astfel încât avem:
 
 \begin{itemize}
-	\item  \textit{Core Layer} fiind structura principala ce confera logica interna a aplicatiei.Acesta cuprinde \textit{Domain} unde sunt modelate entitatile aplicatiei respectiv \textit{Application} unde este definita toata logica interna a serverului,
-	de la declaratiile abstracte ale interfetelor la definerea serviciilor proprii de care se vol folosi ulterior straturile externe ale arhitecturii;
+	\item  \textit{Core Layer} fiind structura principală ce conferă logica internă a aplicației. Acesta cuprinde \textit{Domain} unde sunt modelate entitățile aplicației respectiv \textit{Application} unde este definită toată logica internă a serverului,
+	de la declarațiile abstracte ale interfațelor la definerea serviciilor proprii de care se vor folosi ulterior straturile externe ale arhitecturii;
 	
-	\item \textit{API Layer} este partea structurala care defineste \textit{endpoint-urile} aplicatiei prin diferite \textit{controllere}, expunand astfel functionalitatile aplicatiei la internet;
+	\item \textit{API Layer} este partea structurală care definește \textit{endpoint-urile} aplicației prin diferite \textit{controllere}, expunând astfel funcționalitățile aplicației la internet;
 	
-  	\item \textit{UI Layer} defineste structura de prezentare a aplicatiei si este formata din parte de \textit{Frontend} a aplicatiei;
+  	\item \textit{UI Layer} definește structura de prezentare a aplicației și este formată din partea de \textit{Frontend} a platformei;
   
- 	 \item \textit{Infrastructure Layer} in care gasim logica ce se ocupa de comunicarea cu serviciile externe cum ar fi baza de date, AWS sau servicii de identitate.
+ 	 \item \textit{Infrastructure Layer} în care găsim logica ce se ocupă de comunicarea cu serviciile externe cum ar fi baza de date, AWS sau servicii de identitate.
  	 
 \end{itemize}
 
 \subsection*{\textit{Design pattern-uri} utilizate}
 
-\textit{Design pattern-urile}, potrivit definitiei, sunt solutii generale si reutilizabile asupra problemelor comune ce pot aparea in decursul dezvoltarii unei aplicatii software.\\
-Utilizare lor conduce la o buna mentananta a codului scris, posbilitatea de a reutiliza module deja scrise, imbunatateste comunicare si legaturile dintre module si incurajeaza un stil de cod cat mai elegant si usor de inteles.\\
-In implementarea aplicatiei au fost folosite \textit{desing pattern-uri} din diferite categorii astfel incat in aceasta subsectiune se vor discuta cateva exemple utilizate.
+\textit{Design pattern-urile}, potrivit definiției, sunt soluții generale și reutilizabile asupra problemelor comune ce pot apărea în decursul dezvoltării unei aplicații software.
+
+Utilizarea lor conduce la o buna mentananță a codului scris, posbilitatea de a reutiliza module deja scrise, îmbunătațește comunicarea și legăturile dintre module și încurajează un stil de cod cat mai elegant și ușor de înțeles.\\
+În implementarea aplicației au fost folosite \textit{desing pattern-uri} din diferite categorii astfel încât în această subsecțiune se vor discuta câteva exemple utilizate.
 
 \subsection*{\textit{Optional pattern}}
-Acesta este un model de proiectare care ajuta la gestionarea valorilor care pot sau nu fi prezente, astfel avand valoarea \textit{null}. \textit{Pattern-ul} se asigura ca este eliminata valoarea \textit{null}, care de cele mai multe ori este o sursa comuna in erori la rularea codului (\textit{runtime}).
+Acesta este un model de proiectare care ajută la gestionarea valorilor care pot sau nu fi prezente, astfel având valoarea \textit{null}. \textit{Pattern-ul} se asigură că este eliminată valoarea \textit{null}, care de cele mai multe ori este o sursă comună în erori la rularea codului (\textit{runtime}).
 
-Solutia prezentata de acest model este crearea unei clase \textit{template} care incapsuleaza valoarea propriu zisa a entitatii pe care o construim. Spre exemplu, in cazul in care vrem sa cream o noua entitate de tipul \textit{User} dar la \textit{runtime} apare o eroare, executia programului nu se va opri, iar valoarea entitatii va fi incapsulata intr-un tip   \textit{Result\textless User\textgreater}
-
- cu parametrul \textit{Succes} setat pe fals, indicand astfel ca procesul de creare a esuat.\\
+Soluția prezentată de acest model este crearea unei clase \textit{template} care incapsulează valoarea propriu zisă a entității pe care o construim. Spre exemplu, în cazul în care vrem să creăm o nouă entitate de tipul \textit{User} dar la \textit{runtime} apare o eroare, executia programului nu se va opri, iar valoarea entității va fi incapsulată într-un tip   \textit{Result\textless User\textgreater} cu parametrul \textit{Succes} setat pe fals, indicând astfel că procesul de creare a eșuat.\\
 
 \begin{figure}[h]
 	\centering
 	
 	\includegraphics[width=0.8\textwidth]{c2/optional_patterns}
-	\caption{Exemplu de clasa care implementeaza Optional Pattern}
+	\caption{Exemplu de clasă care implementează Optional Pattern}
 \end{figure}
 
 \subsection*{\textit{Mediator pattern}}
