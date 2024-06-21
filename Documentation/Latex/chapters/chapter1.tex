@@ -54,12 +54,12 @@ De asemenea, este implementat și un sistem de roluri care restrictionează și 
 În plus, pentru o conformitate si pentru o evidență sporită asupra acțiunilor utilizatorilor asupra resurselor de pe platformă este implementat un sistem de auditare al entităților, toate operațiile de creare, modificare și ștergere fiind salvate.
 
 \subsection{Pagina de start}
-Pagina de start este locul implicit unde un utilizator este redirectionat atunci cand autentificarea sa pe aplicatie este cu succes. Aceasta ii prezinta auditorului ultimele modificari la resursele la care are acces, o lista de notificari pe care acesta le-a primit din partea reprezentantilor institutiilor la care auditorul are misiuni de audit in desfasurare cat si diferite butoane de navigare catre pagini cheie din aplicatie, astfel oferind o interactiune mai usoara cu platforma AudIT.
+Pagina de start este locul implicit unde un utilizator este redirecționat atunci când autentificarea sa pe aplicație este cu succes. Aceasta îi prezintă auditorului ultimele modificări la resursele la care are acces, o listă de notificări pe care acesta le-a primit din partea reprezentanților instituțiilor la care auditorul are misiuni de audit în desfășurare cât și diferite butoane de navigare către pagini cheie din aplicație, astfel oferind o interacțiune mai usoară pe platforma AudIT.
 
 \subsection{Gestionarea misinilor de audit public}
-In cadrul procesului de audit public, o gestioneare eficienta a misiunilor, atat curente cat si din trecut, este esentiala pentru o experienta cat mai naturala si intuitiva a utilizatorului pe platforma.
+În cadrul procesului de audit public, o gestionare eficientă a misiunilor, atât curente cât și din trecut, este esențială pentru o experiență cat mai naturală și intuitivă a utilizatorului pe platformă.
 
-Crearea unei noi misiuni de audit este similara cu crearea unui nou proiect, auditorul specificand numele noii misiuni de audit, institutia respectiv departamenul asupra caruia se realizeaza noua misiune de audit.
+Crearea unei noi misiuni de audit este similară cu crearea unui nou proiect, auditorul specificând numele noii misiuni de audit, instituția respectiv departamentul asupra căruia se realizează noua misiune de audit.
 
 	\vspace{0.5 cm}
 \begin{figure}[h]
@@ -73,7 +73,7 @@ Crearea unei noi misiuni de audit este similara cu crearea unui nou proiect, aud
 	\begin{minipage}{.5\textwidth}
 		\centering
 		\includegraphics[width=.9\linewidth]{c1/pas2_creare_misiune.png}
-		\caption{Selectarea institutiei}
+		\caption{Selectarea instituției}
 	
 	\end{minipage}
 	\vspace{0.5 cm}
@@ -90,7 +90,7 @@ Crearea unei noi misiuni de audit este similara cu crearea unui nou proiect, aud
 \end{figure}
 
 
-Dupa crearea noii misiuni, auditorul este redirectionat catre o pagina in care acesta poate vizualiza intr-un tabel toate misiunile de audit la care acesta are acces, cele create de el, dar si cele la care i-a fost oferit accesul.Afisarea intrarilor din tabel este una de tip paginata cu un numar de sapte misiuni pe pagina, astfel incat atentia utilizatorului sa fie concentrata doar pe aceste misiuni, in acest fel eliminand posibilitatea de a nu gasi informatia pe care acesa o cauta datorita unui numar prea mare de linii si informatii.
+După crearea noii misiuni, auditorul este redirecționat către o pagină în care acesta poate vizualiza intr-un tabel toate misiunile de audit la care acesta are acces, cele create de el, dar și cele la care i-a fost oferit accesul. Afișarea intărilor din tabel este una de tip paginată cu un număr de șapte misiuni pe pagină, astfel încât atenția utilizatorului să fie concentrată doar pe aceste misiuni, în acest fel eliminând posibilitatea de a nu găsi informația pe care acesta o caută datorită unui număr prea mare de linii si informații.
 	\vspace{0.5 cm}
 \begin{figure}[h]
 	\centering
@@ -98,61 +98,69 @@ Dupa crearea noii misiuni, auditorul este redirectionat catre o pagina in care a
 	\includegraphics[width=0.8\textwidth]{c1/audit_missions_list.png}
 	\caption{Vizualizarea misiunilor de audit}
 \end{figure}
-De asemenea, informatiile afisate in acest tabel pot fi sortate alfabetic dupa numele misiunii de audit, dupa starea in care fiecare dintre acestea se afla, dupa departamentul asupra caruia se desfasoara misiunea  sau dupa data ultimei modificari a acesteia.
+
+De asemenea, informațiile afișate în acest tabel pot fi sortate alfabetic după numele misiunii de audit, după starea în care fiecare dintre acestea se află, după departamentul asupra căruia se desfasoară misiunea  sau după data ultimei modificări a acesteia.
 
 \subsection{Pagina rezumat misiune de audit}
 
-Pagina de rezumat a unei misiuni de audit are ca scop informarea auditorului asupra unei viziuni de ansamblu asupra misiunii de audit respective. Aceasta contine urmatoarele informatii:\\
+Pagina de rezumat a unei misiuni de audit are ca scop informarea auditorului asupra unei viziuni de ansamblu asupra misiunii de audit respective. Aceasta conține următoarele informații:\\
 \begin{itemize}
 	
-	\item in partea de sus a paginii, auditorului ii este prezentat sub forma unui lant de pasi, statusul curent al misiunii, acesta fiind primul lucru pe care privirea utilizatorului il vede;
+	\item în partea de sus a paginii, auditorului îi este prezentat sub forma unei secvențe de pasi, statusul curent al misiunii, acesta fiind primul lucru pe care privirea utilizatorului il vede;
 		
 		\begin{figure}[h]
 		\centering
 		
 		\includegraphics[width=0.9\textwidth]{c1/lant_summary.png}
-		\caption{Informatii sumare despre misiunea de audit}
+		\caption{Informații despre statusul misiunii de audit}
 	\end{figure}
-	\item o scurta descriere asupra parametrilor misiunii de audit,cum ar fi nume, data ultimii modificari, numele departamentului dar si statusul actual al misiunii. Utilizatorul are optiune de a edita acesti parametri si a salva modificarile aduse;
+
+	\item o scurtă descriere asupra parametrilor misiunii de audit,cum ar fi nume, data ultimii modificări, numele departamentului dar și statusul actual al misiunii. Utilizatorul are opțiunea de a edita acești parametri și a salva modificările aduse;
 	
 		\vspace{0.5 cm}
 	\begin{figure}[h]
 		\centering
 		
 		\includegraphics[width=0.5\textwidth]{c1/status_misiune}
-		\caption{Informatii sumare despre misiunea de audit}
+		\caption{Informații sumare despre misiunea de audit}
 	\end{figure}
 	
-	\item in partea dreapta a paginii sunt prezente patru chenare care prezinta cele mai recente modificari si actualizari in materie de : obiective, documente atasate misiunii, fise de identificare a problemei cat si activitati recente asociate misiunii de audit. Utilizatorul are posibilitatea de a naviga apasand pe numele intrarii din lista catre pagina dedicata acesteia, sau la apasarea butonului de 'See more' sa fie redirectionat catre pagina dedicata tututor entitatilor de acel fel;
+	\item în partea dreaptă a paginii sunt prezente patru chenare care prezintă cele mai recente modificări și actualizări în materie de : obiective, documente atașate misiunii, fișe de identificare a problemei cât și activități recente asociate misiunii de audit. Utilizatorul are posibilitatea de a naviga apăsând pe numele intrării din lista către pagina dedicată acesteia, sau la apăsarea butonului de 'See more' să fie redirecționat către pagina dedicată tututor entităților de acel fel;
+	
 	\begin{figure}[h]
 		\centering
 		
 		\includegraphics[width=0.7\textwidth]{c1/chenar_recent}
-		\caption{Informatii sumare despre modificarile recente}
+		\caption{Informații sumare despre modificarile recente}
 	\end{figure}
-	\item in partea dreapta jos, auditorul are posibilitatea de a selecta misiunea de audit ca fiind misiunea curenta, astfel orice actiune pe care acesta o sa o faca pe platforma o sa ia ca optiune preselectata misiunea selectata de acesta.\\
+
+	\item în partea dreaptă jos, auditorul are posibilitatea de a selecta misiunea de audit ca fiind misiunea curentă, astfel orice acțiune pe care acesta o sa o facă pe platformă o să ia ca opțiune preselectată misiunea aleasă de acesta.\\
 		
 	
 \end{itemize}
 
 
-\subsection{Prelucarea pasilor unei misiuni de audit}
+\subsection{Prelucarea pașilor unei misiuni de audit}
 
-Pentru o reproducere cat mai precisa si cooerenta a stagiilor prin care o misiune de audit trece, platforma permite setarea unui status al fiecarei misiuni de audit, astfel auditorul avand posibilitatea de a-si marca in detaliu progresul pana la momentul curent asupra misiunii de audit.De asemenea, fiecare pas major dintr-o misiune de audit prezinta functionalitati specifice, care vor fi explicate sumar in aceasta subsectiune.
-\subsection*{Pregatirea misiunii de audit}
-Pregatirea misiunii de audit este etapa initiala in care auditorul creeaza misiunea, consulta misiunile anterioare efectuate la acelasi departament, se elaboreaza un plan de audit, se stabilesc obiectivele, actiunile specifice fiecarui obiectiv respectiv riscurile specifice fiecarei actiuni si se intocmesc o serie de documente oficiale, pentru a tine evidenta activitatilor ulterioare pe care auditorul le va realiza in aceasta misiune de audit.
+Pentru o reproducere cât mai precisă și cooerentă a stagiilor prin care o misiune de audit trece, platforma permite setarea unui status al fiecărei misiuni de audit, astfel auditorul având posibilitatea de a-și marca în detaliu progresul până la momentul curent asupra misiunii de audit. De asemenea, fiecare pas major dintr-o misiune de audit prezintă funcționalități specifice, care vor fi explicate sumar in această subsecțiune.
 
-\subsection*{Interventia la fata locului}
-Interventia la fata locului este o etapa importanta a procesului de audit public, etapa care implica de cele mai multe ori o deplasare in teren, auditorul efectueaza interviuri, realizeaza esantioane, analizeaza riscurile si obiectivele stabilite la pasul anterior si incearca sa inteleaga intr-un mod cat mai corect si obiectiv activitatile desfasurate de departamentul respectiv. Acest pas consta in esenta in crearea si completarea a multor documente de tip sablon pe care auditorul le va folosi ulterior in pasii ce urmeaza pentru a intocmi un raport final.
+\subsection*{Pregătirea misiunii de audit}
+
+Pregătirea misiunii de audit este etapa inițială în care auditorul creează misiunea, consultă misiunile anterioare efectuate la același departament, se elaborează un plan de audit, se stabilesc obiectivele, acțiunile specifice fiecărui obiectiv respectiv riscurile specifice fiecărei acțiuni și se întocmesc o serie de documente oficiale, pentru a ține evidența activităților ulterioare pe care auditorul le va realiza în această misiune de audit.
+
+\subsection*{Intervenția la fata locului}
+
+Intervenția la fața locului este o etapă importantă a procesului de audit public, etapă care implică de cele mai multe ori o deplasare in teren unde auditorul efectuează interviuri, realizează eșantioane, analizează riscurile si obiectivele stabilite la pasul anterior și încearcă să înțeleagă într-un mod cât mai corect și obiectiv activitățile desfășurate de departamentul respectiv. Acest pas constă în esență în crearea și completarea a multor documente de tip șablon pe care auditorul le va folosi ulterior în pașii ce urmează pentru a întocmi un raport final.
 
 \subsection*{Rezultatele Misiunii}
-Dupa finalizarea pasului anterior, auditorul acum dispune de intreg instrumentalul pentru a intocmi un raport final.Acesta este intocmit pe baza diferitelor intalniri intre auditor si repezentantul institutiei in care se discuta aspecte legate de constatarile facute in respectiva misiune de audit. Raportul final cuprinde constatarile facute, recomanandari sub forma 
-unor Fise de Identificare si Analiza a Problemei respectiv cauze si consecinte ale problemelor.
+După finalizarea pasului anterior, auditorul acum dispune de întreg instrumentalul pentru a întocmi un raport final. Acesta este întocmit pe baza diferitelor întâlniri între auditor și repezentantul instituției, în care se discută aspecte legate de constatările făcute în respectiva misiune de audit. Raportul final cuprinde constatările făcute, recomanandări sub forma 
+unor Fișe de Identificare și Analiză a Problemei respectiv cauze și consecințe ale problemelor detectate.
 
-Acest raport este prezentat partilor particpante la misiune pentru a le informa asupra rezultatelor misiunii de audit si pentru a ajunge la o intelegere asupra termenilor de remediere a problemelor pe care acestia trebuie sa le rezolve.
+Acest raport este prezentat părților particpante la misiune pentru a le informa asupra rezultatelor misiunii de audit și pentru a ajunge la o înțelegere asupra termenilor de remediere a problemelor pe care aceștia trebuie să le rezolve.
 
 \subsection*{Urmarirea recomandarilor}
-Urmarirea recomandarilor este pasul final dintr-o misine de audit in care sunt monitorizate recomandarile oferite de catre auditor si respectarea termenilor limita de implementare a acestora. Reprezentatii institutiilor trebuie sa ia la cunostinta aceste recomandari si sa gaseasca, ajutati de Fisa de Identificare si Analiza a Problemei corespunzatoare fiecarei recomandari, solutii pentru fiecare chestiune in parte respectand totodata si termenul liminta impus de aceasta.
+
+Urmărirea recomandărilor este pasul final dintr-o misine de audit în care sunt monitorizate recomandările oferite de către auditor și respectarea termenilor limită de implementare a acestora. Reprezentanții instituțiilor trebuie să ia la cunoștință aceste recomandari și să gasească, ajutați de Fișa de Identificare și Analiză a Problemei corespunzătoare fiecărei recomandari, soluții pentru fiecare chestiune în parte respectând totodată și termenul limită impus de aceasta.
 
 
 \subsection{Stabilirea obiectivelor de auditat}
