@@ -44,4 +44,7 @@ public interface IDocumentService
 
     public Task<BaseDTOResponse<BaseTemplateDocViewModel>> UploadTemplateDocumentContentAsync(
         BaseCreateTemplateDocumentStream documentDto);
+
+
+    public Task<BaseDTOResponse<BaseDocumentViewModel>> GetDocumentsByRecommendationIdAsync(Guid recommendationId);
 }

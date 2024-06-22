@@ -3,6 +3,7 @@ using Frontend.Contracts.Abstract_Services.RecommendationService;
 using Frontend.EntityDtos.Misc;
 using Frontend.EntityDtos.Recommendation;
 using Frontend.EntityViewModels.Recommendation;
+using Frontend.EntityViewModels.RecommendationDocument;
 using Newtonsoft.Json;
 
 namespace Frontend.Services.Recommendation;
@@ -90,5 +91,19 @@ public class RecommendationService(HttpClient httpClient) : IRecommendationServi
         var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseRecommendationViewModel>>(content);
 
         return result ?? new BaseDTOResponse<BaseRecommendationViewModel>("Failed to fetch", false);
+    }
+
+    public async Task<BaseResponse> CreateRecommendationDocument(
+        RecommendationDocumentViewModel recommendationDocumentViewModel)
+    {
+        var response = await httpClient.PostAsJsonAsync(
+            $"{IRecommendationService.ApiPath}/create-recommendation-document", recommendationDocumentViewModel);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return new BaseResponse("Failed to create", false);
+        }
+
+        return new BaseResponse("Created successfully", true);
     }
 }

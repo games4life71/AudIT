@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using AudIT.Applicationa.Requests.RecommendationDocument.Command;
 using AudIT.Applicationa.Requests.Recommendations.Commands.Create;
 using AudIT.Applicationa.Requests.Recommendations.Commands.Delete;
 using AudIT.Applicationa.Requests.Recommendations.Commands.Patch;
@@ -37,6 +38,19 @@ public class RecommendationController : BaseController
             return Unauthorized();
 
         var result = await Mediator.Send(new GetRecentRecommendationsByUserQuery(Guid.Parse(userID)));
+        if (!result.Success)
+            return BadRequest(result.Message);
+
+        return Ok(result);
+    }
+
+    [HttpPost]
+    [Route("create-recommendation-document")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> CreateRecommendationDocument(CreateRecommendationDocumentCommand request)
+    {
+        var result = await Mediator.Send(request);
         if (!result.Success)
             return BadRequest(result.Message);
 

@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
 using Frontend.Contracts.Abstract_Services.DocumentService;
 using Frontend.EntityDtos.Document.Standalone;
@@ -97,7 +98,13 @@ public class DocumentService(HttpClient httpClient) : IDocumentService
         if (response.IsSuccessStatusCode)
         {
             //parse
-            return new BaseDTOResponse<BaseStandaloneDocViewModel>("Document uploaded successfully", true);
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var documentDtoConverted = JsonConvert.DeserializeObject<BaseStandaloneDocViewModel>(responseContent);
+
+            var responseViewModel =
+                new BaseDTOResponse<BaseStandaloneDocViewModel>(documentDtoConverted, "succes", true);
+
+            return responseViewModel;
         }
 
         return new BaseDTOResponse<BaseStandaloneDocViewModel>("Error while uploading standalone document");
@@ -249,6 +256,23 @@ public class DocumentService(HttpClient httpClient) : IDocumentService
 
 
         return new BaseDTOResponse<BaseTemplateDocViewModel>("Error while uploading template document");
+    }
+
+    public async Task<BaseDTOResponse<BaseDocumentViewModel>> GetDocumentsByRecommendationIdAsync(Guid recommendationId)
+    {
+        var response =
+            await httpClient.GetAsync(
+                $"{IDocumentService.ApiPathBaseDocument}/get-recommendation-documents/{recommendationId}");
+
+
+        if (response.IsSuccessStatusCode)
+        {
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseDocumentViewModel>>(responseContent);
+            if (result != null) return result;
+        }
+
+        return new BaseDTOResponse<BaseDocumentViewModel>("Error while fetching documents");
     }
 
     public async Task<Stream?> DownloadStandaloneDocumentAsync(string documentName)

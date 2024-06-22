@@ -43,6 +43,8 @@ public class AudITContext : IdentityDbContext<User>
 
     public DbSet<CurrentUsersAuditMission> CurrentUsersAuditMission { get; set; }
 
+    public DbSet<RecommendationDocument> RecommendationDocuments { get; set; }
+
     //Services
     private readonly IHttpContextAccessor _httpContextAccessor;
 

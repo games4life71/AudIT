@@ -1,4 +1,5 @@
 ﻿@page "/activities/{ActivityId}"
+@using Frontend.Components.Activity
 @using Frontend.Contracts.Abstract_Services.ActivityService
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
@@ -9,7 +10,7 @@
 @using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
 @using Frontend.EntityViewModels.Objective
 @using Frontend.EntityViewModels.ObjectiveAction
-@using Frontend.Pages.Components.Activity
+@using Frontend.Components.Activity
 @using Frontend.Services.AuthentificationServices
 @using Orientation = Radzen.Orientation
 @inject NotificationService  _NotificationService

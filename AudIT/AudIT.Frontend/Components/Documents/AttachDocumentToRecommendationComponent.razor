@@ -1,0 +1,147 @@
+﻿@using Frontend.Contracts.Abstract_Services.DocumentService
+@using Frontend.Contracts.Abstract_Services.RecommendationService
+@using Frontend.EntityDtos.Document.Standalone
+@using Frontend.EntityViewModels.Documents
+@using Frontend.EntityViewModels.Recommendation
+@using Frontend.EntityViewModels.RecommendationDocument
+@using Syncfusion.Blazor.Inputs
+@using FileInfo = Radzen.FileInfo
+@using Orientation = Radzen.Orientation
+@using UploadChangeEventArgs = Radzen.UploadChangeEventArgs
+
+@inject IDocumentService _documentService
+@inject NotificationService _notificationService
+@inject IRecommendationService _recommendationService
+
+<RadzenStack Orientation="Orientation.Vertical">
+
+
+    @*See already added documents*@
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenText Text="@($"Documents available for {Recommendation.Description}")"/>
+            <RadzenDataGrid
+                Data="Documents"
+                TItem="BaseDocumentViewModel"
+                AllowFiltering="true"
+                AllowPaging="true"
+                PageSize="5"
+                AllowSorting="true">
+                <Columns>
+                    <RadzenDataGridColumn Property="Name" Title="Name"/>
+                    <RadzenDataGridColumn Property="Extension" Title="Extension"/>
+
+                    <RadzenDataGridColumn Property="DocumentType" Title="Type"/>
+                </Columns>
+
+            </RadzenDataGrid>
+
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenCard Variant="Variant.Outlined">
+        @*Form to upload a new document *@
+        <RadzenStack Orientation="Orientation.Vertical">
+
+            <RadzenStack Orientation="Orientation.Vertical">
+                <RadzenText Text="Attach new document"/>
+                <RadzenUpload
+                    @ref="@uploadRef"
+                    Multiple="false"
+                    Change="@((args) => FilesChanged(args))"/>
+            </RadzenStack>
+            <RadzenButton Click="@UploadDocument" Icon="upload" ButtonStyle="ButtonStyle.Success" Text="Submit"></RadzenButton>
+
+        </RadzenStack>
+    </RadzenCard>
+</RadzenStack>
+
+
+@code {
+
+
+    [Parameter] public BaseRecommendationViewModel Recommendation { get; set; }
+
+    private RadzenUpload uploadRef;
+
+    private List<FileInfo> SelectedFiles { get; set; } = [];
+
+    private List<BaseDocumentViewModel> Documents { get; set; } = [];
+}
+
+
+@functions
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchDocuments();
+    }
+
+
+    private async Task FetchDocuments()
+    {
+        var response = await _documentService.GetDocumentsByRecommendationIdAsync(Recommendation.Id);
+
+        if (response.Success)
+        {
+            Documents = response.DtoResponses;
+        }
+    }
+
+    private async Task FilesChanged(UploadChangeEventArgs args)
+    {
+        SelectedFiles = args.Files.ToList();
+    }
+
+    private async Task UploadDocument()
+    {
+        if(SelectedFiles.Count == 0)
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Please select a file to upload");
+            return;
+        }
+
+        if (SelectedFiles[0].Size > 512000)
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Please select a smaller to upload");
+            return;
+        }
+
+
+        var uploadStandaloneDocument = new BaseCreateStandaloneDocument();
+        //upload it
+        uploadStandaloneDocument.UploadDocument = SelectedFiles.FirstOrDefault();
+        uploadStandaloneDocument.DepartmentId = Guid.Parse("B4DA7309-7BAE-4DF3-AA87-B4D357F90763");
+
+        var uploadResult = await _documentService.UploadStandaloneDocumentAsync(uploadStandaloneDocument);
+
+        if (uploadResult.Success)
+        {
+            _notificationService.Notify(NotificationSeverity.Success, "Document uploaded successfully");
+
+        }
+
+        RecommendationDocumentViewModel newRecommendationDocument = new RecommendationDocumentViewModel();
+        //save it to the database in recommendaation document table
+
+        newRecommendationDocument = new RecommendationDocumentViewModel
+        {
+            BaseDocumentId = uploadResult.DtoResponse.id,
+            RecommendationId = Recommendation.Id
+        };
+
+
+        var saveResult = await _recommendationService.CreateRecommendationDocument(newRecommendationDocument);
+
+        if (saveResult.Success)
+        {
+            _notificationService.Notify(NotificationSeverity.Success, "Document saved successfully");
+            await FetchDocuments();
+            await uploadRef.ClearFiles();
+        }
+        else
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Document could not be saved");
+        }
+    }
+}

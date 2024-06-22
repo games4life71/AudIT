@@ -2,6 +2,7 @@
 using AudIT.Applicationa.Requests.Document.Delete;
 using AudIT.Applicationa.Requests.Document.Get.GetDocumentsByUserId;
 using AudIT.Applicationa.Requests.Document.Get.GetRecentDocumentByUserId;
+using AudIT.Applicationa.Requests.Document.Get.GetRecommendationDocuments;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AudIT.API.Controllers.Document;
@@ -16,7 +17,7 @@ public class BaseDocumentController : BaseController
     public async Task<IActionResult> GetDocumentsByUserId()
     {
         var id = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-        if(id == null)
+        if (id == null)
         {
             return BadRequest("User not found");
         }
@@ -45,6 +46,7 @@ public class BaseDocumentController : BaseController
         {
             return BadRequest("User not found");
         }
+
         var result = await Mediator.Send(new GetRecentDocumentsByUserIdQuery(Guid.Parse(userId.Value)));
 
         if (!result.Success)
@@ -54,6 +56,24 @@ public class BaseDocumentController : BaseController
 
         return Ok(result);
     }
+
+    [HttpGet]
+    [Route("get-recommendation-documents/{recommendationId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetRecommendationDocuments(Guid recommendationId)
+    {
+        var result = await Mediator.Send(new GetDocumentsByRecommendationQuery(recommendationId));
+
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
+
 
     [HttpDelete]
     [Route("delete-document/{id}")]

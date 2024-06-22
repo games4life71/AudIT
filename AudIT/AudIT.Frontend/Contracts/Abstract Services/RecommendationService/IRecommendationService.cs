@@ -1,6 +1,7 @@
 ﻿using Frontend.EntityDtos.Misc;
 using Frontend.EntityDtos.Recommendation;
 using Frontend.EntityViewModels.Recommendation;
+using Frontend.EntityViewModels.RecommendationDocument;
 
 namespace Frontend.Contracts.Abstract_Services.RecommendationService;
 
@@ -19,5 +20,7 @@ public interface IRecommendationService
     public Task<BaseDTOResponse<BaseRecommendationViewModel>> CreateRecommendationAsync(CreateRecommendationDto createRecommendationDto);
 
     public Task<BaseDTOResponse<BaseRecommendationViewModel>> GetAllRecentByUserAsync();
+
+    public Task<BaseResponse> CreateRecommendationDocument(RecommendationDocumentViewModel recommendationDocumentViewModel);
 
 }
