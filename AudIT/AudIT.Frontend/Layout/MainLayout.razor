@@ -96,9 +96,11 @@
                 </RadzenPanelMenuItem>
 
                 <RadzenPanelMenuItem class="rz-my-4" Icon="feedback" Text="Recommendations">
-                    <RadzenPanelMenuItem class="rz-my-2" Path="add-recommendation" Icon="add" Text="Add Recommendation"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem class="rz-my-2" Path="/recommendations" Icon="list" Text="View Recommendations"></RadzenPanelMenuItem>
-                </RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Visible="isAuditor" class="rz-my-2" Path="add-recommendation" Icon="add" Text="Add Recommendation"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Visible="isAuditor" class="rz-my-2" Path="/recommendations" Icon="list" Text="View Recommendations"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Visible="@(isVerified&!isAuditor)" class="rz-my-2" Path="/view-recommendations" Icon="list" Text="View Recommendations"></RadzenPanelMenuItem>
+
+                    </RadzenPanelMenuItem>
 
                 <RadzenPanelMenuItem Visible="isAuditor" class="rz-my-4" Icon="description" Text="Documents">
                     <RadzenPanelMenuItem class="rz-my-2" Text="Upload Document" Path="/upload-document" Icon="add"/>

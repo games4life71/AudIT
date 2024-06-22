@@ -1,10 +1,12 @@
 ﻿@page "/recommendations"
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
+@using Frontend.Contracts.Abstract_Services.DocumentService
 @using Frontend.Contracts.Abstract_Services.RecommendationService
 @using Frontend.EntityDtos.AuditMission
 @using Frontend.EntityDtos.Recommendation
 @using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
+@using Frontend.EntityViewModels.Documents
 @using Frontend.EntityViewModels.Recommendation
 @using Microsoft.AspNetCore.WebUtilities
 @using Orientation = Radzen.Orientation
@@ -16,6 +18,9 @@
 @inject IRecommendationService _recommendationService
 @inject ICurrentUserAuditMissionService _currentUserAuditMissionService
 @inject IAuditMissionService _auditMissionService
+@inject IDocumentService _documentService
+@inject IJSRuntime _jsRuntime
+
 
 <RadzenCard Variant="Variant.Outlined">
     <RadzenStack Orientation="Orientation.Vertical">
@@ -24,21 +29,25 @@
             <RadzenText Text="Recommendations" TextStyle="TextStyle.DisplayH5"/>
             @if (_auditMission.Id != Guid.Empty)
             {
-            <RadzenLink Path="@($"/audit-mission/{_auditMission.Id}")">
-                <RadzenText Text="@($"Selected Audit Mission: {_auditMission.Name}")"></RadzenText>
-            </RadzenLink>
+                <RadzenLink Path="@($"/audit-mission/{_auditMission.Id}")">
+                    <RadzenText Text="@($"Selected Audit Mission: {_auditMission.Name}")"></RadzenText>
+                </RadzenLink>
             }
             else
             {
-            <RadzenLink Path="@($"/audit-missions")">
-                <RadzenText Text="Please select an audit mission "></RadzenText>
-            </RadzenLink>
+                <RadzenLink Path="@($"/audit-missions")">
+                    <RadzenText Text="Please select an audit mission "></RadzenText>
+                </RadzenLink>
             }
 
         </RadzenStack>
+        @* <RadzenText Text="@($"Count:{_recommendationsWithDocuments[0].Recommendation.Cause}")"></RadzenText> *@
         <RadzenDataGrid
-            Data="_recommendations"
-            TItem="BaseRecommendationViewModel">
+            @ref="mainDataGrid"
+            Data="_recommendationsWithDocuments"
+            TItem="RecommendationWithDocumentsViewModel"
+            AllowColumnResize="true">
+
             <Template Context="recommendation">
                 <RadzenTabs TabPosition="TabPosition.Top">
                     <Tabs>
@@ -47,17 +56,17 @@
                                 <RadzenStack Orientation="Orientation.Vertical">
                                     <RadzenStack Orientation="Orientation.Vertical">
                                         <RadzenLabel Text="Name"/>
-                                        <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.Description" ReadOnly="@(!EditPressed)"/>
+                                        <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.Recommendation.Description" ReadOnly="@(!EditPressed)"/>
                                     </RadzenStack>
 
                                     <RadzenStack Orientation="Orientation.Vertical">
                                         <RadzenLabel Text="Problem"/>
-                                        <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.Problem" ReadOnly="@(!EditPressed)"/>
+                                        <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.Recommendation.Problem" ReadOnly="@(!EditPressed)"/>
                                     </RadzenStack>
 
                                     <RadzenStack Orientation="Orientation.Vertical">
                                         <RadzenLabel Text="Cause"/>
-                                        <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.Cause"ReadOnly="@(!EditPressed)"/>
+                                        <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.Recommendation.Cause"ReadOnly="@(!EditPressed)"/>
                                     </RadzenStack>
                                 </RadzenStack>
 
@@ -65,17 +74,17 @@
 
                                     <RadzenStack Orientation="Orientation.Vertical">
                                         <RadzenLabel Text="Description"></RadzenLabel>
-                                        <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.RecommendationDescription"ReadOnly="@(!EditPressed)"></RadzenTextArea>
+                                        <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.Recommendation.RecommendationDescription"ReadOnly="@(!EditPressed)"></RadzenTextArea>
                                     </RadzenStack>
 
                                     <RadzenStack Orientation="Orientation.Vertical">
                                         <RadzenLabel Text="Consequences"></RadzenLabel>
-                                        <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.Consequence" ReadOnly="@(!EditPressed)"></RadzenTextArea>
+                                        <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.Recommendation.Consequence" ReadOnly="@(!EditPressed)"></RadzenTextArea>
                                     </RadzenStack>
 
                                     <RadzenStack Orientation="Orientation.Vertical">
                                         <RadzenLabel Text="Aditional Findings"></RadzenLabel>
-                                        <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.AditionalFindings" ReadOnly="@(!EditPressed)"></RadzenTextArea>
+                                        <RadzenTextArea Style="width: 150%" @bind-Value="recommendation.Recommendation.AditionalFindings" ReadOnly="@(!EditPressed)"></RadzenTextArea>
                                     </RadzenStack>
 
                                 </RadzenStack>
@@ -85,7 +94,7 @@
 
                                     <RadzenStack Orientation="Orientation.Vertical">
                                         <RadzenLabel Text="Due Date"></RadzenLabel>
-                                        <RadzenDatePicker @bind-Value="recommendation.DueDate" ReadOnly="@(!EditPressed)"></RadzenDatePicker>
+                                        <RadzenDatePicker @bind-Value="recommendation.Recommendation.DueDate" ReadOnly="@(!EditPressed)"></RadzenDatePicker>
                                     </RadzenStack>
 
                                     <RadzenStack Orientation="Orientation.Vertical">
@@ -103,14 +112,42 @@
 
                             <RadzenRow JustifyContent="JustifyContent.Center">
                                 <RadzenStack Orientation="Orientation.Horizontal">
-                                    <RadzenButton ButtonStyle="ButtonStyle.Warning" Text="Edit" Visible="@(!EditPressed)" Click="@(() => ShowOtherButtons(recommendation))"></RadzenButton>
-                                    <RadzenButton Click="@(() => CancelChanges(recommendation))" ButtonStyle="ButtonStyle.Secondary" Visible="EditPressed" Text="Cancel"/>
-                                    <RadzenButton Click="@(() => SumbitChanges(recommendation))" ButtonStyle="ButtonStyle.Success" Visible="EditPressed" Text="Save"/>
+                                    <RadzenButton ButtonStyle="ButtonStyle.Warning" Text="Edit" Visible="@(!EditPressed)" Click="@(() => ShowOtherButtons(recommendation.Recommendation))"></RadzenButton>
+                                    <RadzenButton Click="@(() => CancelChanges(recommendation.Recommendation))" ButtonStyle="ButtonStyle.Secondary" Visible="EditPressed" Text="Cancel"/>
+                                    <RadzenButton Click="@(() => SumbitChanges(recommendation.Recommendation))" ButtonStyle="ButtonStyle.Success" Visible="EditPressed" Text="Save"/>
                                 </RadzenStack>
                             </RadzenRow>
 
 
                         </RadzenTabsItem>
+                        @*Recommendation documnents*@
+                        <RadzenTabsItem Icon="description" Text="Uploaded documents">
+                            <RadzenStack Orientation="Orientation.Vertical">
+                                <RadzenText TextStyle="TextStyle.DisplayH5" Text="Uploaded implementation documents:"/>
+                                <RadzenDataGrid AllowColumnResize="true" Data="recommendation.Documents" TItem="BaseDocumentViewModel">
+                                    <Columns>
+                                        <RadzenDataGridColumn Property="Name" Title="Name"/>
+                                        <RadzenDataGridColumn Property="Extension" Title="Extension"/>
+                                        <RadzenDataGridColumn Property="DocumentType" Title="Type"/>
+                                        <RadzenDataGridColumn>
+                                            <Template Context="document">
+                                                <RadzenStack Orientation="Orientation.Vertical">
+                                                    @if (document.Extension == "docx" || document.Extension == "xls" || document.Extension == "xlsx" || document.Extension == "doc")
+                                                    {
+                                                        <RadzenButton Icon="visibility" Click="@(() => ViewDocument(document))" ButtonStyle="ButtonStyle.Secondary" Text="View document"></RadzenButton>
+                                                    }
+                                                    else
+                                                    {
+                                                        <RadzenButton Icon="download" Click="@(()=>DownloadDocument(document))" ButtonStyle="ButtonStyle.Secondary" Text="Download document"></RadzenButton>
+                                                    }
+                                                </RadzenStack>
+                                            </Template>
+                                        </RadzenDataGridColumn>
+                                    </Columns>
+                                </RadzenDataGrid>
+                            </RadzenStack>
+                        </RadzenTabsItem>
+
                         <RadzenTabsItem Text="Settings" Icon="settings">
                             <RadzenStack JustifyContent="JustifyContent.Start" Orientation="Orientation.Horizontal">
 
@@ -118,7 +155,7 @@
 
                                 <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="notification_add" Text="Notify institution"/>
 
-                                <RadzenButton Click="@(() => DeleteRecommendation(recommendation))" Icon="delete" ButtonStyle="ButtonStyle.Danger" Text="Delete Recommendation"/>
+                                <RadzenButton Click="@(() => DeleteRecommendation(recommendation.Recommendation))" Icon="delete" ButtonStyle="ButtonStyle.Danger" Text="Delete Recommendation"/>
 
                             </RadzenStack>
                         </RadzenTabsItem>
@@ -127,9 +164,9 @@
             </Template>
 
             <Columns>
-                <RadzenDataGridColumn Title="Description" Property="Description"/>
-                <RadzenDataGridColumn Title="Due Date " Property="DueDate"/>
-                <RadzenDataGridColumn Title="Status" Property="Status"/>
+                <RadzenDataGridColumn Title="Description" Property="Recommendation.Description"/>
+                <RadzenDataGridColumn Title="Due Date " Property="Recommendation.DueDate"/>
+                <RadzenDataGridColumn Title="Status" Property="Recommendation.Status"/>
 
 
             </Columns>
@@ -143,6 +180,7 @@
 
 
 @code {
+    private RadzenDataGrid<RecommendationWithDocumentsViewModel> mainDataGrid;
 
     private List<BaseRecommendationViewModel> _recommendations = [];
 
@@ -156,7 +194,10 @@
 
     private string selectedStatus = "";
 
+    private List<RecommendationWithDocumentsViewModel> _recommendationsWithDocuments = [];
+
     private CurrentUserAuditMissionViewModel _currentUserAuditMission { get; set; } = new CurrentUserAuditMissionViewModel();
+
     private BaseAuditMissionDto _auditMission { get; set; } = new BaseAuditMissionDto();
 
 }
@@ -222,7 +263,37 @@
 
             if (response.Success)
             {
-                _recommendations = response.DtoResponses;
+                foreach (var baseRecommendation in response.DtoResponses)
+                {
+                    //get the documents for each recommendation
+                    try
+                    {
+                        var documentResponse = await _documentService.GetDocumentsByRecommendationIdAsync(baseRecommendation.Id);
+                        if (documentResponse.Success)
+                        {
+                            _recommendationsWithDocuments.Add(new RecommendationWithDocumentsViewModel
+                            {
+                                Recommendation = baseRecommendation,
+                                Documents = documentResponse.DtoResponses
+                            });
+                        }
+                        else
+                        {
+                            _recommendationsWithDocuments.Add(new RecommendationWithDocumentsViewModel
+                            {
+                                Recommendation = baseRecommendation,
+                                Documents = new List<BaseDocumentViewModel>()
+                            });
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                        continue;
+                    }
+                }
+
+                await mainDataGrid.Reload();
             }
         }
     }
@@ -267,8 +338,6 @@
             {
                 commmand.Status = (Status)Enum.Parse(typeof(Status), selectedStatus);
             }
-
-
 
 
             var response = await _recommendationService.UpdateRecommendationAsync(commmand);
@@ -328,5 +397,21 @@
                 _notificationService.Notify(NotificationSeverity.Error, "Error", response.Message);
             }
         }
+    }
+
+    private Task ViewDocument(BaseDocumentViewModel document)
+    {
+        _navigationManager.NavigateTo($"/view-pdf?documentName={document.Name}.{document.Extension}");
+
+        return Task.CompletedTask;
+    }
+
+    private async  Task DownloadDocument(BaseDocumentViewModel document)
+    {
+            var response  = await _documentService.DownloadStandaloneDocumentAsync(document.Name+"."+document.Extension);
+
+            var fileName = document.Name + "." + document.Extension;
+            using var StreamRef = new DotNetStreamReference(response);
+            await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, StreamRef);
     }
 }
