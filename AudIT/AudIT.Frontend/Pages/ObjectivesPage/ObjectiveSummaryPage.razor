@@ -19,48 +19,48 @@
     <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
         <RadzenText TextStyle="TextStyle.H4" class="rz-my-6" Text="@($"Summary for {_objective.name}")"></RadzenText>
         <RadzenLink Path=@($"/audit-mission/{_auditMission.Id}")>
-            <RadzenText  TextStyle="TextStyle.DisplayH6" Text="@($"Audit mission: {_auditMission.Name}")"></RadzenText>
+            <RadzenText TextStyle="TextStyle.DisplayH6" Text="@($"Audit mission: {_auditMission.Name}")"></RadzenText>
         </RadzenLink>
     </RadzenStack>
     <RadzenCard Variant="Variant.Outlined">
-    <RadzenTabs RenderMode="TabRenderMode.Client" TabPosition="TabPosition.Top">
-        <Tabs>
-            <RadzenTabsItem  Icon="description" Text="Objective Actions">
+        <RadzenTabs RenderMode="TabRenderMode.Client" TabPosition="TabPosition.Top">
+            <Tabs>
+                <RadzenTabsItem Icon="description" Text="Objective Actions">
 
-                <RadzenText Text="Objective Actions" class="rz-mb-6" TextStyle="TextStyle.DisplayH6"></RadzenText>
-                <RadzenDataGrid AllowSorting="true" Data="@_objective.objectiveActions">
-                    <Columns>
-                        <RadzenDataGridColumn Title="Objective Action Name" Property="name"/>
-                        <RadzenDataGridColumn Sortable="true" Title="Last Modified Date" Property="lastModifiedDate"/>
-                        <RadzenDataGridColumn Title="Action Risks Details" Sortable="false" Filterable="false">
-                            <Template Context="objectiveAction">
-                                <RadzenButton Style="display: flex; align-self: center; justify-content: center ;"
-                                              ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="info"
-                                              Text="More details " Click="@(() => OpenActionRiskDialog(objectiveAction))">
-                                </RadzenButton>
-                            </Template>
-                        </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Frozen="true" Title="Selected in auditing" Property="selected"></RadzenDataGridColumn>
-                        <RadzenDataGridColumn Width="15%" Frozen="true" Sortable="false" Filterable="false" Title="">
-                            <Template Context="objectiveAction">
-                                <RadzenButton Shade="Shade.Lighter" Icon="info" Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Text="More details " Click="@(() => NavigateObjAction(objectiveAction))"></RadzenButton>
-                            </Template>
-                        </RadzenDataGridColumn>
-                    </Columns>
+                    <RadzenText Text="Objective Actions" class="rz-mb-6" TextStyle="TextStyle.DisplayH6"></RadzenText>
+                    <RadzenDataGrid AllowSorting="true" Data="@_objective.objectiveActions">
+                        <Columns>
+                            <RadzenDataGridColumn Title="Objective Action Name" Property="name"/>
+                            <RadzenDataGridColumn Sortable="true" Title="Last Modified Date" Property="lastModifiedDate"/>
+                            <RadzenDataGridColumn Title="Action Risks Details" Sortable="false" Filterable="false">
+                                <Template Context="objectiveAction">
+                                    <RadzenButton Style="display: flex; align-self: center; justify-content: center ;"
+                                                  ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="info"
+                                                  Text="More details " Click="@(() => OpenActionRiskDialog(objectiveAction))">
+                                    </RadzenButton>
+                                </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn Frozen="true" Title="Selected in auditing" Property="selected"></RadzenDataGridColumn>
+                            <RadzenDataGridColumn Width="15%" Frozen="true" Sortable="false" Filterable="false" Title="">
+                                <Template Context="objectiveAction">
+                                    <RadzenButton Shade="Shade.Lighter" Icon="info" Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Text="More details " Click="@(() => NavigateObjAction(objectiveAction))"></RadzenButton>
+                                </Template>
+                            </RadzenDataGridColumn>
+                        </Columns>
 
-                </RadzenDataGrid>
+                    </RadzenDataGrid>
 
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="Configure" Icon="settings">
-                <RadzenStack Orientation="Orientation.Horizontal">
-                    <RadzenButton Icon="bookmark" Click="@(() => _navigationManager.NavigateTo($"risks/{_objective.id}"))" Text="Configure Risks"></RadzenButton>
-                    <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="assignment" Click="@(() => OpenEditNameForm(_objective))" Text="Edit Name"></RadzenButton>
-                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="@(() => DeleteObjective(_objective))" Text="Delete Objective"></RadzenButton>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Configure" Icon="settings">
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <RadzenButton Icon="bookmark" Click="@(() => _navigationManager.NavigateTo($"risks/{_objective.id}"))" Text="Configure Risks"></RadzenButton>
+                        <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="assignment" Click="@(() => OpenEditNameForm(_objective))" Text="Edit Name"></RadzenButton>
+                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="@(() => DeleteObjective(_objective))" Text="Delete Objective"></RadzenButton>
 
-                </RadzenStack>
-            </RadzenTabsItem>
-        </Tabs>
-    </RadzenTabs>
+                    </RadzenStack>
+                </RadzenTabsItem>
+            </Tabs>
+        </RadzenTabs>
     </RadzenCard>
 </RadzenStack>
 

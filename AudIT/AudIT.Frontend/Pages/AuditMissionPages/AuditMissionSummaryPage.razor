@@ -117,11 +117,9 @@ else if (_notFound == false && _auditMissionDto != null)
 
                             @foreach (var objective in _objectiveViewModel)
                             {
-
                                 <RadzenLink Path="@($"/objective/{objective.Id}")">
                                     <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{objective.Name}")"></RadzenText>
                                 </RadzenLink>
-
                             }
                             @if (_objectiveViewModel.Count == 0)
                             {
@@ -169,8 +167,6 @@ else if (_notFound == false && _auditMissionDto != null)
                             </RadzenRow>
                             @foreach (var document in _baseDocumentViewmodels)
                             {
-
-
                                 <RadzenLink Path="@($"/document-preview/{document.Id}")">
                                     <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{document.Name}")"></RadzenText>
                                 </RadzenLink>
@@ -217,7 +213,8 @@ else if (_notFound == false && _auditMissionDto != null)
                 </RadzenRow>
                 <RadzenStack JustifyContent="JustifyContent.End" Orientation="Orientation.Horizontal">
                     <RadzenButton Click="@SelectCurrentAuditMission" MouseLeave="@CloseToolTip" MouseEnter="@ShowTooltipSelect" Text="Select this audit mission"></RadzenButton>
-                @code{
+
+                    @code{
 
                         private void CloseToolTip()
                         {
@@ -225,6 +222,7 @@ else if (_notFound == false && _auditMissionDto != null)
                         }
 
                     }
+
                 </RadzenStack>
             </RadzenCard>
         </RadzenColumn>
@@ -240,9 +238,9 @@ else if (_notFound == false && _auditMissionDto != null)
     private List<string> _auditMissionStatuses = Enum.GetNames(typeof(AuditMissionStatus)).ToList();
 
     private BaseAuditMissionDto _auditMissionDto = new BaseAuditMissionDto();
-    private BaseDepartmentDto _departmentDto =new BaseDepartmentDto();
+    private BaseDepartmentDto _departmentDto = new BaseDepartmentDto();
 
-    private string selectedStatus="";
+    private string selectedStatus = "";
     private DateTime selectedDate;
     private List<BaseDocumentViewmodel> _baseDocumentViewmodels = [];
     private List<BaseActivityViewmodel> _activityViewModels = [];
@@ -261,7 +259,6 @@ else if (_notFound == false && _auditMissionDto != null)
 
     protected override async Task OnParametersSetAsync()
     {
-
         await FetchAuditMission();
         await FetchObjectives();
         await FetchDocuments();
@@ -356,9 +353,6 @@ else if (_notFound == false && _auditMissionDto != null)
 
     private async Task FetchDocuments()
     {
-
-
-
         var result = await _documentService.GetRecentDocumentsAsync();
 
         if (result.Success && result.DtoResponses.Count > 0)
@@ -378,7 +372,7 @@ else if (_notFound == false && _auditMissionDto != null)
         });
     }
 
-    private async  Task ShowConfirmDialog(MouseEventArgs obj)
+    private async Task ShowConfirmDialog(MouseEventArgs obj)
     {
         var confirm = await DialogService.OpenAsync("Confirmation", ds =>
             @<div>
@@ -392,9 +386,8 @@ else if (_notFound == false && _auditMissionDto != null)
         </div>, new DialogOptions() { });
     }
 
-    private async  Task UpdateAuditMission()
+    private async Task UpdateAuditMission()
     {
-
         // _updateAuditMissionDto.Name = _auditMissionDto.Name;
         _updateAuditMissionDto.DepartmentId = _auditMissionDto.DepartmentId;
         _updateAuditMissionDto.Status = (AuditMissionStatus)Enum.Parse(typeof(AuditMissionStatus), selectedStatus);
@@ -419,7 +412,6 @@ else if (_notFound == false && _auditMissionDto != null)
 
 
         return;
-
     }
 
     private void ShowTooltipSelect(ElementReference elementReference)
@@ -431,11 +423,9 @@ else if (_notFound == false && _auditMissionDto != null)
             Delay = 0,
             Style = "background-color: #000; color: #fff;"
         });
-
-
     }
 
-    private async  void SelectCurrentAuditMission()
+    private async void SelectCurrentAuditMission()
     {
         //display  a dialog to confirm the selection
         var response = await DialogService.Confirm("Are you sure you want to select this audit mission as the main one ? ",
@@ -449,23 +439,21 @@ else if (_notFound == false && _auditMissionDto != null)
 
         if (response.Value)
         {
-             var result = await _currentUserAuditMissionService.SetCurrentUserAuditMissionAsync(_auditMissionDto.Id);
+            var result = await _currentUserAuditMissionService.SetCurrentUserAuditMissionAsync(_auditMissionDto.Id);
 
-             _currentUserChangedMissionService.NotifyCurrentUserChangedMission();
+            _currentUserChangedMissionService.NotifyCurrentUserChangedMission();
 
-             if (result.Success)
-             {
-                 //display an alert
+            if (result.Success)
+            {
+                //display an alert
 
-                    NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Success", Detail = "Audit Mission selected successfully", Duration = 4000 });
-             }
-             else
-             {
-                    //display an alert
-                    NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "Failed to select audit mission", Duration = 4000 });
-             }
+                NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Success", Detail = "Audit Mission selected successfully", Duration = 4000 });
+            }
+            else
+            {
+                //display an alert
+                NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "Failed to select audit mission", Duration = 4000 });
+            }
         }
-
-
     }
 }

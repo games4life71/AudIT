@@ -55,8 +55,6 @@
             var fileName = $"Objectives_and_Actions_{_currentAuditMissionName}_{DateTime.Now}.xlsx";
             using var StreamRef = new DotNetStreamReference(response);
             await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, StreamRef);
-
-
         }
         else
         {

@@ -39,6 +39,7 @@
 
     [Parameter] public ActionRiskViewModel ActionRisk { get; set; }
     [Parameter] public EventCallback<ActionRiskViewModel> OnEditActionRisk { get; set; }
+
     private async Task SumbitChanges()
     {
         //TODO implement save changes logic
@@ -50,7 +51,7 @@
             ActionRisk.impact
         );
 
-        var response = await  _actionRiskService.UpdateActionRisk(updateActionRiskDto);
+        var response = await _actionRiskService.UpdateActionRisk(updateActionRiskDto);
 
         if (response.Success)
         {

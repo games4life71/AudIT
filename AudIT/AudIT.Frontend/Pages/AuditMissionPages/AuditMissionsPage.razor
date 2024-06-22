@@ -112,7 +112,7 @@ else
                     auditMissionDto.DepartmentId,
                     departmentName,
                     auditMissionDto.LastModifiedDate,
-                        auditMissionDto.Status
+                    auditMissionDto.Status
                 );
 
                 _auditMissionsDto.Add(newAuditMission);
@@ -133,9 +133,7 @@ else
         // Console.WriteLine($"Button clicked for order {order.OrderID}");
         NavigationManager.NavigateTo($"/audit-mission/{auditMission.Id}");
         return Task.CompletedTask;
-
     }
-
 
 
     private Task DepartmentCellClicked(AuditMissionWithDepartmentName data)

@@ -45,7 +45,6 @@
 
     private async Task SumbitChanges()
     {
-
         ActionRisk.objectiveActionId = Guid.Parse(objectiveActionId);
         var response = await _actionRiskService.CreateActionRiskAsync(ActionRisk);
 
@@ -63,7 +62,6 @@
 
         //reset the form
         ActionRisk = new CreateActionRiskDto();
-
     }
 
 }

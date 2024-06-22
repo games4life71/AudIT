@@ -9,5 +9,5 @@ public interface IAuditMissionRepository : IRepository<AuditMission>
 
     Task<Result<IReadOnlyList<AuditMission>>> GetByDepartmentId(Guid requestDepartmentId);
 
-
+    Task<Result<IReadOnlyList<AuditMission>>> GetByInstitutionId(Guid requestInstitutionId);
 }

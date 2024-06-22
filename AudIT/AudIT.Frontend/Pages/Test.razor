@@ -23,15 +23,15 @@
         {
             // await AuthStateProvider.GetAuthenticationStateAsync();
             // Claims =  AuthStateProvider.GetClaims();
-            var result =await  _httpClient.GetAsync("https://localhost:7248/api/v1/Authentification/get-user-claims");
+            var result = await _httpClient.GetAsync("https://localhost:7248/api/v1/Authentification/get-user-claims");
             //send the cookie with the request
 
-            if(!result.IsSuccessStatusCode)
+            if (!result.IsSuccessStatusCode)
             {
-              //show error message
-              Message = "An error occured while fetching the claims";
-
+                //show error message
+                Message = "An error occured while fetching the claims";
             }
+
             Message = result.Content.ReadAsStringAsync().Result;
 
             //
@@ -51,9 +51,6 @@
             // // Claims= await result.Content.ReadFromJsonAsync<List<ClaimResponse>>().ConfigureAwait(false);
             //
             // Message = response2.Content.ReadAsStringAsync().Result;
-
-
-
         }
         catch (Exception e)
         {

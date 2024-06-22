@@ -32,7 +32,7 @@
                     <RadzenPassword style="display: block; width: 100%;" Name="password" @bind-Value="@_loginModel.password"> </RadzenPassword>
                     <RadzenRequiredValidator Component="password" Style="position: absolute" class="w-100" Popup=@popup Text="Password is required !"></RadzenRequiredValidator>
                     @* <RadzenCustomValidator Style="position: absolute" Popup="@popup" @Validator="@(() => ValidatePassword(@_loginModel.password))" Component="password" Text="Password is not strong"></RadzenCustomValidator> *@
-                   
+
                 </RadzenColumn>
             </RadzenFormField>
             @if (!succesLogin)
@@ -56,6 +56,7 @@
 
 @* <RadzenText Text="@succesLogin.ToString()"></RadzenText> *@
 @* <RadzenText Text="@msg"></RadzenText> *@
+
 @code {
     bool popup;
     bool rememberMe = true;
@@ -82,21 +83,23 @@
             // Console.WriteLine("the message is " + _loginModel.email);
             // Console.WriteLine(_loginModel.password);
             buttonBusy = true;
-                var response = await _Client.PostAsJsonAsync("https://localhost:7248/api/v1/Authentification/login", _loginModel);
-           buttonBusy = false;
+            var response = await _Client.PostAsJsonAsync("https://localhost:7248/api/v1/Authentification/login", _loginModel);
+            buttonBusy = false;
             msg = response.Content.ReadAsStringAsync().Result;
             if (!response.IsSuccessStatusCode)
-            {   buttonBusy = false;
+            {
+                buttonBusy = false;
                 succesLogin = false;
                 StateHasChanged();
             }
 
             else
-            {   buttonBusy = false;
+            {
+                buttonBusy = false;
                 succesLogin = true;
 
                 await customAuthState.GetAuthenticationStateAsync();
-                NavigationManager.NavigateTo("/",forceLoad:true);
+                NavigationManager.NavigateTo("/", forceLoad: true);
             }
 
             // Console.WriteLine("the message is " + _loginModel.email);
@@ -147,7 +150,6 @@
 
         //if the password does not contain a special character
         return !password.All(char.IsLetterOrDigit);
-
     }
 
     private void NavigateRegister(MouseEventArgs obj)

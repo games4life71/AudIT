@@ -58,7 +58,6 @@
                     private async Task ObjActionSelected(string value)
                     {
                         _createActivityDto.ObjectiveActionId = Guid.Parse(value);
-
                     }
 
 
@@ -222,6 +221,3 @@
         if (auditMissionResult is { Success: true, DtoResponse: not null }) _auditMission = auditMissionResult.DtoResponse;
     }
 }
-
-
-

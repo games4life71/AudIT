@@ -102,12 +102,12 @@ public class AuthService(
             Console.WriteLine("INSTITUTION ADMIN IS NOT NULL");
         }
 
-        // var emailResult = await emailService.SendAuthorizeEmail(institutionAdmin.Id, newUserValue);
-        //
-        // if (emailResult.Item2 == false)
-        // {
-        //     return (0, "Email not sent");
-        // }
+        var emailResult = await emailService.SendAuthorizeEmail(institutionAdmin.Id, newUserValue);
+
+        if (emailResult.Item2 == false)
+        {
+            return (0, "Email not sent");
+        }
 
         try
         {

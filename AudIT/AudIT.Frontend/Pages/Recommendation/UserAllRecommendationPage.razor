@@ -1,0 +1,113 @@
+﻿@page "/view-recommendations"
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.RecommendationService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityViewModels.Recommendation
+@using Orientation = Radzen.Orientation
+
+@inject IAuditMissionService _auditMissionService
+@inject IRecommendationService _recommendationService
+
+<RadzenStack Orientation="Orientation.Vertical">
+
+    @*Select audit mission to see recommendations*@
+    <RadzenStack Orientation="Orientation.Horizontal">
+        <RadzenDropDown
+            Data="_auditMissions"
+            TValue="Guid"
+            TextProperty="Name"
+            ValueProperty="Id"
+            Value="_selectedAuditMissionId"
+            ValueChanged="@((value) => FetchRecommendations(value))"/>
+
+
+    </RadzenStack>
+
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenDataGrid
+                Data="_recommendations"
+                TItem="BaseRecommendationViewModel"
+                AllowFiltering="true"
+                AllowPaging="true"
+                PageSize="5"
+                AllowSorting="true"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                AllowColumnResize="true">
+                <Columns>
+
+                    <RadzenDataGridColumn Title="Name" Property="Description"/>
+                    <RadzenDataGridColumn Title="Due Date" Property="DueDate"/>
+                    <RadzenDataGridColumn Title="Status" Property="Status"/>
+                    <RadzenDataGridColumn Title="Problem" Property="Problem"/>
+                    <RadzenDataGridColumn >
+                        <Template Context="recommendation">
+                            <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Vertical">
+                                <RadzenButton  ButtonStyle="ButtonStyle.Secondary" Icon="options" Text="Options"></RadzenButton>
+                            </RadzenStack>
+
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+
+            </RadzenDataGrid>
+
+
+        </RadzenStack>
+
+
+    </RadzenCard>
+
+
+</RadzenStack>
+
+
+@code {
+
+    private List<BaseAuditMissionDto> _auditMissions = [];
+
+    private List<BaseRecommendationViewModel> _recommendations = [];
+
+    private Guid _selectedAuditMissionId = Guid.Empty;
+
+
+}
+
+
+@functions
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchUserAuditMission();
+    }
+
+    private async Task FetchUserAuditMission()
+    {
+        var response = await _auditMissionService.GetAuditMissionsByUserInstitution();
+
+        if (response.Success)
+        {
+            _auditMissions = response.DtoResponses;
+        }
+        else
+        {
+            //Handle error
+        }
+    }
+
+
+    private async Task FetchRecommendations(Guid value)
+    {
+        var response = await _recommendationService.FindAllByAuditMissionIdAsync(value);
+
+
+        if (response.Success)
+        {
+            _recommendations = response.DtoResponses;
+        }
+        else
+        {
+            //Handle error
+        }
+    }
+}

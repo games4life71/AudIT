@@ -54,7 +54,7 @@ else
 
                             <RadzenText Text="Choose the Department"></RadzenText>
                             <RadzenFieldset>
-                                <RadzenDropDown @bind-Value="@_selectedDepartmentId"  AllowFiltering="true"
+                                <RadzenDropDown @bind-Value="@_selectedDepartmentId" AllowFiltering="true"
                                                 TValue="Guid" Placeholder="Department:"
                                                 Data="@(_departments)" TextProperty="Name" ValueProperty="Id"/>
 
@@ -90,8 +90,8 @@ else
         public string Value { get; set; } = value;
     }
 
-    List<BaseInstitutionDto> institutions=[];
-    List<BaseDepartmentDto> _departments=[];
+    List<BaseInstitutionDto> institutions = [];
+    List<BaseDepartmentDto> _departments = [];
 
     private string _selectedAuditName = "";
     private Guid _selectedInstitutionId = Guid.Empty;

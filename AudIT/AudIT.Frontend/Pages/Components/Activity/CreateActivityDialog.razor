@@ -1,5 +1,4 @@
-﻿
-@* @page "/create-activity" *@
+﻿@* @page "/create-activity" *@
 @using Frontend.Contracts.Abstract_Services.ActivityService
 @using Frontend.EntityDtos.Activity
 @using Frontend.EntityViewModels.Activity
@@ -27,7 +26,7 @@
                     <RadzenStack Orientation="Orientation.Vertical">
                         <RadzenStack Orientation="Orientation.Horizontal">
                             <RadzenLabel Text="Type:"></RadzenLabel>
-                            <RadzenText  Text="@_selectedActivityType"></RadzenText>
+                            <RadzenText Text="@_selectedActivityType"></RadzenText>
                         </RadzenStack>
                         <RadzenListBox @bind-Value="@_selectedActivityType" Data="@_activityTypes"/>
                         <RadzenButton Click="@CreateActivity" ButtonType="ButtonType.Submit" Text="Create" ButtonStyle="ButtonStyle.Success"></RadzenButton>
@@ -56,10 +55,6 @@
     [Parameter] public Guid AuditMissionId { get; set; }
 
     [Parameter] public Guid DepartmentId { get; set; }
-
-
-
-
 
 
     private async Task CreateActivity()
@@ -102,7 +97,6 @@
         else
         {
             _notificationService.Notify(NotificationSeverity.Error, "Activity not created", "The activity could not be created");
-
         }
     }
 

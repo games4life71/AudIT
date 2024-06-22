@@ -39,7 +39,8 @@ public class AuditMissionRepository(AudITContext context)
     {
         try
         {
-            var result = await _context.AuditMissions.Where(x => x.DepartmentId == requestDepartmentId).ToListAsync();
+            var result = await _context.AuditMissions
+                .Where(x => x.DepartmentId == requestDepartmentId).ToListAsync();
 
             if (result.Count == 0)
             {
@@ -52,6 +53,20 @@ public class AuditMissionRepository(AudITContext context)
         {
             return Result<IReadOnlyList<AuditMission>>.Failure("Error: " + e.Message);
         }
+    }
+
+    public async Task<Result<IReadOnlyList<AuditMission>>> GetByInstitutionId(Guid requestInstitutionId)
+    {
+        var auditMissions = await _context.AuditMissions
+            .Where(x => x.Department.Institution.Id == requestInstitutionId)
+            .ToListAsync();
+
+        if (!auditMissions.Any())
+        {
+            return Result<IReadOnlyList<AuditMission>>.Failure("No audit mission found for this institution");
+        }
+
+        return Result<IReadOnlyList<AuditMission>>.Success(auditMissions);
     }
 
     public override async Task<Result<AuditMission>> FindByIdAsync(Guid id)

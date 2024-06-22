@@ -56,9 +56,7 @@
         test_models.Add(new TestModel("asdasdasadass", "bbbb4"));
 
         return base.OnInitializedAsync();
-
     }
-
 
 
     void OnSubmit(TestModel _valueModel)
@@ -71,7 +69,7 @@
         // console.Log($"InvalidSubmit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() {  WriteIndented = true })}");
     }
 
-     bool CheckLength(string  password)
+    bool CheckLength(string password)
     {
         return password.Length > 5;
     }

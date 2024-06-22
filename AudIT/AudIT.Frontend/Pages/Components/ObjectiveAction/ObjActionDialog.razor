@@ -6,20 +6,18 @@
     <Columns>
         <RadzenDataGridColumn Filterable="true" Sortable="true" Property="name" Title="Risk Name"></RadzenDataGridColumn>
         <RadzenDataGridColumn Filterable="true" Sortable="true" Property="risk" Title="Risk Exposure"></RadzenDataGridColumn>
-        <RadzenDataGridColumn Filterable="true" Sortable="true"  Property="probability" Title="Risk Probability"></RadzenDataGridColumn>
-        <RadzenDataGridColumn  Filterable="true" Sortable="true" Property="impact" Title="Risk Impact(total score)"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Filterable="true" Sortable="true" Property="probability" Title="Risk Probability"></RadzenDataGridColumn>
+        <RadzenDataGridColumn Filterable="true" Sortable="true" Property="impact" Title="Risk Impact(total score)"></RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 <RadzenStack class="rz-mt-10" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="0.5rem">
     @if (ActionRisks.Count > 0)
     {
         <RadzenButton Click="@EditActionRisks" ButtonStyle="ButtonStyle.Warning" Icon="" Variant="Variant.Flat" Text="Edit Risks " Style="width: 120px"/>
-
     }
     else
     {
-        <RadzenButton Click="@(()=>_navigationManager.NavigateTo($"/edit-risks/{ObjectiveActionId}"))"  Icon="add" ButtonStyle="ButtonStyle.Warning" Text="Add Action Risks"> </RadzenButton>
-
+        <RadzenButton Click="@(() => _navigationManager.NavigateTo($"/edit-risks/{ObjectiveActionId}"))" Icon="add" ButtonStyle="ButtonStyle.Warning" Text="Add Action Risks"> </RadzenButton>
     }
     <RadzenButton Click="@((args) => dialogService.Close(true))" Variant="Variant.Flat" Text="Close" Style="width: 120px"/>
 

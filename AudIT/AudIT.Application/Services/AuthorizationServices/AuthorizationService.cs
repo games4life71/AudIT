@@ -1,4 +1,5 @@
-﻿using AudIT.Applicationa.Contracts.AbstractRepositories;
+﻿using System.Security.Claims;
+using AudIT.Applicationa.Contracts.AbstractRepositories;
 using AudIT.Applicationa.Models.Misc;
 using AudIT.Applicationa.Services.UtilsServices;
 using AudiT.Domain.Entities;
@@ -20,20 +21,20 @@ public class AuthorizationService(
     /// </summary>
     /// <param name="token">The token that is received </param>
     /// <returns></returns>
-    public Task<(int, string)> ValidateUser(string token)
+    public async Task<(int, string)> ValidateUser(string token)
     {
         Console.WriteLine("Validating user");
         string userId = "";
         //validate the token
         if (string.IsNullOrEmpty(token))
         {
-            return Task.FromResult((0, "Token is empty"));
+            return (0, "Token is empty");
         }
 
         //validate the token signature
         if (!utilsService.ValidateToken(token))
         {
-            return Task.FromResult((0, "Invalid token"));
+            return (0, "Invalid token");
         }
 
         //decode the token
@@ -44,7 +45,7 @@ public class AuthorizationService(
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return Task.FromResult((0, "Failed to decode token"));
+            return (0, "Failed to decode token");
         }
 
         //change the user status to active
@@ -59,12 +60,12 @@ public class AuthorizationService(
 
         if (user.Result == null)
         {
-            return Task.FromResult((0, "User not found"));
+            return (0, "User not found");
         }
 
         if (user.Result.Verified)
         {
-            return Task.FromResult((0, "User already verified"));
+            return (0, "User already verified");
         }
 
         //change the user status to active
@@ -77,16 +78,27 @@ public class AuthorizationService(
 
         if (!roleManager.RoleExistsAsync(UserRoles.Verified).Result)
         {
-            userManager.RemoveFromRoleAsync(user.Result, UserRoles.Unverified);
-            userManager.AddToRoleAsync(user.Result, UserRoles.Verified);
-            userManager.AddToRoleAsync(user.Result, UserRoles.User);
+            await userManager.RemoveFromRoleAsync(user.Result, UserRoles.Unverified);
+            await roleManager.CreateAsync(new IdentityRole(UserRoles.Verified));
+            await userManager.AddToRoleAsync(user.Result, UserRoles.Verified);
+            await roleManager.CreateAsync(new IdentityRole(UserRoles.User));
+            await userManager.AddToRoleAsync(user.Result, UserRoles.User);
         }
+
+        //update the user claims
+        var claims = await userManager.GetClaimsAsync(user.Result);
+        await userManager.RemoveClaimsAsync(user.Result, claims);
+        await userManager.AddClaimAsync(user.Result, new Claim(ClaimTypes.Role, UserRoles.Verified));
+        await userManager.AddClaimAsync(user.Result, new Claim(ClaimTypes.Role, UserRoles.User));
+
+
+
         //set the department to the user
 
 
-        userManager.UpdateAsync(user.Result);
+     await   userManager.UpdateAsync(user.Result);
 
 
-        return Task.FromResult((1, "User verified successfully"));
+        return (1, "User verified successfully");
     }
 }

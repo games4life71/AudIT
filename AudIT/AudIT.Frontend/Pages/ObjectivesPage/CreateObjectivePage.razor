@@ -165,7 +165,8 @@
                     ToggleShade="Shade.Darker"
                     Icon="toggle_on"
                     Variant="Variant.Flat"
-                    Text="Template Document"></RadzenToggleButton>
+                    Text="Template Document">
+                </RadzenToggleButton>
 
                 @if (templateDocumentSelected)
                 {
@@ -174,7 +175,6 @@
 
                     <RadzenLabel Text="State" Component="state"></RadzenLabel>
                     <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentTypeChanged" Data="@_documentTypes"/>
-
 
 
                     <RadzenLabel Text="Type" Component="type"></RadzenLabel>
@@ -292,7 +292,7 @@
         <RadzenColumn>
             <RadzenCard Variant="Variant.Outlined">
                 <RadzenText TextStyle="TextStyle.DisplayH5" Text="Attachd Documents:"></RadzenText>
-                @if (_attachedDocuments.Count>0)
+                @if (_attachedDocuments.Count > 0)
                 {
                     <RadzenCard Variant="Variant.Outlined">
                         <RadzenDataList Data="_attachedDocuments" TItem="string">
@@ -308,7 +308,6 @@
                 }
                 else
                 {
-
                     <RadzenText TextStyle="TextStyle.DisplayH6" TextAlign="TextAlign.Center" Text="No documents attached"></RadzenText>
                 }
             </RadzenCard>
@@ -516,10 +515,6 @@
             submitButtonBusy = false;
             _notificationService.Notify(NotificationSeverity.Error, "Failed to create objective", "The objective was not created successfully");
         }
-
-
-
-
     }
 
     //Save the objective action into the 2 lists
@@ -571,7 +566,6 @@
     }
 
 
-
     //attach document functions
 
     private async Task FetchInstitutions()
@@ -603,7 +597,7 @@
             //add the selected files to the attached documents list
             // _attachedDocuments.AddRange(_selectedFiles.Select(f => f.Name));
 
-            if(_selectedFiles.Count == 0)
+            if (_selectedFiles.Count == 0)
             {
                 _notificationService.Notify(NotificationSeverity.Error, "No files selected", "Please select at least one file to upload");
                 return;
@@ -657,7 +651,6 @@
                     else
                     {
                         _notificationService.Notify(NotificationSeverity.Error, "Document upload failed");
-
                     }
                 }
             }
@@ -668,8 +661,8 @@
 
                 command.Version = documentVersion.ToString();
                 //find the state in DocumentState enum
-                command.State = (DocumentState)Enum.Parse(typeof(DocumentState),_selectedDocumentState);
-                command.Type = (TemplateTypeStage)Enum.Parse(typeof(TemplateTypeStage),_selectedDocumentType);
+                command.State = (DocumentState)Enum.Parse(typeof(DocumentState), _selectedDocumentState);
+                command.Type = (TemplateTypeStage)Enum.Parse(typeof(TemplateTypeStage), _selectedDocumentType);
 
 
                 command.Files = _selectedFiles;
@@ -689,14 +682,15 @@
                 {
                     _notificationService.Notify(NotificationSeverity.Error, "Document upload failed");
                 }
+
                 isBusySubmit = false;
                 StateHasChanged();
             }
         }
         catch (Exception e)
         {
-           _notificationService.Notify(NotificationSeverity.Error, e.Message);
-           Console.WriteLine(e.Message);
+            _notificationService.Notify(NotificationSeverity.Error, e.Message);
+            Console.WriteLine(e.Message);
         }
     }
 

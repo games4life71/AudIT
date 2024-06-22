@@ -54,13 +54,13 @@ public class AuditMissionService(HttpClient httpClient) : IAuditMissionService
             var content = await response.Content.ReadAsStringAsync();
             var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseAuditMissionDto>>(content);
 
-            if (result != null && result.Success && result.DtoResponses.Count>0 )
+            if (result != null && result.Success && result.DtoResponses.Count > 0)
             {
                 return result;
             }
             else
             {
-                return new BaseDTOResponse<BaseAuditMissionDto>("An error occurred "+ result.Message, false);
+                return new BaseDTOResponse<BaseAuditMissionDto>("An error occurred " + result.Message, false);
             }
         }
         catch (Exception e)
@@ -78,22 +78,25 @@ public class AuditMissionService(HttpClient httpClient) : IAuditMissionService
         throw new NotImplementedException();
     }
 
-    public async Task<BaseDTOResponse<BaseAuditMissionDto>> CreateAuditMissionAsync(CreateAuditMissionDto createAuditMissionDto)
+    public async Task<BaseDTOResponse<BaseAuditMissionDto>> CreateAuditMissionAsync(
+        CreateAuditMissionDto createAuditMissionDto)
     {
-        var response = await httpClient.PostAsJsonAsync($"{IAuditMissionService.ApiPath}/add-audit-mission", createAuditMissionDto);
+        var response = await httpClient.PostAsJsonAsync($"{IAuditMissionService.ApiPath}/add-audit-mission",
+            createAuditMissionDto);
 
         if (!response.IsSuccessStatusCode)
         {
             return new BaseDTOResponse<BaseAuditMissionDto>("Faile to create audit mission", false);
-
         }
 
         return new BaseDTOResponse<BaseAuditMissionDto>("Audit mission created successfully", true);
     }
 
-    public async  Task<BaseDTOResponse<BaseAuditMissionDto>> UpdateAuditMissionAsync(UpdateAuditMissionDto updateAuditMissionDto)
+    public async Task<BaseDTOResponse<BaseAuditMissionDto>> UpdateAuditMissionAsync(
+        UpdateAuditMissionDto updateAuditMissionDto)
     {
-        var response = await  httpClient.PutAsJsonAsync($"{IAuditMissionService.ApiPath}/update-audit-mission", updateAuditMissionDto);
+        var response = await httpClient.PutAsJsonAsync($"{IAuditMissionService.ApiPath}/update-audit-mission",
+            updateAuditMissionDto);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -101,9 +104,29 @@ public class AuditMissionService(HttpClient httpClient) : IAuditMissionService
         }
 
         return new BaseDTOResponse<BaseAuditMissionDto>("Audit mission updated successfully", true);
-
-
     }
 
+    public async Task<BaseDTOResponse<BaseAuditMissionDto>> GetAuditMissionsByUserInstitution()
+    {
+        var response =
+            await httpClient.GetAsync($"{IAuditMissionService.ApiPath}/get-audit-mission-by-user-institution");
 
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return new BaseDTOResponse<BaseAuditMissionDto>("Failed to get audit mission by user institution", false);
+        }
+
+        var content = await response.Content.ReadAsStringAsync();
+        var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseAuditMissionDto>>(content);
+
+        if (result != null && result.Success && result.DtoResponses.Count > 0)
+        {
+            return result;
+        }
+        else
+        {
+            return new BaseDTOResponse<BaseAuditMissionDto>("An error occurred " + result.Message, false);
+        }
+    }
 }

@@ -14,14 +14,11 @@
 @code {
 
 
-
     [Parameter] public ObjectiveFullViewModel Objective { get; set; }
 
-    [Parameter]
-    public EventCallback<string> OnNameEdited { get; set; }
+    [Parameter] public EventCallback<string> OnNameEdited { get; set; }
 
-    [Parameter]
-    public EventCallback<string> OnNameEditFailed { get; set; }
+    [Parameter] public EventCallback<string> OnNameEditFailed { get; set; }
 }
 
 @functions
@@ -29,7 +26,6 @@
 
     private async Task SaveObjectiveName()
     {
-
         try
         {
             var updateDto = new UpdateObjectiveNameDto()

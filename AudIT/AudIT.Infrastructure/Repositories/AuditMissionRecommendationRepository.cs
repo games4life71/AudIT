@@ -53,4 +53,9 @@ public class AuditMissionRecommendationRepository : BaseRepository<AuditMissionR
 
         return ("Recommendation deleted successfully", true);
     }
+
+    public Task<Result<List<Recommendation>>> GetRecommendationsByInstitutionId(Guid valueInstitutionId)
+    {
+        throw new NotImplementedException();
+    }
 }

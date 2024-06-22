@@ -40,7 +40,7 @@
     [Parameter] public Guid InstitutionId { get; set; }
     private CreateDepartmentDto _newDepartment = new CreateDepartmentDto();
 
-     [Parameter]  public  EventCallback<BaseDepartmentDto> OnDepartmentAdded { get; set; }
+    [Parameter] public EventCallback<BaseDepartmentDto> OnDepartmentAdded { get; set; }
 }
 
 @functions

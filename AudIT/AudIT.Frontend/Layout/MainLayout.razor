@@ -51,11 +51,15 @@
                 <RadzenPanelMenuItem Text="Login" Icon="account_circle" Click="@(() => NavigationManager.NavigateTo("/login"))"/>
                 <RadzenPanelMenuItem Text="Register" Icon="account_circle" Click="@(() => NavigationManager.NavigateTo("/register"))"/>
             }
+            else if (!isVerified)
+            {
+                <RadzenText Text="Please verify your email address" class="rz-my-4"/>
+            }
             else
             {
                 <RadzenPanelMenuItem class="rz-my-4" Text="Home" Path="/" Icon="home"/>
 
-                <RadzenPanelMenuItem Icon="chrome_reader_mode" Text="Audit Missions">
+                <RadzenPanelMenuItem Visible="isAuditor" Icon="chrome_reader_mode" Text="Audit Missions">
                     <RadzenPanelMenuItem class="rz-my-2" Text="Current Mission" Path=@($"/audit-mission/{_currentUserAuditMission}") Icon="favorite"/>
                     <RadzenPanelMenuItem class="rz-my-2" Text="Create Mission" Path="/create-mission" Icon="add"/>
                     <RadzenPanelMenuItem class="rz-my-2" Text="List Missions" Path="/audit-missions" Icon="list"/>
@@ -72,7 +76,7 @@
                     </RadzenPanelMenuItem>
                 </RadzenPanelMenuItem>
 
-                <RadzenPanelMenuItem class="rz-my-4" Icon="all_out" Text="Objectives">
+                <RadzenPanelMenuItem Visible="isAuditor" class="rz-my-4" Icon="all_out" Text="Objectives">
                     <RadzenPanelMenuItem class="rz-my-2" Text="Create Objective" Path="/create-objective" Icon="add"/>
                     <RadzenPanelMenuItem class="rz-my-2" Text="List Objectives" Path="/objectives" Icon="list"/>
                     <RadzenPanelMenuItem class="rz-my-2" Text="Create Objective Action" Path="/create-objective-action" Icon="add"/>
@@ -96,24 +100,24 @@
                     <RadzenPanelMenuItem class="rz-my-2" Path="/recommendations" Icon="list" Text="View Recommendations"></RadzenPanelMenuItem>
                 </RadzenPanelMenuItem>
 
-                <RadzenPanelMenuItem class="rz-my-4" Icon="description" Text="Documents">
+                <RadzenPanelMenuItem Visible="isAuditor" class="rz-my-4" Icon="description" Text="Documents">
                     <RadzenPanelMenuItem class="rz-my-2" Text="Upload Document" Path="/upload-document" Icon="add"/>
                     <RadzenPanelMenuItem class="rz-my-2" Text="List Documents" Path="/documents" Icon="list"/>
                 </RadzenPanelMenuItem>
 
-                <RadzenPanelMenuItem class="rz-my-4" Icon="history" Text="Activities">
+                <RadzenPanelMenuItem Visible="isAuditor" class="rz-my-4" Icon="history" Text="Activities">
                     <RadzenPanelMenuItem  class="rz-my-2" Click="@NavigateActivity" Icon="add" Text="Add Activity"></RadzenPanelMenuItem>
                     <RadzenPanelMenuItem  class="rz-my-2" Icon="list" Path="/activities" Text="List Activities"></RadzenPanelMenuItem>
                 </RadzenPanelMenuItem>
 
-                <RadzenPanelMenuItem Icon="bookmark_border" class="rz-my-4" Text="Export">
+                <RadzenPanelMenuItem Visible="isAuditor" Icon="bookmark_border" class="rz-my-4" Text="Export">
                     <RadzenPanelMenuItem Path="/export-activities" class="rz-my-2" Icon="open_in_new_off" Text="Export Activities"></RadzenPanelMenuItem>
                     <RadzenPanelMenuItem Path="/export-fiap" class="rz-my-4" Icon="article" Text="Autocomplete FIAP "></RadzenPanelMenuItem>
                     <RadzenPanelMenuItem Click="@ExportFullObjectives" class="rz-my-2" Icon="edit_document" Text="Export Objectives and Risks "></RadzenPanelMenuItem>
                 </RadzenPanelMenuItem>
-                <RadzenPanelMenuItem class="rz-my-4" Icon="card_membership" Text="Acces control"></RadzenPanelMenuItem>
+                <RadzenPanelMenuItem Visible="isAuditor" class="rz-my-4" Icon="card_membership" Text="Acces control"></RadzenPanelMenuItem>
 
-                <RadzenPanelMenuItem class="rz-my-4" Icon="build" Text="Configure">
+                <RadzenPanelMenuItem Visible="isAuditor" class="rz-my-4" Icon="build" Text="Configure">
                     <RadzenPanelMenuItem Path="/departments?institutionId=" Icon="book" Text="Configure Departments" class="rz-my-2"></RadzenPanelMenuItem>
                     <RadzenPanelMenuItem Icon="account_balance" class="rz-my-2" Path="/institutions" Text="Configure Institutions"></RadzenPanelMenuItem>
                 </RadzenPanelMenuItem>
@@ -147,6 +151,8 @@
 
     bool sidebarExpanded = true;
     bool isAuthenticated = false;
+    bool isVerified = false;
+    bool isAuditor = false;
     private Guid _currentUserAuditMission = Guid.Empty;
 
     private Guid _selectedObjectiveId = Guid.Empty;
@@ -167,6 +173,9 @@
         _currentUserChangedMissionService.CurrentUserChangedMission+= async () => await UpdateCurrentAutidMission();
         var authState = await customAuthState.GetAuthenticationStateAsync();
         isAuthenticated = authState.User.Identity is { IsAuthenticated: true };
+        isVerified = authState.User.IsInRole("Verified");
+        isAuditor = authState.User.IsInRole("Auditor");
+
 
         await FetchAuditMissions();
         await FetchCurrentAuditMission();
@@ -181,6 +190,7 @@
         StateHasChanged();
 
     }
+
     private async Task FetchAuditMissions()
     {
         var auditMissions = await _auditMissionService.GetAuditMissionByOwnerId();
@@ -219,7 +229,12 @@
     private async void RefreshNavbar(Task<AuthenticationState> task)
     {
         // await OnInitializedAsync();
+
+
         StateHasChanged();
+
+
+
     }
 
     private async void SignOut()

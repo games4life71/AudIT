@@ -37,20 +37,16 @@
         if (response.Success)
         {
             _activities = response.DtoResponses;
-
         }
-
     }
 
 
-
-    private async  Task OpenSelectActivityDialog()
+    private async Task OpenSelectActivityDialog()
     {
         var response = await _dialogService.Confirm("Are you sure you want to attach this document to the selected activity?", "Attach Document to Activity", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
 
         if (response.Value)
         {
-
             var result = await _activityService.AttachDocumentAsync(_selectedActivityId, DocumentId);
 
             if (result.Success)
@@ -62,9 +58,6 @@
             {
                 _notificationService.Notify(NotificationSeverity.Error, "Failed to attach document to activity");
             }
-
         }
-
-
     }
 }

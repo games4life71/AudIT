@@ -6,6 +6,7 @@ using AudIT.Applicationa.Requests.AuditMission.Commands.Update;
 using AudIT.Applicationa.Requests.AuditMission.GetCurrentUserAuditMission;
 using AudIT.Applicationa.Requests.AuditMission.Queries.GetBy.GetByDepartmentId;
 using AudIT.Applicationa.Requests.AuditMission.Queries.GetBy.GetByOwnerId;
+using AudIT.Applicationa.Requests.AuditMission.Queries.GetBy.GetByUserInstitution;
 using AudIT.Applicationa.Requests.AuditMission.Queries.GetById;
 using AudIT.Domain.Misc;
 using Microsoft.AspNetCore.Authorization;
@@ -39,7 +40,6 @@ public class AuditMissionController(
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> SetCurrentUserAuditMission([FromQuery] Guid auditMissionId)
     {
-
         var UserId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
 
         if (UserId == null)
@@ -61,8 +61,6 @@ public class AuditMissionController(
         }
 
         return Ok(result);
-
-
     }
 
 
@@ -130,8 +128,30 @@ public class AuditMissionController(
         }
 
 
-
         var result = await Mediator.Send(new GetAudMissByOwnerId(id.Value.ToString()));
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
+
+    [HttpGet]
+    [Route("get-audit-mission-by-user-institution")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAuditMissionByInstitution()
+    {
+        var userId = HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+
+        if (userId == null)
+        {
+            return BadRequest("User not found");
+        }
+
+        var result = await Mediator.Send(new GetAuditMissionByUserInstitutionCommand(userId.Value));
+
+
         if (!result.Success)
         {
             return BadRequest(result.Message);
