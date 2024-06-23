@@ -78,11 +78,13 @@ public class Recommendation : AuditableEntity
         string? aditionalFindings,
         string? cause,
         string? consequence,
-        string recommendationDescription
-    )
+        string recommendationDescription,
+        Status status)
+
     {
         Description = description;
         DueDate = dueDate;
+        Status = status;
         Problem = problem;
         AditionalFindings = aditionalFindings;
         Cause = cause;

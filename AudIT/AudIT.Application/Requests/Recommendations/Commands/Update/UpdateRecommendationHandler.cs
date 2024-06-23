@@ -32,7 +32,8 @@ public class UpdateRecommendationHandler(
                 request.AditionalFindings,
                 request.Cause,
                 request.Consequence,
-                request.RecommendationDescription
+                request.RecommendationDescription,
+                request.Status
             );
 
             var updateResult = await recommendationRepository.UpdateAsync(recommendation.Value);

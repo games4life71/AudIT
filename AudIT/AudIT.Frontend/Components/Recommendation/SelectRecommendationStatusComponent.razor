@@ -1,0 +1,73 @@
+﻿@using Frontend.Contracts.Abstract_Services.RecommendationService
+@using Frontend.EntityDtos.Recommendation
+@using Frontend.EntityViewModels.Recommendation
+@using Orientation = Radzen.Orientation
+
+@inject DialogService _dialogService
+@inject IRecommendationService recommendationService
+@inject NotificationService _notificationService
+<RadzenStack Orientation="Orientation.Vertical">
+
+    <RadzenLabel Text="Select new status"/>
+    <RadzenDropDown
+        TValue="string"
+        Data="statuses"
+        @bind-Value="@selectedStatus"/>
+
+    <RadzenButton Click="@SubmitChanges" ButtonStyle="ButtonStyle.Success" Text="Submit"></RadzenButton>
+</RadzenStack>
+
+@code {
+
+    private string selectedStatus;
+
+    [Parameter] public EventCallback<BaseRecommendationViewModel> OnStatusChanged { get; set; }
+
+    [Parameter] public BaseRecommendationViewModel recommendation { get; set; }
+
+    private List<string> statuses = Enum.GetNames(typeof(Status)).ToList();
+
+    protected override void OnParametersSet()
+    {
+        selectedStatus = recommendation.Status.ToString();
+    }
+
+    private async Task SubmitChanges(MouseEventArgs obj)
+    {
+
+        if(string.IsNullOrEmpty(selectedStatus))
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Error", "Please select a status");
+            return;
+        }
+
+        var updateDto = new UpdateRecommendationDto();
+
+        updateDto.Id = recommendation.Id;
+        updateDto.Description = recommendation.Description;
+        updateDto.DueDate = recommendation.DueDate;
+        //get the status
+        updateDto.Status = (Status)Enum.Parse(typeof(Status), selectedStatus);
+        updateDto.Problem = recommendation.Problem;
+        updateDto.AditionalFindings = recommendation.AditionalFindings;
+        updateDto.Cause = recommendation.Cause;
+        updateDto.Consequence = recommendation.Consequence;
+        updateDto.RecommendationDescription = recommendation.RecommendationDescription;
+
+
+        var response = await recommendationService.UpdateRecommendationAsync(updateDto);
+
+        if (response.Success)
+        {
+
+            _notificationService.Notify(NotificationSeverity.Success, "Success", "Recommendation updated successfully");
+            await OnStatusChanged.InvokeAsync(response.DtoResponse);
+            _dialogService.Close();
+        }
+        else
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Error", "Recommendation could not be updated");
+        }
+    }
+
+}

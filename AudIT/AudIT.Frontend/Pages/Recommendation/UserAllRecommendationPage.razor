@@ -1,5 +1,6 @@
 ﻿@page "/view-recommendations"
 @using Frontend.Components.Documents
+@using Frontend.Components.Recommendation
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.InstitutionsService
 @using Frontend.Contracts.Abstract_Services.Notification
@@ -34,6 +35,7 @@
     <RadzenCard Variant="Variant.Outlined">
         <RadzenStack Orientation="Orientation.Vertical">
             <RadzenDataGrid
+                @ref="_dataGrid"
                 Data="_recommendations"
                 TItem="BaseRecommendationViewModel"
                 AllowFiltering="true"
@@ -51,8 +53,8 @@
                     <RadzenDataGridColumn >
                         <Template Context="recommendation">
                             <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Vertical">
-                                <RadzenButton Click="@(() => UploadDocument(recommendation))" ButtonStyle="ButtonStyle.Secondary" Icon="options" Text="Upload Document"></RadzenButton>
-                                <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="options" Text="Change Status"></RadzenButton>
+                                <RadzenButton Icon="upload" Click="@(() => UploadDocument(recommendation))" ButtonStyle="ButtonStyle.Secondary" Text="Upload Document"></RadzenButton>
+                                <RadzenButton Icon="update" Click="@(() => UpdateStatus(recommendation))" ButtonStyle="ButtonStyle.Warning" Text="Change Status"></RadzenButton>
                             </RadzenStack>
 
                         </Template>
@@ -72,6 +74,7 @@
 
 
 @code {
+    private RadzenDataGrid<BaseRecommendationViewModel> _dataGrid;
 
     private List<BaseAuditMissionDto> _auditMissions = [];
 
@@ -134,8 +137,29 @@
 
 
         //send a notification to the audit team that a document has been uploaded
+    }
 
+    private async Task OnStatusChanged(BaseRecommendationViewModel recommendation)
+    {
+        //update the status of the recommendation
+        _recommendations.First(x => x.Id == recommendation.Id).Status = recommendation.Status;
+        await _dataGrid.Reload();
+    }
 
+    private Task UpdateStatus(BaseRecommendationViewModel recommendation)
+    {
+        //open a dialog to update the status of the recommendation
+        _dialogService.Open<SelectRecommendationStatusComponent>(
+            "Update Status",
+            new Dictionary<string, object>()
+            {
+                { "recommendation", recommendation },
+                { "OnStatusChanged", new EventCallback<BaseRecommendationViewModel>(this, OnStatusChanged) }
 
+            },
+            new DialogOptions() { Width = "40%", Height = "40%" }
+        );
+
+        return Task.CompletedTask;
     }
 }
