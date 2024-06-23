@@ -103,6 +103,7 @@ public static class InfrastructureRegistration
         services.AddScoped<ICurrentUserAuditMissioRepo, CurrentUserAuditMissionRepository>();
         services.AddScoped<IAuditMissionRecommendationsRepository, AuditMissionRecommendationRepository>();
         services.AddScoped<IRecommendationDocumentRepository, RecommendationDocumentRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped(typeof(IRepositoryAcces<>), typeof(BaseAccesRepository<>));
         services.AddScoped<IRepositoryFactory, RepositoryFactory>();
 

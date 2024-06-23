@@ -45,6 +45,8 @@ public class AudITContext : IdentityDbContext<User>
 
     public DbSet<RecommendationDocument> RecommendationDocuments { get; set; }
 
+    public DbSet<Notification> Notifications { get; set; }
+
     //Services
     private readonly IHttpContextAccessor _httpContextAccessor;
 
