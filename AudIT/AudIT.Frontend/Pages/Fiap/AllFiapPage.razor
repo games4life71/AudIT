@@ -1,0 +1,224 @@
+﻿@page "/fiaps"
+@using Frontend.Components.FIAP
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.FiapService
+@using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityViewModels.Fiap
+@using Microsoft.AspNetCore.WebUtilities
+@using Orientation = Radzen.Orientation
+@using Tooltip = BlazorBootstrap.Tooltip
+
+@inject NotificationService _NotificationService
+@inject TooltipService _tooltipService
+@inject IFiapService _fiapService
+@inject IAuditMissionService _auditMissionService
+@inject NavigationManager _navigationManager
+@inject DialogService DialogService
+
+<RadzenStack Orientation="Orientation.Vertical">
+    <RadzenText TextStyle="TextStyle.H5" Text="@($"FIAPS for {(_auditMissions.FirstOrDefault(x => x.Id == _auditMissionQueryId)?.Name ?? "No Audit Mission Selected")}")"/>
+
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenLabel Text="Select an audit mission: "></RadzenLabel>
+    <RadzenDropDown
+        Data="_auditMissions"
+        TextProperty="Name"
+        ValueProperty="Id"
+        TValue="Guid"
+        Value="@_auditMissionQueryId"
+        ValueChanged="@((value) => FetchFiaps(value))"/>
+
+    <RadzenDataGrid
+        Data="_fiaps"
+        @ref="fiapGrid"
+        TItem="BaseObjActionFiapViewmodel"
+        AllowFiltering="true"
+        AllowPaging="true"
+        PageSize="10"
+        AllowSorting="true"
+        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
+
+        <Columns>
+            <RadzenDataGridColumn Filterable="true" Sortable="true" Title="Name" Property="Name"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Filterable="true" Sortable="true"Title="Start" Property="AuditedPeriodStart"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Filterable="true" Sortable="true" Title="End" Property="AuditedPeriodEnd"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Filterable="true" Sortable="true"Title="Problem" Property="Problem"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Filterable="true" Sortable="true"Title="Cause" Property="Cause"></RadzenDataGridColumn>
+            <RadzenDataGridColumn Filterable="true" Sortable="true" Title="Recommendation" Property="Recommendation"></RadzenDataGridColumn>
+            <RadzenDataGridColumn >
+                <Template Context="fiap">
+                    <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+                        <RadzenButton MouseEnter="@((obj) => ShowToolTipText(obj, "Edit"))" ButtonStyle="ButtonStyle.Warning" Click="@(() => NavigateFiapEdit(fiap))" Icon="edit"></RadzenButton>
+                        <RadzenButton MouseEnter="@((obj) => ShowToolTipText(obj, "Delete"))" ButtonStyle="ButtonStyle.Danger" Click="@(() => DeleteFiap(fiap))" Icon="delete"></RadzenButton>
+                        <RadzenButton MouseEnter="@ShowExportToolTip" ButtonStyle="ButtonStyle.Info" Click="@(() => ExportFiap(fiap))" Icon="open_in_new_off"></RadzenButton>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+
+        </Columns>
+
+
+    </RadzenDataGrid>
+</RadzenCard>
+    <RadzenButton Click="@NavigateAddNewFiap" ButtonStyle="ButtonStyle.Dark" Text="Add new Fiap" Icon="add"></RadzenButton>
+
+</RadzenStack>
+
+
+@code {
+
+    private Guid _auditMissionQueryId = Guid.Empty;
+
+    private RadzenDataGrid<BaseObjActionFiapViewmodel> fiapGrid;
+    private List<BaseObjActionFiapViewmodel> _fiaps = [];
+
+    private List<BaseAuditMissionDto> _auditMissions = [];
+}
+
+
+@functions
+{
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchAuditMissionIdFromQuery();
+        await FetchAuditMissions();
+        await FetchFiaps(_auditMissionQueryId);
+    }
+
+    private async Task FetchAuditMissionIdFromQuery()
+    {
+        var query = new Uri(_navigationManager.Uri).Query;
+
+        if (string.IsNullOrWhiteSpace(query)) return;
+
+        var queryDictionary = QueryHelpers.ParseQuery(query);
+
+        if (queryDictionary.ContainsKey("auditMissionId"))
+        {
+            var auditMissionId = queryDictionary["auditMissionId"].ToString();
+
+            if (Guid.TryParse(auditMissionId, out var auditMissionGuid))
+            {
+                _auditMissionQueryId = auditMissionGuid;
+            }
+        }
+    }
+
+
+    private async Task FetchAuditMissions()
+    {
+        var response = await _auditMissionService.GetAuditMissionByOwnerId();
+
+        if (response.Success)
+        {
+            _auditMissions = response.DtoResponses;
+        }
+    }
+
+
+    private async Task FetchFiaps(Guid selectedAuditMissionId)
+    {
+        Console.WriteLine("Called with id: " + selectedAuditMissionId);
+        _auditMissionQueryId = selectedAuditMissionId;
+        var result = await _fiapService.GetFiapsByAudidMissionAsync(selectedAuditMissionId);
+
+        if (result.Success)
+        {
+            _fiaps = result.DtoResponses;
+        }
+        else
+        {
+            _fiaps = new List<BaseObjActionFiapViewmodel>();
+        }
+
+        await fiapGrid.Reload();
+        StateHasChanged();
+    }
+
+    private void ShowExportToolTip(ElementReference obj)
+    {
+        //display a tool tip
+
+        _tooltipService.OpenOnTheTop(obj, "Export", new TooltipOptions() { Position = TooltipPosition.Top, Duration = 2000 });
+    }
+
+    private void ShowToolTipText(ElementReference obj, string text)
+    {
+        _tooltipService.OpenOnTheTop(obj, text, new TooltipOptions() { Position = TooltipPosition.Top, Duration = 2000 });
+    }
+
+    private Task NavigateFiapEdit(BaseObjActionFiapViewmodel fiap)
+    {
+        DialogService.Open<EditFiapDialog>(
+            "Edit FIAP",
+            new Dictionary<string, object>()
+            {
+                { "UpdateFiapDto", fiap },
+                {
+                    "OnFiapEditDialogClose", new EventCallback<BaseObjActionFiapViewmodel>(this, OnEditFiapDialogClose)
+                }
+            }, new DialogOptions()
+            {
+                Width = "1000px",
+                Height = "750px",
+                Draggable = false,
+                Resizable = false
+            }
+        );
+
+        return Task.CompletedTask;
+    }
+
+    private void OnEditFiapDialogClose(BaseObjActionFiapViewmodel editedFiap)
+    {
+        var fiap = _fiaps.FirstOrDefault(f => f.Id == editedFiap.Id);
+
+        fiap = editedFiap;
+
+        StateHasChanged();
+        fiapGrid.Reload();
+    }
+
+    private async Task DeleteFiap(BaseObjActionFiapViewmodel fiap)
+    {
+        //show a confirmation dialog
+
+        var result = await DialogService.Confirm("Are you sure you want to delete this FIAP?",
+            "Delete FIAP", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+
+        if (result.Value)
+        {
+            var resultDelete = await _fiapService.DeleteFiapAsync(fiap.Id);
+
+            if (resultDelete.Success)
+            {
+                //display a success message
+                _NotificationService.Notify(NotificationSeverity.Success, "FIAP deleted successfully");
+
+                // Create a new list without the deleted fiap
+                var updatedFiaps = _fiaps.Where(f => f.Id != fiap.Id).ToList();
+
+                // Assign the new list to _fiaps
+                _fiaps = updatedFiaps;
+                await InvokeAsync(StateHasChanged);
+            }
+            else
+            {
+                //display an error message
+                _NotificationService.Notify(NotificationSeverity.Error, "Failed to delete FIAP");
+            }
+        }
+    }
+
+    private Task ExportFiap(BaseObjActionFiapViewmodel fiap)
+    {
+        _navigationManager.NavigateTo($"export-fiap/{fiap.Id}");
+
+        return Task.CompletedTask;
+    }
+
+    private void NavigateAddNewFiap(MouseEventArgs obj)
+    {
+        _navigationManager.NavigateTo("/objectives");
+    }
+}

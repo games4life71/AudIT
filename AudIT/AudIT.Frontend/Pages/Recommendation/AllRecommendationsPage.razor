@@ -2,6 +2,7 @@
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
 @using Frontend.Contracts.Abstract_Services.DocumentService
+@using Frontend.Contracts.Abstract_Services.ObjectiveService
 @using Frontend.Contracts.Abstract_Services.RecommendationService
 @using Frontend.EntityDtos.AuditMission
 @using Frontend.EntityDtos.Recommendation
@@ -12,6 +13,8 @@
 @using Orientation = Radzen.Orientation
 @using Radzen.Blazor
 @using Radzen.Blazor
+
+@inject IObjectiveService _objectiveService
 @inject NotificationService _notificationService
 @inject DialogService _dialogService
 @inject NavigationManager _navigationManager
@@ -151,7 +154,7 @@
                         <RadzenTabsItem Text="Settings" Icon="settings">
                             <RadzenStack JustifyContent="JustifyContent.Start" Orientation="Orientation.Horizontal">
 
-                                <RadzenButton ButtonStyle="ButtonStyle.Warning" Icon="edit" Text="Objective"></RadzenButton>
+                                <RadzenButton Click="@(()=>NavigateObjective(recommendation))" ButtonStyle="ButtonStyle.Warning" Icon="edit" Text="Objective"></RadzenButton>
 
                                 <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="notification_add" Text="Notify institution"/>
 
@@ -413,5 +416,19 @@
             var fileName = document.Name + "." + document.Extension;
             using var StreamRef = new DotNetStreamReference(response);
             await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, StreamRef);
+    }
+
+    private async Task NavigateObjective(RecommendationWithDocumentsViewModel recommendation)
+    {
+        var response = await _objectiveService.GetObjectiveByRecommendationIdAsync(recommendation.Recommendation.Id);
+
+        if (response.Success)
+        {
+            if (response.DtoResponse != null) _navigationManager.NavigateTo($"/objective/{response.DtoResponse.Id}");
+        }
+        else
+        {
+            _notificationService.Notify(NotificationSeverity.Error, "Error", response.Message);
+        }
     }
 }

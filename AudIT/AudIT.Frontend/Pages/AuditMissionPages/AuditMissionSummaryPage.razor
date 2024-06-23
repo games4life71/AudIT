@@ -133,6 +133,7 @@ else if (_notFound == false && _auditMissionDto != null)
                             </RadzenRow>
                         </RadzenCard>
                     </RadzenColumn>
+
                     @*Recent Activities card *@
                     <RadzenColumn>
                         <RadzenCard Style="min-height: 200px; max-height: 400px;">
@@ -149,7 +150,7 @@ else if (_notFound == false && _auditMissionDto != null)
                             }
                             <RadzenRow >
                                 <RadzenColumn Style="display: flex; justify-content: end; align-content: flex-end ">
-                                    <RadzenButton Shade="Shade.Darker" Visible="@(_activityViewModels.Count > 0)" ButtonStyle="ButtonStyle.Secondary" Text="See more..."></RadzenButton>
+                                    <RadzenButton Click="@NavigateActivities" Shade="Shade.Darker" Visible="@(_activityViewModels.Count > 0)" ButtonStyle="ButtonStyle.Secondary" Text="See more..."></RadzenButton>
                                 </RadzenColumn>
 
                             </RadzenRow>
@@ -165,6 +166,7 @@ else if (_notFound == false && _auditMissionDto != null)
                                 <RadzenText TextStyle="TextStyle.Overline" Style="font-size: 15px;" Text="Recent Documents:"></RadzenText>
                                 <RadzenIcon Icon="description"></RadzenIcon>
                             </RadzenRow>
+
                             @foreach (var document in _baseDocumentViewmodels)
                             {
                                 <RadzenLink Path="@($"/document-preview/{document.Id}")">
@@ -177,7 +179,7 @@ else if (_notFound == false && _auditMissionDto != null)
                             }
                             <RadzenRow >
                                 <RadzenColumn Style="display: flex; justify-content: end; align-content: flex-end ">
-                                    <RadzenButton Shade="Shade.Darker" Visible="@(_activityViewModels.Count > 0)" ButtonStyle="ButtonStyle.Secondary" Text="See more..."></RadzenButton>
+                                    <RadzenButton Click="@NavigateDocuments" Shade="Shade.Darker" Visible="@(_activityViewModels.Count > 0)" ButtonStyle="ButtonStyle.Secondary" Text="See more..."></RadzenButton>
                                 </RadzenColumn>
 
                             </RadzenRow>
@@ -192,7 +194,7 @@ else if (_notFound == false && _auditMissionDto != null)
                             </RadzenRow>
                             @foreach (var fiap in _fiapViewModels)
                             {
-                                <RadzenLink Path="@($"/fiap-preview/{fiap.Id}")">
+                                <RadzenLink  Path="@($"/objective-action/{fiap.ObjectiveActionId}")">
                                     <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{fiap.Name}")"></RadzenText>
                                 </RadzenLink>
                             }
@@ -204,7 +206,7 @@ else if (_notFound == false && _auditMissionDto != null)
 
                             <RadzenRow >
                                 <RadzenColumn Style="display: flex; justify-content: end; align-content: flex-end ">
-                                    <RadzenButton Shade="Shade.Darker" Visible="@(_activityViewModels.Count > 0)" ButtonStyle="ButtonStyle.Secondary" Text="See more..."></RadzenButton>
+                                    <RadzenButton Click="@NavigateFiaps" Shade="Shade.Darker" Visible="@(_activityViewModels.Count > 0)" ButtonStyle="ButtonStyle.Secondary" Text="See more..."></RadzenButton>
                                 </RadzenColumn>
 
                             </RadzenRow>
@@ -455,5 +457,20 @@ else if (_notFound == false && _auditMissionDto != null)
                 NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error", Detail = "Failed to select audit mission", Duration = 4000 });
             }
         }
+    }
+
+    private void NavigateActivities(MouseEventArgs obj)
+    {
+        _navigationManager.NavigateTo("/activities");
+    }
+
+    private void NavigateDocuments(MouseEventArgs obj)
+    {
+        _navigationManager.NavigateTo("/documents");
+    }
+
+    private void NavigateFiaps(MouseEventArgs obj)
+    {
+        _navigationManager.NavigateTo($"/fiaps?auditMissionId={AuditMissionId}");
     }
 }

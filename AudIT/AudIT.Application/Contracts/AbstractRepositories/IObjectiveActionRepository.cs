@@ -13,4 +13,6 @@ public interface IObjectiveActionRepository:IRepository<ObjectiveAction>
     public Task<Result<List<ObjectiveAction>>> GetAllSelectedByObjectiveId(Guid requestObjectiveId);
 
     public Task<Result<AuditMission>> GetAuditMissionByObjectiveActionId(Guid objectiveActionId);
+
+
 }

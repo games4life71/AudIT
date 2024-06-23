@@ -114,6 +114,33 @@ public class ObjectiveService(HttpClient httpClient) : IObjectiveService
         };
     }
 
+    public async Task<BaseDTOResponse<BaseObjectiveViewModel>> GetObjectiveByRecommendationIdAsync(
+        Guid recommendationId)
+    {
+        var response =
+            await httpClient.GetAsync(
+                $"{IObjectiveService.ApiPath}/get-objective-by-recommendation-id/{recommendationId}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return new BaseDTOResponse<BaseObjectiveViewModel>
+            {
+                Success = false,
+                Message = "An error occurred while fetching the data."
+            };
+        }
+
+        var result = await response.Content.ReadFromJsonAsync<BaseDTOResponse<BaseObjectiveViewModel>>();
+
+        if (result != null) return result;
+
+        return new BaseDTOResponse<BaseObjectiveViewModel>
+        {
+            Success = false,
+            Message = "An error occurred while fetching the data."
+        };
+    }
+
     public async Task<BaseResponse> DeleteObjectiveAsync(Guid objectiveId)
     {
         var response = await httpClient.DeleteAsync($"{IObjectiveService.ApiPath}/delete-objective/{objectiveId}");

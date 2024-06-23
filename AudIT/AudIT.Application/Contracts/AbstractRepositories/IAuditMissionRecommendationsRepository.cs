@@ -8,4 +8,7 @@ public interface IAuditMissionRecommendationsRepository:IRepository<AuditMission
     public  Task<Result<List<Recommendation>>> FindAllByAuditMissionIdAsync(Guid requestAuditMissionId);
     Task<(string,bool)> DeleteByRecommendationId(Guid requestId);
     Task<Result<List<Recommendation>>> GetRecommendationsByInstitutionId(Guid valueInstitutionId);
+
+    Task<Result<AuditMissionRecommendations>> GetAuditMissionByRecommendationId(Guid recommendationId);
+
 }

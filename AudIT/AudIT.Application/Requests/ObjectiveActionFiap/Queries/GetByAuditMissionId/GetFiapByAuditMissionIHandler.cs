@@ -35,8 +35,8 @@ public class GetFiapByAuditMissionIHandler(
         else
         {
             // var result =
-            await objectiveActionFiapRepository.GetByFilterAsync(x => x.AuditMissionId == request.AuditMissionId);
-            var result =  await objectiveActionFiapRepository.GetAllAsync();
+           var result = await objectiveActionFiapRepository.GetByFilterAsync(x => x.AuditMissionId == request.AuditMissionId);
+
             if (!result.IsSuccess)
             {
                 return new BaseDTOResponse<BaseObjActionFiapDto>("No entities found.", false);

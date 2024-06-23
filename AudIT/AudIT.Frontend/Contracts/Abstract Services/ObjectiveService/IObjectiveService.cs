@@ -18,7 +18,9 @@ public interface IObjectiveService
     public Task<BaseDTOResponse<ObjectiveFullViewModel>> GetObjectiveFullByAuditMissionIdAsync(
         Guid auditMissionId);
 
-    Task<BaseResponse> DeleteObjectiveAsync(Guid  objectiveId);
-    Task<BaseDTOResponse<BaseObjectiveViewModel>> UpdateObjectiveAsync(UpdateObjectiveNameDto updateObjectiveNameDto);
-    Task<BaseDTOResponse<BaseObjectiveViewModel>> CreateObjectiveAsync(CreateObjectiveDto createObjectiveDto);
+    public Task<BaseDTOResponse<BaseObjectiveViewModel>> GetObjectiveByRecommendationIdAsync(Guid recommendationId);
+
+    public  Task<BaseResponse> DeleteObjectiveAsync(Guid  objectiveId);
+    public  Task<BaseDTOResponse<BaseObjectiveViewModel>> UpdateObjectiveAsync(UpdateObjectiveNameDto updateObjectiveNameDto);
+    public Task<BaseDTOResponse<BaseObjectiveViewModel>> CreateObjectiveAsync(CreateObjectiveDto createObjectiveDto);
 }

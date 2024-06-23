@@ -25,6 +25,21 @@ public class ObjectiveRepository(AudITContext context) : BaseRepository<Objectiv
         return Result<List<Objective>>.Success(objectives);
     }
 
+    public async Task<Result<Objective>> FindObjectiveByObjectiveActionId(Guid objectiveActionId)
+    {
+        var objective = await _dbcContext.ObjectiveAction
+            .Where(o => o.Id == objectiveActionId)
+            .Include(o => o.Objective)
+            .Select(o => o.Objective)
+            .FirstOrDefaultAsync();
+
+
+        if (objective == null)
+            return Result<Objective>.Failure("Objective not found");
+
+        return Result<Objective>.Success(objective);
+    }
+
     /// <summary>
     /// Get the most recent 3  objectives by audit mission id
     /// </summary>

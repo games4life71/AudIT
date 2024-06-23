@@ -28,24 +28,6 @@
       </Reference>
     </ItemGroup>
 
-    <ItemGroup>
-      <AdditionalFiles Include="Components\Action\CreateActionRiskDialog.razor" />
-      <AdditionalFiles Include="Components\Action\EditActionRiskDialog.razor" />
-      <AdditionalFiles Include="Components\Activity\AddNewActivityFullDialog.razor" />
-      <AdditionalFiles Include="Components\Activity\CreateActivityDialog.razor" />
-      <AdditionalFiles Include="Components\Activity\EditActivityComponent.razor" />
-      <AdditionalFiles Include="Components\Departments\CreateDepartmentComponent.razor" />
-      <AdditionalFiles Include="Components\Departments\DepartmentsDialog.razor" />
-      <AdditionalFiles Include="Components\Departments\UpdateDepartmenComponent.razor" />
-      <AdditionalFiles Include="Components\Documents\AttachDocumentToActivityComponent.razor" />
-      <AdditionalFiles Include="Components\Export\ExportFullObjectivesComponent.razor" />
-      <AdditionalFiles Include="Components\FIAP\CreateFiapDialog.razor" />
-      <AdditionalFiles Include="Components\FIAP\EditFiapDialog.razor" />
-      <AdditionalFiles Include="Components\Institution\AddInstitutionComponent.razor" />
-      <AdditionalFiles Include="Components\Institution\EditInstitutionComponent.razor" />
-      <AdditionalFiles Include="Components\Misc\NotFound.razor" />
-      <AdditionalFiles Include="Components\ObjectiveAction\ObjActionDialog.razor" />
-      <AdditionalFiles Include="Components\Objective\EditObjectiveNameDialog.razor" />
-    </ItemGroup>
+    
 
 </Project>

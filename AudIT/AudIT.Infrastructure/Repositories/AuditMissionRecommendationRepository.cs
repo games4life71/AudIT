@@ -23,7 +23,6 @@ public class AuditMissionRecommendationRepository : BaseRepository<AuditMissionR
             .Include(amr => amr.Recommendation)
             .ThenInclude(r => r.ObjectiveAction)
             .Select(amr => amr.Recommendation)
-
             .ToListAsync();
 
 
@@ -57,5 +56,19 @@ public class AuditMissionRecommendationRepository : BaseRepository<AuditMissionR
     public Task<Result<List<Recommendation>>> GetRecommendationsByInstitutionId(Guid valueInstitutionId)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<Result<AuditMissionRecommendations>> GetAuditMissionByRecommendationId(Guid recommendationId)
+    {
+        var auditMission = _context.AuditMissionRecommendations
+            .Where(amr => amr.RecommendationId == recommendationId)
+            .Include(amr => amr.AuditMission)
+            .Include(amr=>amr.Recommendation)
+            .FirstOrDefault();
+
+        if (auditMission == null)
+            return Result<AuditMissionRecommendations>.Failure("AuditMission not found");
+
+        return Result<AuditMissionRecommendations>.Success(auditMission);
     }
 }
