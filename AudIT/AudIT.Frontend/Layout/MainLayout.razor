@@ -1,4 +1,5 @@
-﻿@using Frontend.Contracts.Abstract_Services.AuditMissionService
+﻿@using Frontend.Components
+@using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
 @using Frontend.Contracts.Abstract_Services.ObjectiveService
 @using Frontend.Contracts.Services
@@ -19,6 +20,7 @@
 @inject DialogService DialogService
 @inject IAuditMissionService _auditMissionService
 @inject NotificationService NotificationService
+
 <RadzenLayout Style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body'">
     <RadzenHeader Style="display: flex; justify-content: space-between;">
 
@@ -36,7 +38,7 @@
             <RadzenMenu>
                 <RadzenMenuItem Icon="dashboard" Text="Menu">
                     <RadzenMenuItem Path="/profile" Icon="account_circle" Text="Profile"></RadzenMenuItem>
-                    <RadzenMenuItem Icon="markunread_mailbox" Text="Notifications"> </RadzenMenuItem>
+                    <RadzenMenuItem Click="@OpenNotification" Icon="markunread_mailbox" Text="Notifications"> </RadzenMenuItem>
                 </RadzenMenuItem>
             </RadzenMenu>
         </RadzenStack>
@@ -100,9 +102,9 @@
                 <RadzenPanelMenuItem class="rz-my-4" Icon="feedback" Text="Recommendations">
                     <RadzenPanelMenuItem Visible="isAuditor" class="rz-my-2" Path="add-recommendation" Icon="add" Text="Add Recommendation"></RadzenPanelMenuItem>
                     <RadzenPanelMenuItem Visible="isAuditor" class="rz-my-2" Path="/recommendations" Icon="list" Text="View Recommendations"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Visible="@(isVerified&!isAuditor)" class="rz-my-2" Path="/view-recommendations" Icon="list" Text="View Recommendations"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Visible="@(isVerified & !isAuditor)" class="rz-my-2" Path="/view-recommendations" Icon="list" Text="View Recommendations"></RadzenPanelMenuItem>
 
-                    </RadzenPanelMenuItem>
+                </RadzenPanelMenuItem>
 
                 <RadzenPanelMenuItem Visible="isAuditor" class="rz-my-4" Icon="description" Text="Documents">
                     <RadzenPanelMenuItem class="rz-my-2" Text="Upload Document" Path="/upload-document" Icon="add"/>
@@ -110,8 +112,8 @@
                 </RadzenPanelMenuItem>
 
                 <RadzenPanelMenuItem Visible="isAuditor" class="rz-my-4" Icon="history" Text="Activities">
-                    <RadzenPanelMenuItem  class="rz-my-2" Click="@NavigateActivity" Icon="add" Text="Add Activity"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem  class="rz-my-2" Icon="list" Path="/activities" Text="List Activities"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem class="rz-my-2" Click="@NavigateActivity" Icon="add" Text="Add Activity"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem class="rz-my-2" Icon="list" Path="/activities" Text="List Activities"></RadzenPanelMenuItem>
                 </RadzenPanelMenuItem>
 
                 <RadzenPanelMenuItem Visible="isAuditor" Icon="bookmark_border" class="rz-my-4" Text="Export">
@@ -174,7 +176,7 @@
     protected override async Task OnInitializedAsync()
     {
         customAuthState.AuthenticationStateChanged += RefreshNavbar;
-        _currentUserChangedMissionService.CurrentUserChangedMission+= async () => await UpdateCurrentAutidMission();
+        _currentUserChangedMissionService.CurrentUserChangedMission += async () => await UpdateCurrentAutidMission();
         var authState = await customAuthState.GetAuthenticationStateAsync();
         isAuthenticated = authState.User.Identity is { IsAuthenticated: true };
         isVerified = authState.User.IsInRole("Verified");
@@ -192,7 +194,6 @@
         await FetchObjectives();
         await FetchAuditMissions();
         StateHasChanged();
-
     }
 
     private async Task FetchAuditMissions()
@@ -236,9 +237,6 @@
 
 
         StateHasChanged();
-
-
-
     }
 
     private async void SignOut()
@@ -318,7 +316,7 @@
             new DialogOptions { Width = "50%", Height = "60%" });
     }
 
-    private async Task  NavigateActivity(MenuItemEventArgs obj)
+    private async Task NavigateActivity(MenuItemEventArgs obj)
     {
         await FetchObjectives();
         DialogService.Open<AddNewActivityFullDialog>(
@@ -331,4 +329,22 @@
             new DialogOptions { Width = "50%", Height = "60%" }
         );
     }
+
+    private async Task OpenNotification(MenuItemEventArgs obj)
+    {
+        //get the user institution from the claims
+        var authState = await customAuthState.GetAuthenticationStateAsync();
+        var claims = customAuthState.GetClaims(authState);
+
+        var institutionId = Guid.Parse(claims.FirstOrDefault(x => x.Type == "Institution").Value);
+
+        DialogService.Open<AllNotificationsDialog>(
+            "Notifications",
+            new Dictionary<string, object>
+            {
+                { "InstitutionId", institutionId }
+            },
+            new DialogOptions { Width = "50%", Height = "60%" });
+    }
+
 }

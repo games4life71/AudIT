@@ -161,6 +161,11 @@ public class AuthService(
             return (0, "Invalid credentials");
         }
 
+        var userInstitution = await _userInstitutionRepository.GetInstitutionByUserId(Guid.Parse(user.Id));
+        if (userInstitution == null)
+        {
+            return (0, "User's institution not found!");
+        }
 
         //attach the roles
         var userRoles = await userManager.GetRolesAsync(user);
@@ -169,7 +174,8 @@ public class AuthService(
         {
             new Claim(ClaimTypes.Name, user.UserName),
             new Claim(ClaimTypes.Email, user.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim("Institution", userInstitution.Value.Id.ToString())
         };
 
 

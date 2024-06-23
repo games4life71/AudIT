@@ -1,0 +1,50 @@
+﻿@using Frontend.Contracts.Abstract_Services.Notification
+@using Frontend.EntityViewModels.Notification
+@using Orientation = Radzen.Orientation
+@inject IAuditNotificationService _auditNotificationService
+
+<RadzenStack Orientation="Orientation.Vertical">
+
+    <RadzenText  Text="Active Notifications:"/>
+    <RadzenDataGrid TItem="BaseNotificationViewModel" Data="Notifications">
+        <Columns>
+            <RadzenDataGridColumn Title="Title" Property="Title"></RadzenDataGridColumn>
+        </Columns>
+
+    </RadzenDataGrid>
+
+</RadzenStack>
+
+
+
+@code {
+
+    [Parameter] public Guid InstitutionId { get; set; }
+
+    public List<BaseNotificationViewModel> Notifications { get; set; } = [];
+
+}
+
+
+
+@functions
+{
+
+    protected override async  Task OnInitializedAsync()
+    {
+        await FetchNotifications();
+    }
+
+
+    private async Task FetchNotifications()
+    {
+        var response = await _auditNotificationService.GetNotificationsByInstitutionIdAsync(InstitutionId);
+
+
+        if (response.Success)
+        {
+            Notifications = response.DtoResponses;
+        }
+    }
+
+}
