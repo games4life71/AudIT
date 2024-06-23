@@ -1,11 +1,10 @@
-﻿
-using AudIT.Applicationa.Requests.Institution.DTO;
+﻿using AudIT.Applicationa.Requests.Institution.DTO;
 using AudIT.Applicationa.Requests.Recommendations.DTO;
-using NotificationType = AudiT.Domain.Entities.NotificationType;
+using AudiT.Domain.Entities;
 
 namespace AudIT.Applicationa.Requests.Notification.DTO;
 
-public class BaseNotificationDto
+public class NotificationWithDateDto
 {
     public Guid Id { get; set; }
 
@@ -22,4 +21,6 @@ public class BaseNotificationDto
     public bool? IsRead { get; set; } = false;
 
     public bool? IsDeleted { get; set; } = false;
+
+    public DateTime LastModifiedDate { get; set; }
 }

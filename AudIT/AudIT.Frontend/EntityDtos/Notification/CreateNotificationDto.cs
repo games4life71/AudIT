@@ -10,5 +10,11 @@ public class CreateNotificationDto
 
     public string? AdditionalInfo { get; set; }
 
+    public NotificationType NotificationType { get; set; }
+}
 
+public enum NotificationType
+{
+    FromAuditor,
+    FromInstitution
 }

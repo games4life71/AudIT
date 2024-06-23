@@ -9,9 +9,9 @@ namespace AudIT.Applicationa.Requests.Notification.Queries.GetByInstitution;
 public class GetNotificationsByInstitutionIdHandler(
     INotificationRepository notificationRepository,
     IMapper mapper
-) : IRequestHandler<GetNotificationsByInstitutionIdQuery, BaseDTOResponse<BaseNotificationDto>>
+) : IRequestHandler<GetNotificationsByInstitutionIdQuery, BaseDTOResponse<NotificationWithDateDto>>
 {
-    public async Task<BaseDTOResponse<BaseNotificationDto>> Handle(GetNotificationsByInstitutionIdQuery request,
+    public async Task<BaseDTOResponse<NotificationWithDateDto>> Handle(GetNotificationsByInstitutionIdQuery request,
         CancellationToken cancellationToken)
     {
         try
@@ -20,17 +20,17 @@ public class GetNotificationsByInstitutionIdHandler(
 
             if (!notifications.IsSuccess)
             {
-                return new BaseDTOResponse<BaseNotificationDto>("No notifications found", false);
+                return new BaseDTOResponse<NotificationWithDateDto>("No notifications found", false);
             }
 
-            var notificationsDto = mapper.Map<List<BaseNotificationDto>>(notifications.Value);
+            var notificationsDto = mapper.Map<List<NotificationWithDateDto>>(notifications.Value);
 
 
-            return new BaseDTOResponse<BaseNotificationDto>(notificationsDto, "Notifications found", true);
+            return new BaseDTOResponse<NotificationWithDateDto>(notificationsDto, "Notifications found", true);
         }
         catch (Exception e)
         {
-            return new BaseDTOResponse<BaseNotificationDto>(e.Message, false);
+            return new BaseDTOResponse<NotificationWithDateDto>(e.Message, false);
         }
     }
 }

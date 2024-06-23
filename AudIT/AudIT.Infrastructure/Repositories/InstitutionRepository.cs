@@ -33,4 +33,21 @@ public class InstitutionRepository(AudITContext context) : BaseRepository<Instit
 
         return Result<List<Institution>>.Success(institutions);
     }
+
+    public async Task<Result<Institution>> GetInstitutionByAuditMissionId(Guid valueAuditMissionId)
+    {
+        var institution = _context.AuditMissions
+            .Where(x => x.Id == valueAuditMissionId)
+            .Include(x => x.Department)
+            .ThenInclude(x => x.Institution)
+            .Select(x => x.Department.Institution)
+            .FirstOrDefault();
+
+        if (institution == null)
+        {
+            return Result<Institution>.Failure("Institution not found.");
+        }
+
+        return Result<Institution>.Success(institution);
+    }
 }

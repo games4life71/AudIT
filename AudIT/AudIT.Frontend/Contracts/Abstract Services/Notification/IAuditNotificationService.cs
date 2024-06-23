@@ -12,4 +12,6 @@ public interface IAuditNotificationService
 
     public Task<BaseDTOResponse<BaseNotificationViewModel>> CreateNotificationAsync(CreateNotificationDto notification);
 
+    public Task<BaseResponse> SetNotificationReadAsync(Guid notificationId);
+
 }

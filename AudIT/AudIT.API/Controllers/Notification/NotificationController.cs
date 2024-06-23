@@ -1,4 +1,5 @@
 ﻿using AudIT.Applicationa.Requests.Notification.Commands.Create;
+using AudIT.Applicationa.Requests.Notification.Commands.Update.SetAsRead;
 using AudIT.Applicationa.Requests.Notification.Queries.GetByInstitution;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,5 +35,16 @@ public class NotificationController : BaseController
         return Ok(result);
     }
 
+    [HttpPost]
+    [Route("set-notification-read/{notificationId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> SetNotificationRead(Guid notificationId)
+    {
+        var result = await Mediator.Send(new SetNotificationReadCommand(notificationId));
 
+        if (!result.Success)
+            return BadRequest(result.Message);
+
+        return Ok(result);
+    }
 }

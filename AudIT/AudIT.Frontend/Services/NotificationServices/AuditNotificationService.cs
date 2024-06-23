@@ -49,7 +49,7 @@ public class AuditNotificationService(HttpClient httpClient) : IAuditNotificatio
             var content = await response.Content.ReadAsStringAsync();
             var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseNotificationViewModel>>(content);
 
-            if (result is { DtoResponses: not null, Success: true }) return result;
+            if (result is { DtoResponse: not null, Success: true }) return result;
 
             return new BaseDTOResponse<BaseNotificationViewModel>
             {
@@ -63,5 +63,18 @@ public class AuditNotificationService(HttpClient httpClient) : IAuditNotificatio
             Success = false,
             Message = "An error occurred while creating notification"
         };
+    }
+
+    public async Task<BaseResponse> SetNotificationReadAsync(Guid notificationId)
+    {
+        var response =
+            await httpClient.PostAsJsonAsync(
+                $"{IAuditNotificationService.ApiPath}/set-notification-read/{notificationId}",
+                notificationId);
+
+        if (response.IsSuccessStatusCode)
+            return new BaseResponse("Notification updated successfully", true);
+
+        return new BaseResponse("Failed to update notification", false);
     }
 }

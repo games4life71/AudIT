@@ -1,8 +1,11 @@
 ﻿@page "/view-recommendations"
 @using Frontend.Components.Documents
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
+@using Frontend.Contracts.Abstract_Services.InstitutionsService
+@using Frontend.Contracts.Abstract_Services.Notification
 @using Frontend.Contracts.Abstract_Services.RecommendationService
 @using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityDtos.Notification
 @using Frontend.EntityViewModels.Recommendation
 @using Orientation = Radzen.Orientation
 
@@ -10,7 +13,8 @@
 @inject IRecommendationService _recommendationService
 @inject DialogService _dialogService
 @inject NotificationService _notificationService
-
+@inject IAuditNotificationService _auditNotificationService
+@inject IInstitutionService _institutionService
 
 <RadzenStack Orientation="Orientation.Vertical">
 
@@ -116,7 +120,7 @@
         }
     }
 
-    private Task UploadDocument(BaseRecommendationViewModel recommendation)
+    private async Task UploadDocument(BaseRecommendationViewModel recommendation)
     {
         //open a dialog to upload document for that recommendation
         _dialogService.Open<AttachDocumentToRecommendationComponent>(
@@ -128,6 +132,10 @@
             new DialogOptions() { Width = "60%", Height = "70%" }
         );
 
-        return Task.CompletedTask;
+
+        //send a notification to the audit team that a document has been uploaded
+
+
+
     }
 }

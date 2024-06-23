@@ -4,7 +4,7 @@ using MediatR;
 
 namespace AudIT.Applicationa.Requests.Notification.Queries.GetByInstitution;
 
-public class GetNotificationsByInstitutionIdQuery : IRequest<BaseDTOResponse<BaseNotificationDto>>
+public class GetNotificationsByInstitutionIdQuery : IRequest<BaseDTOResponse<NotificationWithDateDto>>
 {
     public Guid InstitutionId { get; set; }
 

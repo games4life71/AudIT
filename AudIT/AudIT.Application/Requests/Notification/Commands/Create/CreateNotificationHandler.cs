@@ -37,7 +37,9 @@ public class CreateNotificationHandler(
                     request.Title,
                     request.AdditionalInfo,
                     request.RecommendationId,
-                    request.InstitutionId);
+                    request.InstitutionId,
+                    request.NotificationType
+                );
 
 
             if (!notification.IsSuccess)

@@ -8,5 +8,6 @@ public class NotificationProfile:MyCustomProfile
     public NotificationProfile()
     {
         CreateMap<Notification, BaseNotificationDto>();
+        CreateMap<Notification, NotificationWithDateDto>();
     }
 }

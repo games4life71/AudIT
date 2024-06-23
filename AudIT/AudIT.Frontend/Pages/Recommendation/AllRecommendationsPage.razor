@@ -2,9 +2,12 @@
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.CurrentUserAuditMissionService
 @using Frontend.Contracts.Abstract_Services.DocumentService
+@using Frontend.Contracts.Abstract_Services.InstitutionsService
+@using Frontend.Contracts.Abstract_Services.Notification
 @using Frontend.Contracts.Abstract_Services.ObjectiveService
 @using Frontend.Contracts.Abstract_Services.RecommendationService
 @using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityDtos.Notification
 @using Frontend.EntityDtos.Recommendation
 @using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
 @using Frontend.EntityViewModels.Documents
@@ -14,6 +17,7 @@
 @using Radzen.Blazor
 @using Radzen.Blazor
 
+@inject IInstitutionService _institutionService
 @inject IObjectiveService _objectiveService
 @inject NotificationService _notificationService
 @inject DialogService _dialogService
@@ -23,7 +27,7 @@
 @inject IAuditMissionService _auditMissionService
 @inject IDocumentService _documentService
 @inject IJSRuntime _jsRuntime
-
+@inject IAuditNotificationService _auditNotificationService
 
 <RadzenCard Variant="Variant.Outlined">
     <RadzenStack Orientation="Orientation.Vertical">
@@ -141,7 +145,7 @@
                                                     }
                                                     else
                                                     {
-                                                        <RadzenButton Icon="download" Click="@(()=>DownloadDocument(document))" ButtonStyle="ButtonStyle.Secondary" Text="Download document"></RadzenButton>
+                                                        <RadzenButton Icon="download" Click="@(() => DownloadDocument(document))" ButtonStyle="ButtonStyle.Secondary" Text="Download document"></RadzenButton>
                                                     }
                                                 </RadzenStack>
                                             </Template>
@@ -154,9 +158,9 @@
                         <RadzenTabsItem Text="Settings" Icon="settings">
                             <RadzenStack JustifyContent="JustifyContent.Start" Orientation="Orientation.Horizontal">
 
-                                <RadzenButton Click="@(()=>NavigateObjective(recommendation))" ButtonStyle="ButtonStyle.Warning" Icon="edit" Text="Objective"></RadzenButton>
+                                <RadzenButton Click="@(() => NavigateObjective(recommendation))" ButtonStyle="ButtonStyle.Warning" Icon="edit" Text="Objective"></RadzenButton>
 
-                                <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="notification_add" Text="Notify institution"/>
+                                <RadzenButton Click="@(() => NotifyInstitution(recommendation))" ButtonStyle="ButtonStyle.Info" Icon="notification_add" Text="Notify institution"/>
 
                                 <RadzenButton Click="@(() => DeleteRecommendation(recommendation.Recommendation))" Icon="delete" ButtonStyle="ButtonStyle.Danger" Text="Delete Recommendation"/>
 
@@ -409,13 +413,13 @@
         return Task.CompletedTask;
     }
 
-    private async  Task DownloadDocument(BaseDocumentViewModel document)
+    private async Task DownloadDocument(BaseDocumentViewModel document)
     {
-            var response  = await _documentService.DownloadStandaloneDocumentAsync(document.Name+"."+document.Extension);
+        var response = await _documentService.DownloadStandaloneDocumentAsync(document.Name + "." + document.Extension);
 
-            var fileName = document.Name + "." + document.Extension;
-            using var StreamRef = new DotNetStreamReference(response);
-            await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, StreamRef);
+        var fileName = document.Name + "." + document.Extension;
+        using var StreamRef = new DotNetStreamReference(response);
+        await _jsRuntime.InvokeVoidAsync("downloadFileFromStream", fileName, StreamRef);
     }
 
     private async Task NavigateObjective(RecommendationWithDocumentsViewModel recommendation)
@@ -429,6 +433,34 @@
         else
         {
             _notificationService.Notify(NotificationSeverity.Error, "Error", response.Message);
+        }
+    }
+
+    private async Task NotifyInstitution(RecommendationWithDocumentsViewModel recommendation)
+    {
+        var institution = await _institutionService.GetInstitutionByRecommendationAsync(recommendation.Recommendation.Id);
+
+        if (institution.Success)
+        {
+            var newNotification = new CreateNotificationDto();
+
+            newNotification.RecommendationId = recommendation.Recommendation.Id;
+            if (institution.DtoResponse != null) newNotification.InstitutionId = institution.DtoResponse.Id;
+
+            newNotification.Title = "New recommendation created";
+            newNotification.AdditionalInfo = "Problem: " + recommendation.Recommendation.Problem;
+            newNotification.NotificationType = NotificationType.FromAuditor;
+
+            var result = await _auditNotificationService.CreateNotificationAsync(newNotification);
+
+            if (result.Success)
+            {
+                _notificationService.Notify(NotificationSeverity.Success, "Success", "Notification sent successfully");
+            }
+            else
+            {
+                _notificationService.Notify(NotificationSeverity.Error, "Error", result.Message);
+            }
         }
     }
 }

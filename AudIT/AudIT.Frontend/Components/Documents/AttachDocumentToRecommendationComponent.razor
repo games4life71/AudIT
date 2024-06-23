@@ -1,6 +1,9 @@
 ﻿@using Frontend.Contracts.Abstract_Services.DocumentService
+@using Frontend.Contracts.Abstract_Services.InstitutionsService
+@using Frontend.Contracts.Abstract_Services.Notification
 @using Frontend.Contracts.Abstract_Services.RecommendationService
 @using Frontend.EntityDtos.Document.Standalone
+@using Frontend.EntityDtos.Notification
 @using Frontend.EntityViewModels.Documents
 @using Frontend.EntityViewModels.Recommendation
 @using Frontend.EntityViewModels.RecommendationDocument
@@ -12,6 +15,8 @@
 @inject IDocumentService _documentService
 @inject NotificationService _notificationService
 @inject IRecommendationService _recommendationService
+@inject IInstitutionService _institutionService
+@inject IAuditNotificationService _auditNotificationService
 
 <RadzenStack Orientation="Orientation.Vertical">
 
@@ -137,6 +142,34 @@
             _notificationService.Notify(NotificationSeverity.Success, "Document saved successfully");
             await FetchDocuments();
             await uploadRef.ClearFiles();
+
+            //send a notification to the audit team that a document has been uploaded
+            var newNotification = new CreateNotificationDto();
+
+            newNotification.Title = "Document Uploaded";
+            newNotification.AdditionalInfo = "For recommendation: " + Recommendation.Description;
+            newNotification.NotificationType = NotificationType.FromInstitution;
+            newNotification.RecommendationId = Recommendation.Id;
+
+            var institution = await _institutionService.GetInstitutionByRecommendationAsync(Recommendation.Id);
+
+            if (institution.Success)
+            {
+                if (institution.DtoResponse != null) newNotification.InstitutionId = institution.DtoResponse.Id;
+            }
+
+            var response = await _auditNotificationService.CreateNotificationAsync(newNotification);
+
+            if (response.Success)
+            {
+                _notificationService.Notify(NotificationSeverity.Success, "Notification Sent", "Notification has been sent to the audit team");
+            }
+            else
+            {
+                _notificationService.Notify(NotificationSeverity.Error, "Notification Error", "Failed to send notification to the audit team");
+            }
+
+
         }
         else
         {

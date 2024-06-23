@@ -7,11 +7,18 @@
 @using Frontend.EntityViewModels.Objective
 @using Frontend.Components.Activity
 @using Frontend.Components.Export
+@using Frontend.Contracts.Abstract_Services.Notification
+@using Frontend.EntityDtos.Notification
+@using Frontend.EntityViewModels.Notification
 @using Frontend.Services.AuthentificationServices
 @using Microsoft.AspNetCore.Components.Authorization
+@using Radzen.Blazor.Rendering
 @using Orientation = Radzen.Orientation
 @inherits LayoutComponentBase
 
+
+@inject TooltipService _tooltipService
+@inject IAuditNotificationService _auditNotificationService
 @inject ICurrentUserChangedMissionService _currentUserChangedMissionService
 @inject IObjectiveService _objectiveService
 @inject CustomAuthStateProvider customAuthState
@@ -20,7 +27,7 @@
 @inject DialogService DialogService
 @inject IAuditMissionService _auditMissionService
 @inject NotificationService NotificationService
-
+@inject IJSRuntime JSRuntime
 <RadzenLayout Style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body'">
     <RadzenHeader Style="display: flex; justify-content: space-between;">
 
@@ -35,13 +42,89 @@
         </RadzenStack>
 
         <RadzenStack class="rz-mx-12" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
-            <RadzenMenu>
+
+
+            <RadzenMenu @ref=@notificationMenu Responsive="true">
                 <RadzenMenuItem Icon="dashboard" Text="Menu">
                     <RadzenMenuItem Path="/profile" Icon="account_circle" Text="Profile"></RadzenMenuItem>
-                    <RadzenMenuItem Click="@OpenNotification" Icon="markunread_mailbox" Text="Notifications"> </RadzenMenuItem>
+                    <RadzenMenuItem Click="@DisplayPopup" Icon="markunread_mailbox" Text="Notifications"> </RadzenMenuItem>
+
+
                 </RadzenMenuItem>
+
+                @code{
+
+                    private int CountUnreadNotifications()
+                    {
+                        return Notifications.Count(x => x.IsRead == false);
+                    }
+
+                }
+
+                <Popup
+                    Style="display:none;position:absolute; right: 0;  height:300px;width:600px;padding:5px;"
+                    @ref="notificationPopup" Open="@OnNotificationPopupOpen">
+                    @if (CountUnreadNotifications() == 0)
+                    {
+                        <RadzenCard Variant="Variant.Filled">
+                            <RadzenCard Variant="Variant.Outlined">
+                                <RadzenText TextAlign="TextAlign.Center" Text="No notifications"></RadzenText>
+                            </RadzenCard>
+                        </RadzenCard>
+                    }
+                    else
+                    {
+                        <RadzenDataList Style="height:150%;overflow:auto;" AllowPaging="true" PageSize="3" Data="Notifications">
+                            <Template Context="notification">
+                                @if (notification.IsRead != null && notification.IsRead.Value == false)
+                                {
+                                    <RadzenCard Variant="Variant.Outlined">
+
+                                        <RadzenStack Wrap="FlexWrap.Wrap" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+
+
+                                            <RadzenText TextStyle="TextStyle.Overline" Text="@notification.Title"></RadzenText>
+                                            <RadzenText TextStyle="TextStyle.Overline" Text="@notification.AdditionalInfo"></RadzenText>
+                                            <RadzenText TextStyle="TextStyle.Overline" Text="@notification.Institution.Name"></RadzenText>
+
+                                            @if (notification.IsRead != null && notification.IsRead.Value)
+                                            {
+                                                <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Read" Variant="Variant.Text"></RadzenBadge>
+                                            }
+                                            else
+                                            {
+                                                <RadzenBadge IsPill="true" BadgeStyle="BadgeStyle.Warning" Text="Unread" Variant="Variant.Text"></RadzenBadge>
+                                            }
+                                            @* <hr style="border: none; background-color: #0c0d0e; height: 1px; margin: 1rem 0;" /> *@
+                                            <RadzenStack Orientation="Orientation.Horizontal">
+                                                <RadzenButton Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Text="Mark as read" Icon="mark_chat_read" Click="@(() => MarkAsRead(notification))"></RadzenButton>
+                                                <RadzenButton Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Info" Text="Recommendation" Icon="assistant_direction" Click="@NavigateRecommendations"></RadzenButton>
+                                            </RadzenStack>
+                                        </RadzenStack>
+                                    </RadzenCard>
+                                }
+                            </Template>
+
+                        </RadzenDataList>
+                    }
+                </Popup>
             </RadzenMenu>
         </RadzenStack>
+
+        @code{
+            bool notificationBtnVisible = false;
+            RadzenButton btnref;
+            RadzenMenu notificationMenu;
+            Popup notificationPopup;
+
+            private void ShowToolTipText(ElementReference obj, string text)
+            {
+                _tooltipService.OpenOnTheTop(obj, text, new TooltipOptions() { Position = TooltipPosition.Top, Duration = 2000 });
+            }
+
+
+        }
+
     </RadzenHeader>
     <RadzenSidebar Style="display: flex;  justify-content: space-between; flex-direction: column;" @bind-Expanded="@sidebarExpanded">
         <RadzenPanelMenu>
@@ -182,6 +265,11 @@
         isVerified = authState.User.IsInRole("Verified");
         isAuditor = authState.User.IsInRole("Auditor");
 
+
+        var claims = customAuthState.GetClaims(authState);
+
+        var institutionId = Guid.Parse(claims.FirstOrDefault(x => x.Type == "Institution").Value);
+        InstitutionId = institutionId;
 
         await FetchAuditMissions();
         await FetchCurrentAuditMission();
@@ -337,7 +425,7 @@
         var claims = customAuthState.GetClaims(authState);
 
         var institutionId = Guid.Parse(claims.FirstOrDefault(x => x.Type == "Institution").Value);
-
+        InstitutionId = institutionId;
         DialogService.Open<AllNotificationsDialog>(
             "Notifications",
             new Dictionary<string, object>
@@ -347,4 +435,63 @@
             new DialogOptions { Width = "50%", Height = "60%" });
     }
 
+    private async Task OnNotificationPopupOpen()
+    {
+        var response = await _auditNotificationService.GetNotificationsByInstitutionIdAsync(InstitutionId);
+
+        if (response.Success)
+        {
+            if (isAuditor)
+            {
+                var unreadNotifications = response.DtoResponses
+                    .Where(x => x.IsRead == false && x.NotificationType == NotificationType.FromInstitution)
+                    .OrderByDescending(x => x.LastModifiedDate)
+                    .ToList();
+
+                Notifications = unreadNotifications;
+            }
+            else
+            {
+                var unreadNotifications = response.DtoResponses
+                    .Where(x => x.IsRead == false && x.NotificationType == NotificationType.FromAuditor)
+                    .OrderByDescending(x => x.LastModifiedDate)
+                    .ToList();
+                Notifications = unreadNotifications;
+            }
+        }
+    }
+}
+
+@code
+{
+    private Guid InstitutionId { get; set; } = Guid.Empty;
+
+    public List<BaseNotificationViewModel> Notifications { get; set; } = [];
+
+    private async Task DisplayPopup(MouseEventArgs obj)
+    {
+        //make the button visible
+        notificationBtnVisible = true;
+        StateHasChanged();
+        await notificationPopup.ToggleAsync(notificationMenu.Element);
+    }
+
+    private void NavigateRecommendations(MouseEventArgs obj)
+    {
+        if (isAuditor)
+        {
+            NavigationManager.NavigateTo("/recommendations");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/view-recommendations");
+        }
+    }
+
+    private async Task MarkAsRead(BaseNotificationViewModel notification)
+    {
+        notification.IsRead = true;
+
+        var response = await _auditNotificationService.SetNotificationReadAsync(notification.Id);
+    }
 }

@@ -19,6 +19,8 @@ public class NotificationRepository : BaseRepository<Notification>, INotificatio
     {
         var notifications = await _context.Notifications
             .Where(n => n.InstitutionId == requestInstitutionId)
+            .Include(x=>x.Institution)
+            .Include(x=>x.Recommendation)
             .ToListAsync();
 
         if (notifications.Any())
