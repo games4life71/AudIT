@@ -10,6 +10,7 @@ using Frontend.Contracts.Abstract_Services.DocumentService;
 using Frontend.Contracts.Abstract_Services.ExportService;
 using Frontend.Contracts.Abstract_Services.FiapService;
 using Frontend.Contracts.Abstract_Services.InstitutionsService;
+using Frontend.Contracts.Abstract_Services.Notification;
 using Frontend.Contracts.Abstract_Services.ObjectiveActionService;
 using Frontend.Contracts.Abstract_Services.ObjectiveService;
 using Frontend.Contracts.Abstract_Services.RecommendationService;
@@ -28,6 +29,7 @@ using Frontend.Services.ExportService;
 using Frontend.Services.FiapService;
 using Frontend.Services.InstitutionServices;
 using Frontend.Services.Misc;
+using Frontend.Services.NotificationServices;
 using Frontend.Services.ObjectiveActionServices;
 using Frontend.Services.ObjectiveServices;
 using Frontend.Services.Recommendation;
@@ -69,7 +71,7 @@ public static class ServiceRegistration
         services.AddScoped<IExportService, ExportService>();
         services.AddScoped<ICurrentUserChangedMissionService, CurrentUserChangedMissionService>();
         services.AddScoped<IUserService, UserService>();
-
+        services.AddScoped<IAuditNotificationService, AuditNotificationService>();
         services.AddBlazoredLocalStorage();
 
         // services.AddScoped<ClaimsPrincipal>();
