@@ -18,4 +18,6 @@ public interface IInstitutionService
     public Task<BaseDTOResponse<InstitutionFullViewModel>> EditInstitutionAsync(EditInstitutionDto institution);
 
     public Task<BaseDTOResponse<BaseInstitutionDto>> GetInstitutionByRecommendationAsync(Guid id);
+
+    public Task<BaseDTOResponse<BaseInstitutionDto>> GetInstitutionByAuditMissionIdAsync(Guid auditMissionId);
 }

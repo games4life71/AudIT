@@ -66,7 +66,7 @@ public class UserService(HttpClient httpClient) : IUserService
     {
         var response =
             await httpClient.GetAsync(
-                $"{IUserService.BaseUrl}/get-all-users-by-institution-id/{institutionId}/{institutionId}");
+                $"{IUserService.BaseUrl}/get-all-users-by-institution-id/{institutionId}");
 
         if (response.IsSuccessStatusCode)
         {

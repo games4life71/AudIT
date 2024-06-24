@@ -1,0 +1,90 @@
+﻿@using Frontend.Contracts.Abstract_Services.EntityAccesService
+@using Frontend.EntityDtos.EntityAcces
+@using Frontend.EntityViewModels.EntityAccess
+@using Frontend.EntityViewModels.User
+@using Orientation = Radzen.Orientation
+
+@inject IEntityAccesService entityAccesService
+@inject NotificationService notificationService
+
+<RadzenStack Orientation="Orientation.Vertical">
+
+    <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
+        <RadzenText TextStyle="TextStyle.H5" Text="@($"Give access to {EntityName}")"/>
+    </RadzenStack>
+   
+    <RadzenDataList
+        AllowVirtualization="true"
+        Data="Users"
+        TItem="UserWithIdViewModel">
+        <Template Context="user">
+            <RadzenStack JustifyContent="JustifyContent.SpaceAround" Orientation="Orientation.Horizontal">
+
+                <RadzenStack Orientation="Orientation.Vertical">
+                    <RadzenText TextStyle="TextStyle.Overline" Text="Username"></RadzenText>
+                    <RadzenText Text="@user.Username"></RadzenText>
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Vertical">
+                    <RadzenText TextStyle="TextStyle.Overline" Text="Email"></RadzenText>
+                    <RadzenText Text="@user.FirstEmail"></RadzenText>
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Vertical">
+                    <RadzenText TextStyle="TextStyle.Overline" Text="Function"></RadzenText>
+                    <RadzenText Text="@user.Functie"></RadzenText>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical">
+                    <RadzenToggleButton @bind-Value="@WtiteAccess" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Danger" Text="Write Access"></RadzenToggleButton>
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Vertical">
+                    <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text="Give access" Click="@(() => GiveAccess(user))"></RadzenButton>
+                </RadzenStack>
+
+
+            </RadzenStack>
+        </Template>
+    </RadzenDataList>
+
+</RadzenStack>
+
+
+@code {
+
+    private bool WtiteAccess = false;
+
+    [Parameter] public Guid EntityId { get; set; }
+
+    [Parameter] public List<UserWithIdViewModel> Users { get; set; }
+
+    [Parameter] public EntityType EntityType { get; set; }
+
+    [Parameter] public string EntityName { get; set; }
+
+    private async  Task GiveAccess(UserWithIdViewModel user)
+    {
+        AccesType accesType = WtiteAccess ? AccesType.Write : AccesType.Read;
+
+
+        var entityAcces = new BaseCreateEntityaAccesDto()
+        {
+            EntityId = EntityId,
+            UserId = user.Id.ToString(),
+            Type = EntityType,
+            AccesType = accesType
+        };
+
+        var response = await entityAccesService.CreateEntityAccesAsync(entityAcces);
+
+        if (response.Success)
+        {
+            notificationService.Notify(NotificationSeverity.Success, "Success", "User has been given access succesfully");
+        }
+        else
+        {
+            notificationService.Notify(NotificationSeverity.Warning, "Already granted access", "User already has access to this entity");
+        }
+    }
+
+}

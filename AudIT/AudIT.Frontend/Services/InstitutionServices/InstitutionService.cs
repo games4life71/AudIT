@@ -103,9 +103,30 @@ public class InstitutionService(HttpClient _httpClient) : IInstitutionService
         return new BaseDTOResponse<InstitutionFullViewModel>("Error while editing institution", false);
     }
 
-     public async  Task<BaseDTOResponse<BaseInstitutionDto>> GetInstitutionByRecommendationAsync(Guid id)
+    public async Task<BaseDTOResponse<BaseInstitutionDto>> GetInstitutionByRecommendationAsync(Guid id)
     {
-        var response = await _httpClient.GetAsync($"{IInstitutionService.ApiPath}/get-institution-by-recommendation/{id}");
+        var response =
+            await _httpClient.GetAsync($"{IInstitutionService.ApiPath}/get-institution-by-recommendation/{id}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return new BaseDTOResponse<BaseInstitutionDto>("Error while fetching data for institutions", false);
+        }
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseInstitutionDto>>(content);
+
+        if (result != null) return result;
+
+        return new BaseDTOResponse<BaseInstitutionDto>("Error while fetching data for institutions", false);
+    }
+
+    public async Task<BaseDTOResponse<BaseInstitutionDto>> GetInstitutionByAuditMissionIdAsync(Guid auditMissionId)
+    {
+        var response =
+            await _httpClient.GetAsync(
+                $"{IInstitutionService.ApiPath}/get-institution-by-audit-mission/{auditMissionId}");
 
         if (!response.IsSuccessStatusCode)
         {

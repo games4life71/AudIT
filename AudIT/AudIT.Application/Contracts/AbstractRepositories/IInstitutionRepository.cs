@@ -11,4 +11,5 @@ public interface IInstitutionRepository: IRepository<Institution>
 
     public Task<Result<List<Institution>>> GetAllInstitutionsFullAsync();
     public Task<Result<Institution>> GetInstitutionByAuditMissionId(Guid valueAuditMissionId);
+
 }

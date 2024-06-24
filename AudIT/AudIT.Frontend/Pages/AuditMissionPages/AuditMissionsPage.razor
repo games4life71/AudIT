@@ -1,8 +1,16 @@
 ﻿@page "/audit-missions"
+@using Frontend.Components.EntityAcces
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.DepartmentService
+@using Frontend.Contracts.Abstract_Services.EntityAccesService
+@using Frontend.Contracts.Abstract_Services.InstitutionsService
+@using Frontend.Contracts.Abstract_Services.UserService
 @using Frontend.EntityDtos.AuditMission
 @using Frontend.EntityDtos.Department
+@using Frontend.EntityDtos.Institution
+@using Frontend.EntityDtos.Misc
+@using Frontend.EntityViewModels.EntityAccess
+@using Frontend.EntityViewModels.User
 @using Frontend.Services.AuthentificationServices
 @using Orientation = Radzen.Orientation
 @* <h3>AuditMissions</h3> *@
@@ -11,6 +19,11 @@
 @inject IAuditMissionService auditMissionService
 @inject IDepartmentService departmentService
 @inject CustomAuthStateProvider customAuthState
+
+@inject DialogService _dialogService
+@inject IEntityAccesService entityAccesService
+@inject IUserService _userService
+@inject IInstitutionService _institutionService
 
 @if (isAuthenticated)
 {
@@ -34,7 +47,10 @@
                     <RadzenDataGridColumn Property="LastModifiedDate" Title="Last Modified"></RadzenDataGridColumn>
                     <RadzenDataGridColumn Width="15%" Frozen="true" Sortable="false" Filterable="false" TItem="AuditMissionWithDepartmentName" Title="">
                         <Template Context="auditMission">
-                            <RadzenButton Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Text" Text="More details " Click="@(() => ButtonClicked(auditMission))"></RadzenButton>
+                            <RadzenStack Orientation="Orientation.Vertical">
+                                <RadzenButton Icon="info" Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Secondary" Text="More details " Click="@(() => ButtonClicked(auditMission))"></RadzenButton>
+                                <RadzenButton  Icon="key" Click="@(() => GiveAccess(auditMission))" ButtonStyle="ButtonStyle.Warning" Text="Give access"></RadzenButton>
+                            </RadzenStack>
                         </Template>
                     </RadzenDataGridColumn>
 
@@ -146,6 +162,70 @@ else
     {
         Console.WriteLine($"Department cell clicked for department {data.DepartmentName}");
         return Task.CompletedTask;
+    }
+
+    private async Task<List<UserWithIdViewModel>> FetchUsersByInstitution(Guid institutionId)
+    {
+        var result = await _userService.GetAllUsersByInstitutionIdAsync(institutionId);
+        if (result.Success)
+        {
+            // Users = result.DtoResponses;
+            return result.DtoResponses;
+        }
+        else
+        {
+            return [];
+        }
+    }
+
+    private async Task<BaseInstitutionDto?> FetchInstiution(Guid auditmissionId)
+    {
+        var result = await _institutionService.GetInstitutionByAuditMissionIdAsync(auditmissionId);
+
+        if (result.Success)
+        {
+            if (result.DtoResponse != null) return result.DtoResponse;
+        }
+        else
+        {
+            return null;
+        }
+
+        return null;
+    }
+
+    ///Filter the users and remove the current user
+    private async Task FilterUsers(List<UserWithIdViewModel> users)
+    {
+        var currentUser = await customAuthState.GetUserIdFromTokenAsync();
+        if (currentUser.Item2)
+        {
+            var currentFoundUser = users.Find(user => user.Id == currentUser.Item1);
+            //users.Where(user => user.Id != currentUser.Item1);
+            if (currentFoundUser != null) users.Remove(currentFoundUser);
+        }
+    }
+
+    private async Task GiveAccess(AuditMissionWithDepartmentName auditMission)
+    {
+        var institution = await FetchInstiution(auditMission.Id);
+        if (institution != null)
+        {
+            var users = await FetchUsersByInstitution(institution.Id);
+            await FilterUsers(users);
+
+            _dialogService.Open<CreateEntityAccesComponent>(
+                "Give access to this entity",
+                new Dictionary<string, object>
+                {
+                    { "EntityId", auditMission.Id },
+                    { "Users", users },
+                    { "EntityType", EntityType.AuditMission },
+                    { "EntityName", auditMission.Name }
+                },
+                new DialogOptions { Width = "50%", Height = "70%" }
+            );
+        }
     }
 
 }
