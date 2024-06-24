@@ -8,6 +8,7 @@
 
 @using Frontend.EntityViewModels.ObjectiveAction
 @using Frontend.Components.Objective
+@using Frontend.Contracts.Abstract_Services.EntityAccesService
 @using Frontend.Contracts.Abstract_Services.InstitutionsService
 @using Frontend.Contracts.Abstract_Services.UserService
 @using Frontend.EntityDtos.Institution
@@ -26,9 +27,10 @@
 @inject IUserService _userService
 @inject IInstitutionService _institutionService
 @inject CustomAuthStateProvider customAuthState
-
+@inject IEntityAccesService _entityAccessService
 
 <RadzenStack Orientation="Orientation.Vertical">
+    <RadzenText Text="@($"Read acces {ReadAccess}")"></RadzenText>
     <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
         <RadzenText TextStyle="TextStyle.H4" class="rz-my-6" Text="@($"Summary for {_objective.name}")"></RadzenText>
         <RadzenLink Path=@($"/audit-mission/{_auditMission.Id}")>
@@ -48,6 +50,7 @@
                             <RadzenDataGridColumn Title="Action Risks Details" Sortable="false" Filterable="false">
                                 <Template Context="objectiveAction">
                                     <RadzenButton Style="display: flex; align-self: center; justify-content: center ;"
+                                                  Disabled="ReadAccess"
                                                   ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" Icon="info"
                                                   Text="More details " Click="@(() => OpenActionRiskDialog(objectiveAction))">
                                     </RadzenButton>
@@ -56,7 +59,7 @@
                             <RadzenDataGridColumn Frozen="true" Title="Selected in auditing" Property="selected"></RadzenDataGridColumn>
                             <RadzenDataGridColumn Width="15%" Frozen="true" Sortable="false" Filterable="false" Title="">
                                 <Template Context="objectiveAction">
-                                    <RadzenButton Shade="Shade.Lighter" Icon="info" Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Text="More details " Click="@(() => NavigateObjAction(objectiveAction))"></RadzenButton>
+                                    <RadzenButton Disabled="ReadAccess" Shade="Shade.Lighter" Icon="info" Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Info" Variant="Variant.Flat" Text="More details " Click="@(() => NavigateObjAction(objectiveAction))"></RadzenButton>
                                 </Template>
                             </RadzenDataGridColumn>
                         </Columns>
@@ -67,9 +70,9 @@
                 <RadzenTabsItem Text="Configure" Icon="settings">
                     <RadzenStack Orientation="Orientation.Horizontal">
 
-                        <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="assignment" Click="@(() => OpenEditNameForm(_objective))" Text="Edit Name"></RadzenButton>
-                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="@(() => DeleteObjective(_objective))" Text="Delete Objective"></RadzenButton>
-                        <RadzenButton ButtonStyle="ButtonStyle.Warning" Icon="settings" Click="@(() => GiveAccess(_objective))" Text="Configure Access"></RadzenButton>
+                        <RadzenButton Disabled="ReadAccess" ButtonStyle="ButtonStyle.Info" Icon="assignment" Click="@(() => OpenEditNameForm(_objective))" Text="Edit Name"></RadzenButton>
+                        <RadzenButton Disabled="ReadAccess" ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="@(() => DeleteObjective(_objective))" Text="Delete Objective"></RadzenButton>
+                        <RadzenButton Disabled="ReadAccess" ButtonStyle="ButtonStyle.Warning" Icon="settings" Click="@(() => GiveAccess(_objective))" Text="Configure Access"></RadzenButton>
 
 
                     </RadzenStack>
@@ -81,23 +84,72 @@
 
 @code {
 
+    private bool ReadAccess = false;
 
     [Parameter] public string ObjectiveId { get; set; }
 
     private ObjectiveFullViewModel _objective { get; set; } = new ObjectiveFullViewModel();
 
     private BaseAuditMissionDto _auditMission { get; set; } = new BaseAuditMissionDto();
+
+    private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
 }
 
 
 @functions
 {
+
+
+
     protected override async Task OnInitializedAsync()
     {
+        await VerifyAcces();
+
         await FetchObjectiveAsync();
-        if (_objective.auditMissionId != Guid.Empty.ToString()) await FetchAuditMissionAsync();
+
+        if (_objective != null && !string.IsNullOrEmpty(_objective.auditMissionId))
+        {
+            await FetchAuditMissionAsync(_cancellationToken.Token);
+        }
     }
 
+    private async Task VerifyAcces()
+    {
+        var authState = await customAuthState.GetAuthenticationStateAsync();
+
+        if (authState.User.Identity != null && authState.User.Identity.IsAuthenticated)
+        {
+            var userid = await customAuthState.GetUserIdFromTokenAsync();
+
+
+            var accesList = await _entityAccessService.GetEntityAccesByUserIdAsync(userid.Item1);
+
+            if (accesList.Success)
+            {
+                var access = accesList.DtoResponses.Find(
+                    acces => acces.EntityId == Guid.Parse(ObjectiveId)
+                             && acces.Type == EntityType.Objective);
+
+                if (access == null)
+                {
+                 await   _cancellationToken.CancelAsync();
+                    _navigationManager.NavigateTo($"/");
+                }
+                else if (access.AccesType == AccesType.Read)
+                {
+                    ReadAccess = true;
+                }
+
+                else if (access.AccesType == AccesType.Write)
+                {
+                    ReadAccess = false;
+                }
+            }
+        }
+
+
+
+    }
 
     private async Task FetchObjectiveAsync()
     {
@@ -109,9 +161,15 @@
 
             StateHasChanged();
         }
+        else
+        {
+            await  _cancellationToken.CancelAsync();
+            _navigationManager.NavigateTo($"/");
+
+        }
     }
 
-    private async Task FetchAuditMissionAsync()
+    private async Task FetchAuditMissionAsync(CancellationToken cancellationToken)
     {
         var result = await _auditMissionService.GetAuditMissionById(Guid.Parse(_objective.auditMissionId));
 

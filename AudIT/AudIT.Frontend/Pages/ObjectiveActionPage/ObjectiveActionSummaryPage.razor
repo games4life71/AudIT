@@ -228,6 +228,10 @@
             {
                 if (objective.DtoResponse != null) _currentObjective = objective.DtoResponse;
             }
+            else
+            {
+                NavigationManager.NavigateTo("/");
+            }
         }
         else
         {

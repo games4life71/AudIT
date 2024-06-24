@@ -345,8 +345,12 @@
 
             if (response.Success)
             {
+            }
+            else
+            {
                 //navigate to the objectives page
                 _objectives = response.DtoResponses;
+                _objectives = [];
             }
         }
     }

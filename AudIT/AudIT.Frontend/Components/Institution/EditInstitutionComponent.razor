@@ -26,7 +26,7 @@
         </RadzenStack>
 
         <RadzenStack JustifyContent="JustifyContent.Center" Orientation="Orientation.Horizontal">
-            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Text="Cancel"></RadzenButton>
+            <RadzenButton Click="@(args=>_dialogService.Close())" ButtonStyle="ButtonStyle.Secondary" Text="Cancel"></RadzenButton>
             <RadzenButton Click="@SubmitChanges" ButtonStyle="ButtonStyle.Success" Text="Submit"></RadzenButton>
         </RadzenStack>
     </RadzenStack>
