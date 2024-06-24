@@ -12,7 +12,7 @@ public class AddReadAccessHandler(
     {
         try
         {
-            var repository = repositoryFactory.Create(request.EntityType.ToString());
+            var repository = repositoryFactory.Create(request.EntityAccesType.ToString());
             //cast the repository to the correct type
             // repository = (IRepositoryAcces<AuditableEntity>)repository;
 

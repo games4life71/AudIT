@@ -105,6 +105,7 @@ public static class InfrastructureRegistration
         services.AddScoped<IRecommendationDocumentRepository, RecommendationDocumentRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         services.AddScoped(typeof(IRepositoryAcces<>), typeof(BaseAccesRepository<>));
+        services.AddScoped<IEntityAccesRepository, EntityAccesRepository>();
         services.AddScoped<IRepositoryFactory, RepositoryFactory>();
 
         services.AddScoped(typeof(IRepositoryAcces<>), typeof(BaseAccesRepository<>));

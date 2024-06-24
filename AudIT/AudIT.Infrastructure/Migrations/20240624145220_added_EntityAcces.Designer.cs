@@ -3,6 +3,7 @@ using System;
 using AudIT.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AudIT.Infrastructure.Migrations
 {
     [DbContext(typeof(AudITContext))]
-    partial class AudITContextModelSnapshot : ModelSnapshot
+    [Migration("20240624145220_added_EntityAcces")]
+    partial class added_EntityAcces
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.2");
@@ -342,9 +345,6 @@ namespace AudIT.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("AccesType")
-                        .HasColumnType("INTEGER");
 
                     b.Property<Guid>("EntityId")
                         .HasColumnType("TEXT");

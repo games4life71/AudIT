@@ -61,4 +61,32 @@ public class UserService(HttpClient httpClient) : IUserService
             Message = "An error occurred while updating user information"
         };
     }
+
+    public async Task<BaseDTOResponse<UserWithIdViewModel>> GetAllUsersByInstitutionIdAsync(Guid institutionId)
+    {
+        var response =
+            await httpClient.GetAsync(
+                $"{IUserService.BaseUrl}/get-all-users-by-institution-id/{institutionId}/{institutionId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<UserWithIdViewModel>>(content);
+            if (result != null) return result;
+        }
+        else
+        {
+            return new BaseDTOResponse<UserWithIdViewModel>
+            {
+                Success = false,
+                Message = "An error occurred while fetching users"
+            };
+        }
+
+        return new BaseDTOResponse<UserWithIdViewModel>
+        {
+            Success = false,
+            Message = "An error occurred while fetching users"
+        };
+    }
 }

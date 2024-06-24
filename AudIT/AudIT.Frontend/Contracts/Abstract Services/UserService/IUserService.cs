@@ -12,4 +12,6 @@ public interface IUserService
 
     public Task<BaseDTOResponse<BaseUserViewModel>> UpdateUserInfoAsync(UpdateUserInfoDto updateUserInfoDto);
 
+    public Task<BaseDTOResponse<UserWithIdViewModel>> GetAllUsersByInstitutionIdAsync(Guid institutionId);
+
 }

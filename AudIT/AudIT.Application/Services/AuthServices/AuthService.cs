@@ -5,6 +5,7 @@ using AudIT.Applicationa.Services.EmailServices;
 using AudIT.Applicationa.Services.UtilsServices;
 using AudiT.Domain.Entities;
 using AudIT.Domain.Misc;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
@@ -26,14 +27,16 @@ public class AuthService(
     EmailService emailService,
     UtilsService utilsService,
     SignInManager<User> signInManager,
+    IMapper _mapper,
     IUserInstitutionRepository userInstitutionRepository
 )
     : IAuthService // This is the implementation of the IAuthService interface
 {
     private readonly IConfiguration _configuration = configuration;
+    private readonly IMapper _mapper = _mapper;
     private readonly IInstitutionRepository _institutionRepository = institutionRepository;
-    private readonly EmailService _emailService = emailService;
-    private readonly UtilsService _utilsService = utilsService;
+    private readonly EmailService _emailService = emailService = emailService;
+    private readonly UtilsService _utilsService = utilsService = utilsService;
     private readonly IUserInstitutionRepository _userInstitutionRepository = userInstitutionRepository;
 
     public async Task<(int, string)> Registration(RegistrationModel model, string role)
@@ -209,10 +212,15 @@ public class AuthService(
     {
         var results = await userInstitutionRepository.GetAllUsersByInstitutionId(institutionId);
 
+
+
+
         if (!results.IsSuccess)
         {
             return Result<List<User>>.Failure("No users found");
         }
+
+
 
         return Result<List<User>>.Success(results.Value);
     }

@@ -1,15 +1,13 @@
 ﻿using AudIT.Applicationa.Requests.Access.ReadAcces;
+using AudIT.Applicationa.Requests.EntityAcces.Commands.Create;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AudIT.API.Controllers.Access;
 
-
 [ApiController]
 [Route("api/[controller]")]
-public class AccessController:BaseController
+public class AccessController : BaseController
 {
-
-
     [HttpPost]
     [Route("SetReadAccess")]
     public async Task<IActionResult> SetReadAccess([FromBody] AddReadAccesCommand command)

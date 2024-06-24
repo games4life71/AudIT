@@ -4,8 +4,11 @@ using AudIT.Applicationa.Contracts.Identity;
 using AudIT.Applicationa.Models.AuthDTO;
 using AudIT.Applicationa.Models.Misc;
 using AudIT.Applicationa.Requests.User.Commands.UpdateUserInfo;
+using AudIT.Applicationa.Requests.User.Dto;
 using AudIT.Applicationa.Requests.User.Queries.GetInformation;
+using AudIT.Applicationa.Responses;
 using AudiT.Domain.Entities;
+using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -25,10 +28,11 @@ public class AuthentificationController : ControllerBase
     private readonly SignInManager<User> _signInManager;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IMediator _mediator;
+    private readonly IMapper _mapper;
 
     public AuthentificationController(IAuthService authService, IEmailService emailService,
         IAuthorization authorizationService, UserManager<User> userManager, SignInManager<User> signInManager,
-        IHttpContextAccessor httpContextAccessor, IMediator mediator)
+        IHttpContextAccessor httpContextAccessor, IMediator mediator, IMapper mapper)
     {
         _httpContextAccessor = httpContextAccessor;
         _authService = authService;
@@ -37,6 +41,7 @@ public class AuthentificationController : ControllerBase
         _userManager = userManager;
         _signInManager = signInManager;
         _mediator = mediator;
+        _mapper = mapper;
     }
 
 
@@ -239,7 +244,12 @@ public class AuthentificationController : ControllerBase
         try
         {
             var users = await _authService.GetAllUsersByInstitutionId(institutionId);
-            return Ok(users);
+
+            var mappedUsers = _mapper.Map<List<UserInformationWithIdDto>>(users.Value);
+
+            var responseDto = new BaseDTOResponse<UserInformationWithIdDto>(mappedUsers, "Succes", true);
+
+            return Ok(responseDto);
         }
         catch (Exception ex)
         {
