@@ -141,4 +141,22 @@ public class InstitutionService(HttpClient _httpClient) : IInstitutionService
 
         return new BaseDTOResponse<BaseInstitutionDto>("Error while fetching data for institutions", false);
     }
+
+    public async Task<BaseDTOResponse<BaseInstitutionDto>> GetinstitutionByUserIdAsync(Guid userId)
+    {
+        var response = await _httpClient.GetAsync($"{IInstitutionService.ApiPath}/get-institution-by-user-id/{userId}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return new BaseDTOResponse<BaseInstitutionDto>("Error while fetching data for institutions", false);
+        }
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseInstitutionDto>>(content);
+
+        if (result != null) return result;
+
+        return new BaseDTOResponse<BaseInstitutionDto>("Error while fetching data for institutions", false);
+    }
 }

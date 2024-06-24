@@ -1,4 +1,5 @@
 ﻿@page "/objective/{ObjectiveId}"
+@using Frontend.Components.EntityAcces
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.ObjectiveService
 @using Frontend.EntityDtos.AuditMission
@@ -7,6 +8,12 @@
 
 @using Frontend.EntityViewModels.ObjectiveAction
 @using Frontend.Components.Objective
+@using Frontend.Contracts.Abstract_Services.InstitutionsService
+@using Frontend.Contracts.Abstract_Services.UserService
+@using Frontend.EntityDtos.Institution
+@using Frontend.EntityViewModels.EntityAccess
+@using Frontend.EntityViewModels.User
+@using Frontend.Services.AuthentificationServices
 @using Orientation = Radzen.Orientation
 
 @inject NavigationManager _navigationManager
@@ -14,6 +21,12 @@
 @inject IObjectiveService _objectiveService
 @inject IAuditMissionService _auditMissionService
 @inject NotificationService _notificationService
+
+
+@inject IUserService _userService
+@inject IInstitutionService _institutionService
+@inject CustomAuthStateProvider customAuthState
+
 
 <RadzenStack Orientation="Orientation.Vertical">
     <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
@@ -56,6 +69,8 @@
 
                         <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="assignment" Click="@(() => OpenEditNameForm(_objective))" Text="Edit Name"></RadzenButton>
                         <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="@(() => DeleteObjective(_objective))" Text="Delete Objective"></RadzenButton>
+                        <RadzenButton ButtonStyle="ButtonStyle.Warning" Icon="settings" Click="@(() => GiveAccess(_objective))" Text="Configure Access"></RadzenButton>
+
 
                     </RadzenStack>
                 </RadzenTabsItem>
@@ -152,7 +167,6 @@
         _notificationService.Notify(NotificationSeverity.Error, "Error", message, 3000);
         StateHasChanged();
     }
-
     private async Task DeleteObjective(ObjectiveFullViewModel objective)
     {
         //open a dialog to confirm the deletion
@@ -178,6 +192,87 @@
                 _notificationService.Notify(NotificationSeverity.Error, "Error", "Failed to delete the objective", 3000);
             }
         }
+    }
+
+
+
+
+    private async Task<List<UserWithIdViewModel>> FetchUsersByInstitution(Guid institutionId)
+    {
+        var result = await _userService.GetAllUsersByInstitutionIdAsync(institutionId);
+        if (result.Success)
+        {
+            // Users = result.DtoResponses;
+            return result.DtoResponses;
+        }
+        else
+        {
+            return [];
+        }
+    }
+
+
+
+
+
+
+    private async Task<BaseInstitutionDto?> FetchInstitutionByUser(Guid userId)
+    {
+        var response = await _institutionService.GetinstitutionByUserIdAsync(userId);
+
+        if (response.Success && response.DtoResponse != null)
+        {
+            return response.DtoResponse;
+        }
+        else
+        {
+            return null;
+        }
+
+        return null;
+    }
+
+
+
+    ///Filter the users and remove the current user
+    private async Task FilterUsers(List<UserWithIdViewModel> users)
+    {
+        var currentUser = await customAuthState.GetUserIdFromTokenAsync();
+        if (currentUser.Item2)
+        {
+            var currentFoundUser = users.Find(user => user.Id == currentUser.Item1);
+            //users.Where(user => user.Id != currentUser.Item1);
+            if (currentFoundUser != null) users.Remove(currentFoundUser);
+        }
+    }
+
+    private async Task GiveAccess(ObjectiveFullViewModel objective)
+    {
+        var userid = await customAuthState.GetUserIdFromTokenAsync();
+
+        if (userid.Item2 && userid.Item1 != null)
+        {
+            var institution = await FetchInstitutionByUser(userid.Item1);
+            if (institution != null)
+            {
+                var users = await FetchUsersByInstitution(institution.Id);
+                await FilterUsers(users);
+
+                _dialogService.Open<CreateEntityAccesComponent>(
+                    "Give access ",
+                    new Dictionary<string, object>
+                    {
+                        { "EntityId", Guid.Parse(objective.id) },
+                        { "Users", users },
+                        { "EntityType", EntityType.Objective },
+                        { "EntityName", objective.name }
+                    },
+                    new DialogOptions { Width = "50%", Height = "70%" }
+                );
+            }
+        }
+
+
     }
 
 }

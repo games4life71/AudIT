@@ -1,0 +1,80 @@
+﻿@page "/view-access"
+@using Frontend.Contracts.Abstract_Services.EntityAccesService
+@using Frontend.EntityViewModels.EntityAccess
+@using Frontend.Services.AuthentificationServices
+@using Orientation = Radzen.Orientation
+
+@inject IEntityAccesService _accesService
+@inject CustomAuthStateProvider _authStateProvider
+@inject NavigationManager _navigationManager
+
+<RadzenStack Orientation="Orientation.Vertical">
+    <RadzenText TextStyle="TextStyle.H5" Text="Access control list"/>
+
+    <RadzenDataGrid
+        Data="_accesList"
+        TItem="BaseEntityAccesViewModel"
+        AllowFiltering="true"
+        AllowPaging="true"
+        PageSize="10"
+        AllowSorting="true"
+        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
+        <Columns>
+            <RadzenDataGridColumn Title="Type" Property="Type"/>
+            <RadzenDataGridColumn Title="Access type" Property="AccesType"/>
+            <RadzenDataGridColumn>
+                <Template Context="data">
+                    <RadzenStack Orientation="Orientation.Vertical">
+                        <RadzenButton ButtonStyle="ButtonStyle.Secondary" Click="@(()=>NavigateEntity(data))" Icon="visibility" Text="View entity"></RadzenButton>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+
+    </RadzenDataGrid>
+</RadzenStack>
+
+@code {
+    private List<BaseEntityAccesViewModel> _accesList = [];
+}
+
+@functions
+{
+    protected override async  Task OnInitializedAsync()
+    {
+        await GetAccesByUser();
+    }
+
+    private async Task GetAccesByUser()
+    {
+        var user = await _authStateProvider.GetAuthenticationStateAsync();
+
+        var UserId = await _authStateProvider.GetUserIdFromTokenAsync();
+
+        if (UserId.Item2 && UserId.Item1 != null)
+        {
+            var response = await _accesService.GetEntityAccesByUserIdAsync(UserId.Item1);
+
+            if (response.Success)
+            {
+                // Do something
+                _accesList = response.DtoResponses;
+            }
+        }
+    }
+
+    private async  Task NavigateEntity(BaseEntityAccesViewModel entity)
+    {
+        if (entity.Type == EntityType.Objective)
+        {
+            _navigationManager.NavigateTo($"/objective/{entity.EntityId}");
+        }
+
+        if (entity.Type == EntityType.AuditMission)
+        {
+            _navigationManager.NavigateTo($"/audit-mission/{entity.EntityId}");
+        }
+
+
+    }
+}

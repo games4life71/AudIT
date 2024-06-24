@@ -26,4 +26,20 @@ public class EntityAccesRepository : BaseRepository<EntityAcces>, IEntityAccesRe
 
         return Result<EntityAcces>.Success(entityAcces);
     }
+
+    public async  Task<Result<List<EntityAcces>>> GetAllByUserId(Guid requestUserId)
+    {
+
+        var entityAcces = await _context.EntityAcces
+            .Where(x=>x.UserId == requestUserId.ToString())
+            .ToListAsync();
+
+
+        if (!entityAcces.Any())
+        {
+            return Result<List<EntityAcces>>.Failure("Entity acces not found");
+        }
+
+        return Result<List<EntityAcces>>.Success(entityAcces);
+    }
 }

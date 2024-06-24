@@ -30,4 +30,24 @@ public class EntityAccesService(HttpClient httpClient) : IEntityAccesService
             Message = "An error occurred while creating entity access"
         };
     }
+
+    public async Task<BaseDTOResponse<BaseEntityAccesViewModel>> GetEntityAccesByUserIdAsync(Guid userId)
+    {
+        var response = await httpClient.GetAsync($"{IEntityAccesService.BaseUrl}/get-all-acces-by-user/{userId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseEntityAccesViewModel>>(content);
+
+            if (result != null) return result;
+        }
+
+        return new BaseDTOResponse<BaseEntityAccesViewModel>
+        {
+            Success = false,
+            Message = "An error occurred while fetching entity access"
+        };
+    }
 }

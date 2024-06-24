@@ -8,4 +8,5 @@ public interface IEntityAccesRepository:IRepository<EntityAcces>
 
     public Task<Result<EntityAcces>> FindByEntityIdAsync(Guid entityId, EntityType entityType);
 
+    public Task<Result<List<EntityAcces>>> GetAllByUserId(Guid requestUserId);
 }

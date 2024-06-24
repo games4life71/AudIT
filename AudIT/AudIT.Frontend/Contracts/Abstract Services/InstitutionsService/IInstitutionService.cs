@@ -20,4 +20,6 @@ public interface IInstitutionService
     public Task<BaseDTOResponse<BaseInstitutionDto>> GetInstitutionByRecommendationAsync(Guid id);
 
     public Task<BaseDTOResponse<BaseInstitutionDto>> GetInstitutionByAuditMissionIdAsync(Guid auditMissionId);
+
+    public Task<BaseDTOResponse<BaseInstitutionDto>> GetinstitutionByUserIdAsync(Guid userId);
 }

@@ -6,6 +6,7 @@ using AudIT.Applicationa.Requests.Institutions.Queries.GetAll;
 using AudIT.Applicationa.Requests.Institutions.Queries.GetAllIFull;
 using AudIT.Applicationa.Requests.Institutions.Queries.GetByDepartment;
 using AudIT.Applicationa.Requests.Institutions.Queries.GetByRecommendation;
+using AudIT.Applicationa.Requests.Institutions.Queries.GetUserInstitution;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,6 +38,20 @@ public class InstitutionController : BaseController
     public async Task<IActionResult> GetInstitutionByAuditMission(Guid auditMissionId)
     {
         var result = await Mediator.Send(new GetInstitutionByAuditMissionIdCommand(auditMissionId));
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
+
+    [HttpGet]
+    [Route("get-institution-by-user-id/{userId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetInstitutionByUserId(Guid userId)
+    {
+        var result = await Mediator.Send(new GetInstitutionByUserIdQuery(userId));
         if (!result.Success)
         {
             return BadRequest(result.Message);

@@ -21,7 +21,6 @@
 @inject CustomAuthStateProvider customAuthState
 
 @inject DialogService _dialogService
-@inject IEntityAccesService entityAccesService
 @inject IUserService _userService
 @inject IInstitutionService _institutionService
 
@@ -215,7 +214,7 @@ else
             await FilterUsers(users);
 
             _dialogService.Open<CreateEntityAccesComponent>(
-                "Give access to this entity",
+                "Give access ",
                 new Dictionary<string, object>
                 {
                     { "EntityId", auditMission.Id },

@@ -205,7 +205,10 @@
                     <RadzenPanelMenuItem Path="/export-fiap" class="rz-my-4" Icon="article" Text="Autocomplete FIAP "></RadzenPanelMenuItem>
                     <RadzenPanelMenuItem Click="@ExportFullObjectives" class="rz-my-2" Icon="edit_document" Text="Export Objectives and Risks "></RadzenPanelMenuItem>
                 </RadzenPanelMenuItem>
-                <RadzenPanelMenuItem Visible="isAuditor" class="rz-my-4" Icon="card_membership" Text="Acces control"></RadzenPanelMenuItem>
+                <RadzenPanelMenuItem Visible="isAuditor" class="rz-my-4" Icon="card_membership" Text="Acces control">
+                    <RadzenPanelMenuItem class="rz-my-2" Icon="pageview" Path="/view-access" Text="View given access" />
+
+                </RadzenPanelMenuItem>
 
                 <RadzenPanelMenuItem Visible="isAuditor" class="rz-my-4" Icon="build" Text="Configure">
                     <RadzenPanelMenuItem Path="/departments?institutionId=" Icon="book" Text="Configure Departments" class="rz-my-2"></RadzenPanelMenuItem>

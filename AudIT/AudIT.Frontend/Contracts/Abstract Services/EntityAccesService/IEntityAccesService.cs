@@ -9,4 +9,6 @@ public interface IEntityAccesService
 
     public const string BaseUrl = "https://localhost:7248/api/EntityAcces";
     public Task<BaseDTOResponse<BaseEntityAccesViewModel>> CreateEntityAccesAsync(BaseCreateEntityaAccesDto entityAccesDto);
+
+    public Task<BaseDTOResponse<BaseEntityAccesViewModel>> GetEntityAccesByUserIdAsync(Guid userId);
 }
