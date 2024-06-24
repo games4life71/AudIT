@@ -169,7 +169,7 @@ else if (_notFound == false && _auditMissionDto != null)
 
                             @foreach (var document in _baseDocumentViewmodels)
                             {
-                                <RadzenLink Path="@($"/document-preview/{document.Id}")">
+                                <RadzenLink Path="@($"/documents")">
                                     <RadzenText TextStyle="TextStyle.DisplayH6" class="rz-mt-4 rz-color-primary" Text="@($"{document.Name}")"></RadzenText>
                                 </RadzenLink>
                             }
@@ -277,12 +277,7 @@ else if (_notFound == false && _auditMissionDto != null)
 
         selectedStatus = _auditMissionDto.Status.ToString();
 
-        _baseDocumentViewmodels.Add(new BaseDocumentViewmodel(
-            new Guid(),
-            "Document 1",
-            "Document 1 description",
-            "Document 1 type"
-        ));
+
     }
 
     private async Task FetchAuditMission()

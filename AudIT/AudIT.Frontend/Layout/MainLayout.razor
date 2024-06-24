@@ -150,9 +150,9 @@
                     <RadzenPanelMenuItem class="rz-my-2" Text="List Missions" Path="/audit-missions" Icon="list"/>
                     <RadzenPanelMenuItem class="rz-my-2" Text="Search Audit Mission" Icon="search">
                         <RadzenStack class="rz-my-2" Orientation="Orientation.Vertical">
-
                             <RadzenAutoComplete ValueChanged="@((value) => AuditMissionSearchChanged(value))"
                                                 TextProperty="Name"
+                                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                                 Data="@_auditMissions"
                                                 Placeholder="Audit Mission name...">
                             </RadzenAutoComplete>
@@ -171,6 +171,7 @@
 
                         <RadzenStack Orientation="Orientation.Vertical">
                             <RadzenAutoComplete Data="@_objectives"
+                                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                                 TextProperty="Name"
                                                 ValueChanged="@((value) => ObjectiveChanged(value))"
                                                 Placeholder="Objective name...">
@@ -267,9 +268,24 @@
 
 
         var claims = customAuthState.GetClaims(authState);
+        ClaimResponse? first = null;
+        foreach (var x in claims)
+        {
+            if (x.Type == "Institution")
+            {
+                first = x;
+                break;
+            }
+        }
 
-        var institutionId = Guid.Parse(claims.FirstOrDefault(x => x.Type == "Institution").Value);
-        InstitutionId = institutionId;
+        if (first != null)
+        {
+            var institution = first.Value;
+
+            var institutionId = Guid.Parse(institution);
+            InstitutionId = institutionId;
+        }
+
 
         await FetchAuditMissions();
         await FetchCurrentAuditMission();

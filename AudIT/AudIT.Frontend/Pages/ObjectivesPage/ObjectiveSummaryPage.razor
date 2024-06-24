@@ -53,7 +53,7 @@
                 </RadzenTabsItem>
                 <RadzenTabsItem Text="Configure" Icon="settings">
                     <RadzenStack Orientation="Orientation.Horizontal">
-                        <RadzenButton Icon="bookmark" Click="@(() => _navigationManager.NavigateTo($"risks/{_objective.id}"))" Text="Configure Risks"></RadzenButton>
+
                         <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="assignment" Click="@(() => OpenEditNameForm(_objective))" Text="Edit Name"></RadzenButton>
                         <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="@(() => DeleteObjective(_objective))" Text="Delete Objective"></RadzenButton>
 

@@ -24,4 +24,6 @@ public class AccessController:BaseController
         return Ok(result.Item2);
     }
 
+
+
 }

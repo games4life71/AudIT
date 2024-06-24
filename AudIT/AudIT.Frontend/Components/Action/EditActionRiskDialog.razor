@@ -11,19 +11,21 @@
             <RadzenLabel Text="Risk Name:" Component="forName"></RadzenLabel>
             <RadzenTextBox @bind-Value="@ActionRisk.name" Placeholder="@ActionRisk.name"></RadzenTextBox>
         </RadzenColumn>
+
         <RadzenColumn>
-            <RadzenLabel Text="Risk:" Component="forRisk"></RadzenLabel>
-            <RadzenNumeric Min="0" Max="10" @bind-Value="ActionRisk.risk" Placeholder="@ActionRisk.risk.ToString()"></RadzenNumeric>
+            <RadzenLabel Text="Impact:" Component="forImpact"></RadzenLabel>
+            <RadzenNumeric TValue="int" ValueChanged="@((value) => ImpactChanged(value))" Min="0" Max="10"  Placeholder="@ActionRisk.impact.ToString()"></RadzenNumeric>
         </RadzenColumn>
     </RadzenRow>
     <RadzenRow class="rz-my-4">
         <RadzenColumn>
             <RadzenLabel Text="Probability:" Component="forProbability"></RadzenLabel>
-            <RadzenNumeric Min="0" Max="10" @bind-Value="ActionRisk.probability" Placeholder="@ActionRisk.probability.ToString()"></RadzenNumeric>
+            <RadzenNumeric TValue="int" ValueChanged="@((value) => ProbabilityChanged(value))" Min="0" Max="10" Placeholder="@ActionRisk.probability.ToString()"></RadzenNumeric>
         </RadzenColumn>
+
         <RadzenColumn>
-            <RadzenLabel Text="Impact:" Component="forImpact"></RadzenLabel>
-            <RadzenNumeric Min="0" Max="10" @bind-Value="ActionRisk.impact" Placeholder="@ActionRisk.impact.ToString()"></RadzenNumeric>
+            <RadzenLabel Text="Risk:" Component="forRisk"></RadzenLabel>
+            <RadzenNumeric Min="0" Max="10" @bind-Value="ActionRisk.risk" Placeholder="@ActionRisk.risk.ToString()"></RadzenNumeric>
         </RadzenColumn>
     </RadzenRow>
     <RadzenStack class="rz-my-12" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
@@ -60,6 +62,20 @@
         }
 
         _dialogService.Close(null);
+    }
+
+    private Task ImpactChanged(int value)
+    {
+        ActionRisk.impact = value;
+        ActionRisk.risk =  (ActionRisk.impact * ActionRisk.probability)/10;
+        return Task.CompletedTask;
+    }
+
+    private Task ProbabilityChanged(int value)
+    {
+        ActionRisk.probability = value;
+        ActionRisk.risk = (ActionRisk.impact * ActionRisk.probability)/10;
+        return Task.CompletedTask;
     }
 
 }

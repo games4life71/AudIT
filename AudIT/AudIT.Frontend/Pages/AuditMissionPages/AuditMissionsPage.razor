@@ -4,6 +4,7 @@
 @using Frontend.EntityDtos.AuditMission
 @using Frontend.EntityDtos.Department
 @using Frontend.Services.AuthentificationServices
+@using Orientation = Radzen.Orientation
 @* <h3>AuditMissions</h3> *@
 
 @inject NavigationManager NavigationManager
@@ -13,30 +14,35 @@
 
 @if (isAuthenticated)
 {
-    <RadzenDataGrid Data="@_auditMissionsDto" AllowSorting="true" AllowFiltering="true">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenDataGrid Data="@_auditMissionsDto" AllowSorting="true" AllowFiltering="true">
 
-        <Columns>
+                <Columns>
 
-            @* <RadzenDataGridColumn Property="Id" Title="Id"></RadzenDataGridColumn> *@
-            <RadzenDataGridColumn Property="Name" Title="Name"></RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="DepartmentName" Title="Department Name">
+                    @* <RadzenDataGridColumn Property="Id" Title="Id"></RadzenDataGridColumn> *@
+                    <RadzenDataGridColumn Property="Name" Title="Name"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="DepartmentName" Title="Department Name">
 
-                <Template Context="data">
-                    <div @onclick="() => DepartmentCellClicked(data)">
-                        @data.DepartmentName
-                    </div>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="Status" Title="Status"></RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="LastModifiedDate" Title="Last Modified"></RadzenDataGridColumn>
-            <RadzenDataGridColumn Width="15%" Frozen="true" Sortable="false" Filterable="false" TItem="AuditMissionWithDepartmentName" Title="">
-                <Template Context="auditMission">
-                    <RadzenButton Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Text" Text="More details " Click="@(() => ButtonClicked(auditMission))"></RadzenButton>
-                </Template>
-            </RadzenDataGridColumn>
+                        <Template Context="data">
+                            <div @onclick="() => DepartmentCellClicked(data)">
+                                @data.DepartmentName
+                            </div>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="Status" Title="Status"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="LastModifiedDate" Title="Last Modified"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Width="15%" Frozen="true" Sortable="false" Filterable="false" TItem="AuditMissionWithDepartmentName" Title="">
+                        <Template Context="auditMission">
+                            <RadzenButton Style="display: flex; align-self: center; justify-content: center ;" ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Text" Text="More details " Click="@(() => ButtonClicked(auditMission))"></RadzenButton>
+                        </Template>
+                    </RadzenDataGridColumn>
 
-        </Columns>
-    </RadzenDataGrid>
+                </Columns>
+            </RadzenDataGrid>
+            <RadzenButton Click="@(args => NavigationManager.NavigateTo("/create-mission"))" ButtonStyle="ButtonStyle.Dark" Icon="add" Text="Add new Audit Mission"></RadzenButton>
+        </RadzenStack>
+    </RadzenCard>
 }
 @* else if(!isAuthenticated) *@
 @* { *@

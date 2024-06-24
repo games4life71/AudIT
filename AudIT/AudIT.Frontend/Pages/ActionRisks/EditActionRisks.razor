@@ -25,9 +25,9 @@
         <RadzenDataGrid @ref="_dataGrid" AllowSorting="true" AllowFiltering="true" TItem="ActionRiskViewModel" Data="@_objectiveActionViewModel.actionRisks">
             <Columns>
                 <RadzenDataGridColumn Property="name" Title="Name"/>
-                <RadzenDataGridColumn Property="risk" Title="Risk"></RadzenDataGridColumn>
                 <RadzenDataGridColumn Property="probability" Title="Probability"></RadzenDataGridColumn>
                 <RadzenDataGridColumn Property="impact" Title="Impact"></RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="risk" Title="Risk"></RadzenDataGridColumn>
                 <RadzenDataGridColumn Frozen="true" Filterable="false" Sortable="false">
 
                     <Template Context="actionRisk">
@@ -43,6 +43,8 @@
         <RadzenStack Orientation="Orientation.Horizontal">
             <RadzenLabel Text="Total Risks: "></RadzenLabel>
             <RadzenText Text="@_objectiveActionViewModel.actionRisks.Count.ToString()"></RadzenText>
+            <RadzenLabel Text="Total Score: "></RadzenLabel>
+            <RadzenText Text="@totalScore.ToString()"></RadzenText>
         </RadzenStack>
     </RadzenRow>
     <RadzenRow class="rz-my-12">
@@ -61,7 +63,7 @@ else
 
 @code {
     RadzenDialog dialog;
-
+    private int totalScore = 0;
     [Parameter] public string objectiveActionId { get; set; }
 
     private ObjectiveActionViewModel _objectiveActionViewModel = null;
@@ -80,6 +82,7 @@ else
     protected async override Task OnInitializedAsync()
     {
         await FetchObjectiveAction();
+        CalculateTotalScore();
     }
 
 
@@ -93,6 +96,7 @@ else
             _objectiveActionViewModel = objectiveAction.DtoResponse;
             StateHasChanged();
         }
+        CalculateTotalScore();
     }
 
 
@@ -126,6 +130,7 @@ else
             actionRisk.probability = updatedActionRisk.probability;
             actionRisk.impact = updatedActionRisk.impact;
         }
+        CalculateTotalScore();
     }
 
     private async void CreateNewRisk(MouseEventArgs obj)
@@ -156,7 +161,14 @@ else
         StateHasChanged();
     }
 
-
+    private void CalculateTotalScore()
+    {
+        totalScore = 0;
+        foreach (var actionRisk in _objectiveActionViewModel.actionRisks)
+        {
+            totalScore += actionRisk.risk;
+        }
+    }
 }
 
 @code

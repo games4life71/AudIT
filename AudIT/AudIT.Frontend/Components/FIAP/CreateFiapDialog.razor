@@ -15,10 +15,10 @@
             <RadzenColumn>
                 <RadzenStack Orientation="Orientation.Vertical">
                     <RadzenLabel Text="Start Date:" Component="forStart"></RadzenLabel>
-                    <RadzenDatePicker @bind-Value="@CreateFiapDto.AuditedPeriodStart" Name="forStart" Placeholder="Start Date:"></RadzenDatePicker>
+                    <RadzenDatePicker Min="DateTime.Now" @bind-Value="@CreateFiapDto.AuditedPeriodStart" Name="forStart" Placeholder="Start Date:"></RadzenDatePicker>
                     <RadzenRequiredValidator Text="Field is required " Component="forStart"></RadzenRequiredValidator>
-                    <RadzenLabel Text="End Date:" Component="forEnd"></RadzenLabel>
-                    <RadzenDatePicker @bind-Value="@CreateFiapDto.AuditedPeriodEnd" Name="forEnd" Placeholder="Start Date:"></RadzenDatePicker>
+                    <RadzenLabel  Text="End Date:" Component="forEnd"></RadzenLabel>
+                    <RadzenDatePicker Min="CreateFiapDto.AuditedPeriodStart" @bind-Value="@CreateFiapDto.AuditedPeriodEnd" Name="forEnd" Placeholder="Start Date:"></RadzenDatePicker>
                     <RadzenRequiredValidator Text="Field is required " Component="forEnd"></RadzenRequiredValidator>
                 </RadzenStack>
             </RadzenColumn>

@@ -31,6 +31,20 @@ public class BaseAccesRepository<TEntity> : IRepositoryAcces<TEntity> where TEnt
         return Result<TEntity>.Success(entity);
     }
 
+    public async Task CheckWriteAccesAsync(Guid userId, Guid entityId)
+    {
+        var entity = await _context.Set<TEntity>().FindAsync(entityId);
+
+        if (entity == null)
+        {
+            throw new UnauthorizedAccessException("Entity not found.");
+        }
+
+        if (entity.WriteAccesUserId == null || !entity.WriteAccesUserId.Contains(userId))
+        {
+            throw new UnauthorizedAccessException("You do not have write access to this entity.");
+        }
+    }
 
     public async Task<Result<TEntity>> SetReadAccesAsync(Guid userId, Guid entityId)
     {
