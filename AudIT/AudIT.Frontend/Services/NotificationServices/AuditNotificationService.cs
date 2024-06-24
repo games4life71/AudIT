@@ -77,4 +77,15 @@ public class AuditNotificationService(HttpClient httpClient) : IAuditNotificatio
 
         return new BaseResponse("Failed to update notification", false);
     }
+
+    public async  Task<BaseResponse> DeleteNotificationAsync(Guid notificationId)
+    {
+        var response =
+            await httpClient.DeleteAsync($"{IAuditNotificationService.ApiPath}/delete-notification/{notificationId}");
+
+        if (response.IsSuccessStatusCode)
+            return new BaseResponse("Notification deleted successfully", true);
+
+        return new BaseResponse("Failed to delete notification", false);
+    }
 }

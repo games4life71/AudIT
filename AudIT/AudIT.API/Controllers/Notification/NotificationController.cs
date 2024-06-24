@@ -1,4 +1,5 @@
 ﻿using AudIT.Applicationa.Requests.Notification.Commands.Create;
+using AudIT.Applicationa.Requests.Notification.Commands.Delete;
 using AudIT.Applicationa.Requests.Notification.Commands.Update.SetAsRead;
 using AudIT.Applicationa.Requests.Notification.Queries.GetByInstitution;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,20 @@ public class NotificationController : BaseController
     public async Task<IActionResult> CreateNotification(CreateNotificationCommand command)
     {
         var result = await Mediator.Send(command);
+
+        if (!result.Success)
+            return BadRequest(result.Message);
+
+        return Ok(result);
+    }
+
+
+    [HttpDelete]
+    [Route("delete-notification/{notificationId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> DeleteNotification(Guid notificationId)
+    {
+        var result = await Mediator.Send(new DeleteNotificationCommand(notificationId));
 
         if (!result.Success)
             return BadRequest(result.Message);

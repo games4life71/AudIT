@@ -14,4 +14,6 @@ public interface IAuditNotificationService
 
     public Task<BaseResponse> SetNotificationReadAsync(Guid notificationId);
 
+    public Task<BaseResponse> DeleteNotificationAsync(Guid notificationId);
+
 }
