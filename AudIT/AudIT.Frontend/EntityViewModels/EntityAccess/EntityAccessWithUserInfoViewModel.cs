@@ -1,12 +1,14 @@
-﻿using AudiT.Domain.Entities;
+﻿using Frontend.EntityViewModels.User;
 
-namespace AudIT.Applicationa.Requests.EntityAcces.DTO;
+namespace Frontend.EntityViewModels.EntityAccess;
 
-public class BaseEntityAccesDto
+public class EntityAccessWithUserInfoViewModel
 {
     public Guid Id { get; set; }
 
     public string UserId { get; set; }
+
+    public BaseUserViewModel User { get; set; }
 
     public string GrantedByUserId { get; set; }
 

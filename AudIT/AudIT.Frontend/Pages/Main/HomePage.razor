@@ -24,8 +24,11 @@
 
 
 <RadzenStack Orientation="Orientation.Vertical">
-
-    @if (isAuditor)
+    @if (isLoading)
+    {
+        <LoadingComponent/>
+    }
+    else if (isAuditor)
     {
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
             <RadzenText Text="@($"Welcome, {currentUserName} !")" TextStyle="TextStyle.DisplayH5"/>
@@ -205,7 +208,7 @@
     }
     else
     {
-        <LoadingComponent/>
+        _navigationManager.NavigateTo("/login");
     }
 
 </RadzenStack>
@@ -231,6 +234,7 @@
 
     private List<ClaimResponse> _claims { get; set; } = [];
 
+    private bool isLoading = true;
     private RadzenDataGrid<BaseNotificationViewModel> _notificationDataGrid;
 }
 
@@ -239,6 +243,8 @@
 
     private async Task FetchUserClaims()
     {
+        isLoading = true;
+
         var authState = await _authStateProvider.GetAuthenticationStateAsync();
 
         isAuthenticated = authState.User.Identity is { IsAuthenticated: true };
@@ -246,6 +252,8 @@
         isAuditor = authState.User.IsInRole("Auditor");
 
         _claims = _authStateProvider.GetClaims(authState);
+
+        isLoading = false;
     }
 
     private async Task FetchNotifications()
@@ -345,6 +353,8 @@
 
             if (response.Success)
             {
+                _objectives = response.DtoResponses;
+
             }
             else
             {

@@ -10,6 +10,8 @@ public class CreateEntityAccesCommand : IRequest<BaseDTOResponse<BaseEntityAcces
 {
     public string UserId { get; set; }
 
+    public string GrantedByUserId { get; set; }
+
     public Guid EntityId { get; set; }
 
     public EntityType Type { get; set; }

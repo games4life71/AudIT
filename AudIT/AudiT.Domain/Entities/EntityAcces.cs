@@ -8,7 +8,12 @@ public class EntityAcces
 
     public string UserId { get; set; }
 
+    public string GrantedByUserId { get; set; }
+
+    public User GrantedByUser { get; set; }
+
     public User User { get; set; }
+
 
     public Guid EntityId { get; set; }
 
@@ -18,20 +23,23 @@ public class EntityAcces
 
 
 
-    private EntityAcces(string userId, Guid entityId, EntityType entityType, AccesType accesType)
+    private EntityAcces(string userId,  Guid entityId, EntityType entityType, AccesType accesType, string grantedByUserId)
     {
         Id = Guid.NewGuid();
         UserId = userId;
         EntityId = entityId;
         Type = entityType;
         AccesType = accesType;
+        GrantedByUserId = grantedByUserId;
     }
 
 
-    public static Result<EntityAcces> Create(string userId, Guid entityId, EntityType entityType, AccesType accesType)
+
+    public static Result<EntityAcces> Create(string userId, Guid entityId, EntityType entityType, AccesType accesType, string grantedByUserId)
     {
-        return Result<EntityAcces>.Success(new EntityAcces(userId, entityId, entityType, accesType));
+        return Result<EntityAcces>.Success(new EntityAcces(userId, entityId, entityType, accesType, grantedByUserId));
     }
+
 
 
     public EntityAcces()

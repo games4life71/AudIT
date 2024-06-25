@@ -2,6 +2,7 @@
 @using Frontend.Contracts.Abstract_Services.AuditMissionService
 @using Frontend.Contracts.Abstract_Services.DepartmentService
 @using Frontend.Contracts.Abstract_Services.DocumentService
+@using Frontend.Contracts.Abstract_Services.EntityAccesService
 @using Frontend.Contracts.Abstract_Services.InstitutionsService
 @using Frontend.Contracts.Abstract_Services.ObjectiveActionService
 @using Frontend.Contracts.Abstract_Services.ObjectiveService
@@ -9,12 +10,18 @@
 @using Frontend.EntityDtos.Department
 @using Frontend.EntityDtos.Document.Standalone
 @using Frontend.EntityDtos.Document.Template
+@using Frontend.EntityDtos.EntityAcces
 @using Frontend.EntityDtos.Institution
 @using Frontend.EntityDtos.Objective
 @using Frontend.EntityDtos.ObjectiveAction
+@using Frontend.EntityViewModels.EntityAccess
+@using Frontend.Services.AuthentificationServices
+@using Microsoft.AspNetCore.Components.Authorization
 @using ButtonType = Radzen.ButtonType
 @using Orientation = Radzen.Orientation
 
+@inject CustomAuthStateProvider authState
+@inject IEntityAccesService _entityAccessService
 @inject IDepartmentService _departmentService
 @inject NotificationService _notificationService
 @inject IObjectiveActionService _objectiveActionService
@@ -393,6 +400,21 @@
         }
         else
         {
+            //add into acces
+            var userIdResponse = await authState.GetUserIdFromTokenAsync();
+
+            if (userIdResponse.Item2)
+            {
+                if (createObjResult.DtoResponse != null)
+                    await CreateNewWriteAccess(
+                        EntityType.Objective,
+                        createObjResult.DtoResponse.Id,
+                        userIdResponse.Item1
+                    );
+
+            }
+
+
             //continue to add the objective actions
 
             foreach (var objAction in _addedObjActions)
@@ -701,4 +723,17 @@
         return Task.CompletedTask;
     }
 
+    private async Task CreateNewWriteAccess(EntityType entityType, Guid entityId, Guid userId)
+    {
+        var command = new BaseCreateEntityaAccesDto();
+
+        command.Type = entityType;
+        command.EntityId = entityId;
+        command.UserId = userId.ToString();
+        command.AccesType = AccesType.Write;
+
+        var result = await _entityAccessService.CreateEntityAccesAsync(command);
+
+
+    }
 }

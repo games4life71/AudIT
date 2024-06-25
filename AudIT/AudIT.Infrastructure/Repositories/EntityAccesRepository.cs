@@ -27,11 +27,10 @@ public class EntityAccesRepository : BaseRepository<EntityAcces>, IEntityAccesRe
         return Result<EntityAcces>.Success(entityAcces);
     }
 
-    public async  Task<Result<List<EntityAcces>>> GetAllByUserId(Guid requestUserId)
+    public async Task<Result<List<EntityAcces>>> GetAllByUserId(Guid requestUserId)
     {
-
         var entityAcces = await _context.EntityAcces
-            .Where(x=>x.UserId == requestUserId.ToString())
+            .Where(x => x.UserId == requestUserId.ToString())
             .ToListAsync();
 
 
@@ -41,5 +40,33 @@ public class EntityAccesRepository : BaseRepository<EntityAcces>, IEntityAccesRe
         }
 
         return Result<List<EntityAcces>>.Success(entityAcces);
+    }
+
+    public async Task<Result<List<EntityAcces>>> GetAllGrantedAccesByUserId(Guid requestUserId)
+    {
+        var entityAcces = await _context.EntityAcces
+            .Where(x => x.GrantedByUserId == requestUserId.ToString())
+            .Include(x=>x.GrantedByUser)
+            .ToListAsync();
+
+
+
+        if (entityAcces.Any())
+        {
+            foreach (var entity in entityAcces)
+            {
+                var user = _context.Users.FirstOrDefault(x => x.Id == entity.UserId);
+
+                if (user != null)
+                {
+                    entity.User = user;
+                }
+
+            }
+            return Result<List<EntityAcces>>.Success(entityAcces);
+        }
+            return Result<List<EntityAcces>>.Failure("Entity acces not found");
+
+
     }
 }

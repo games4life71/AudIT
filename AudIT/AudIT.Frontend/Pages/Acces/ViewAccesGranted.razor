@@ -1,4 +1,4 @@
-﻿@page "/view-access"
+﻿@page "/view-granted-access"
 @using Frontend.Contracts.Abstract_Services.EntityAccesService
 @using Frontend.EntityViewModels.EntityAccess
 @using Frontend.Services.AuthentificationServices
@@ -14,20 +14,42 @@
 
     <RadzenDataGrid
         Data="_accesList"
-        TItem="BaseEntityAccesViewModel"
+        TItem="EntityAccessWithUserInfoViewModel"
         AllowFiltering="true"
         AllowPaging="true"
         PageSize="10"
         AllowSorting="true"
         FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
         <Columns>
-            <RadzenDataGridColumn Title="Type" Property="Type"/>
-            <RadzenDataGridColumn Title="Access type" Property="AccesType"/>
+            <RadzenDataGridColumn Width="20%" Title="Type" Property="Type"/>
+            <RadzenDataGridColumn Width="20%" Title="Access type" Property="AccesType"/>
+            <RadzenDataGridColumn>
+                <Template Context="access">
+                    <RadzenStack Orientation="Orientation.Horizontal">
+
+                        <RadzenStack Orientation="Orientation.Vertical">
+                            <RadzenText TextStyle="TextStyle.Overline" Text="User"/>
+                            <RadzenText Text="@access.User.Username"/>
+                        </RadzenStack>
+
+                        <RadzenStack Orientation="Orientation.Vertical">
+                            <RadzenText TextStyle="TextStyle.Overline" Text="Email"/>
+                            <RadzenText Text="@access.User.FirstEmail"/>
+                        </RadzenStack>
+
+                        <RadzenStack Orientation="Orientation.Vertical">
+                            <RadzenText TextStyle="TextStyle.Overline" Text="Functie"/>
+                            <RadzenText Text="@access.User.Functie"/>
+                        </RadzenStack>
+
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
             <RadzenDataGridColumn>
                 <Template Context="data">
                     <RadzenStack Orientation="Orientation.Vertical">
                         <RadzenButton ButtonStyle="ButtonStyle.Secondary" Click="@(()=>NavigateEntity(data))" Icon="visibility" Text="View entity"></RadzenButton>
-                        @* <RadzenButton ButtonStyle="ButtonStyle.Danger" Text="Remove Access" Icon="delete" Click="@(()=>RemoveAcces(data))"></RadzenButton> *@
+                        <RadzenButton ButtonStyle="ButtonStyle.Danger" Text="Remove Access" Icon="delete" Click="@(()=>RemoveAcces(data))"></RadzenButton>
                     </RadzenStack>
                 </Template>
             </RadzenDataGridColumn>
@@ -37,7 +59,7 @@
 </RadzenStack>
 
 @code {
-    private List<BaseEntityAccesViewModel> _accesList = [];
+    private List<EntityAccessWithUserInfoViewModel> _accesList = [];
 }
 
 @functions
@@ -55,7 +77,7 @@
 
         if (UserId.Item2 && UserId.Item1 != null)
         {
-            var response = await _accesService.GetEntityAccesByUserIdAsync(UserId.Item1);
+            var response = await _accesService.GetAccesGrantedByUserAsync();
 
             if (response.Success)
             {
@@ -65,7 +87,7 @@
         }
     }
 
-    private async  Task NavigateEntity(BaseEntityAccesViewModel entity)
+    private async  Task NavigateEntity(EntityAccessWithUserInfoViewModel entity)
     {
         if (entity.Type == EntityType.Objective)
         {
@@ -80,7 +102,7 @@
 
     }
 
-    private async  Task RemoveAcces(BaseEntityAccesViewModel data)
+    private async  Task RemoveAcces(EntityAccessWithUserInfoViewModel data)
     {
         var response = await _accesService.RemoveEntityAccesAsync(data.Id);
 

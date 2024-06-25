@@ -20,6 +20,7 @@ public class CreateEntityAccesHandler(
 
             if (existingEntity.IsSuccess)
             {
+                Console.WriteLine("Entity acces already exists");
                 return new BaseDTOResponse<BaseEntityAccesDto>
                 {
                     Success = false,
@@ -32,7 +33,8 @@ public class CreateEntityAccesHandler(
                 request.UserId,
                 request.EntityId,
                 request.Type,
-                request.AccesType
+                request.AccesType,
+                request.GrantedByUserId
             );
 
             var addResult = await entityAccesRepository.AddAsync(newEntityAcess.Value);

@@ -132,8 +132,9 @@
 
                 if (access == null)
                 {
+                    _notificationService.Notify(NotificationSeverity.Error, "Error", "You do not have access to this objective", 3000);
                  await   _cancellationToken.CancelAsync();
-                    _navigationManager.NavigateTo($"/");
+                    // _navigationManager.NavigateTo($"/");
                 }
                 else if (access.AccesType == AccesType.Read)
                 {

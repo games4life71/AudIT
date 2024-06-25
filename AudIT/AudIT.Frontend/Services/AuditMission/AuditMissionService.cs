@@ -89,7 +89,15 @@ public class AuditMissionService(HttpClient httpClient) : IAuditMissionService
             return new BaseDTOResponse<BaseAuditMissionDto>("Faile to create audit mission", false);
         }
 
-        return new BaseDTOResponse<BaseAuditMissionDto>("Audit mission created successfully", true);
+        var content = await response.Content.ReadAsStringAsync();
+
+        var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseAuditMissionDto>>(content);
+        if(result is {Success: true, DtoResponse: not null})
+        {
+            return new BaseDTOResponse<BaseAuditMissionDto>(result.DtoResponse);
+        }
+
+        return new BaseDTOResponse<BaseAuditMissionDto>("Audit mission failed", false);
     }
 
     public async Task<BaseDTOResponse<BaseAuditMissionDto>> UpdateAuditMissionAsync(

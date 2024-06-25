@@ -9,6 +9,7 @@ public class EntityAccesProfile:MyCustomProfile
     public EntityAccesProfile()
     {
         CreateMap<EntityAcces, BaseEntityAccesDto>();
+        CreateMap<EntityAcces, EntityAccesWithUserInfo>();
 
     }
 }

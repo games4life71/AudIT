@@ -11,4 +11,8 @@ public interface IEntityAccesService
     public Task<BaseDTOResponse<BaseEntityAccesViewModel>> CreateEntityAccesAsync(BaseCreateEntityaAccesDto entityAccesDto);
 
     public Task<BaseDTOResponse<BaseEntityAccesViewModel>> GetEntityAccesByUserIdAsync(Guid userId);
+
+    public Task<BaseDTOResponse<EntityAccessWithUserInfoViewModel>> GetAccesGrantedByUserAsync();
+
+    public Task<BaseResponse> RemoveEntityAccesAsync(Guid id);
 }

@@ -6,6 +6,8 @@ public class BaseEntityAccesViewModel
 
     public string UserId { get; set; }
 
+    public string GrantedByUserId { get; set; }
+
     public Guid EntityId { get; set; }
 
     public EntityType Type { get; set; }
