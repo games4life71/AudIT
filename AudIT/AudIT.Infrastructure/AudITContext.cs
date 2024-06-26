@@ -52,7 +52,7 @@ public class AudITContext : IdentityDbContext<User>
     private readonly IHttpContextAccessor _httpContextAccessor;
 
 
-    public AudITContext()
+    public AudITContext(): base()
     {
     }
 
@@ -64,13 +64,19 @@ public class AudITContext : IdentityDbContext<User>
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlite(
-            $"Data Source={"D:\\Projects\\AudIT\\AudIT\\AudIT\\AudIT.Infrastructure\\database.db"}");
+    optionsBuilder.UseSqlite(
+    $"Data Source={"D:\\Projects\\AudIT\\AudIT\\AudIT\\AudIT.Infrastructure\\database.db"}");
+    // optionsBuilder.UseMySql("Server=localhost;Port=9999;Database=auditdatabase;", ServerVersion.AutoDetect("Server=localhost;Port=9999;Database=auditdatabase;"));
+
     }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // modelBuilder.Entity<User>()
+        //     .Property(u => u.Id)
+        //     .HasColumnType("char(36)");
+
         base.OnModelCreating(modelBuilder);
         //
         // modelBuilder.Entity<User>()

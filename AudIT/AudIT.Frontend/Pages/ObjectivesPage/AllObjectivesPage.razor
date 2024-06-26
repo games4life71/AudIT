@@ -80,7 +80,6 @@
                                 <RadzenTabsItem Text="Options" Icon="build">
 
                                     <RadzenRow>
-                                        <RadzenButton Icon="bookmark" Click="@(() => _navigationManager.NavigateTo($"risks/{objective.id}"))" Text="Configure Risks"></RadzenButton>
                                         <RadzenButton ButtonStyle="ButtonStyle.Info" Icon="assignment" Click="@(() => OpenEditNameForm(objective))" Text="Edit Name"></RadzenButton>
                                         <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Click="@(() => DeleteObjective(objective))" Text="Delete Objective"></RadzenButton>
                                     </RadzenRow>

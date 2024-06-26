@@ -42,7 +42,17 @@
         </RadzenStack>
 
         <RadzenStack Orientation="Orientation.Vertical">
-            <RadzenDataGrid @ref="@docGrid" AllowColumnResize="true" AllowColumnPicking="true" AllowSorting="true" Data="@_documents" TItem="BaseDocumentViewModel" AllowFiltering="true">
+            <RadzenDataGrid
+                @ref="@docGrid"
+                AllowColumnResize="true"
+                AllowColumnPicking="true"
+                AllowSorting="true"
+                Data="@_documents"
+                TItem="BaseDocumentViewModel"
+                AllowFiltering="true"
+                AllowPaging="true"
+                PageSize="5"
+                >
                 <Columns>
                     <RadzenDataGridColumn Title="Name" Property="Name"/>
                     <RadzenDataGridColumn Title="Extension" Property="Extension"/>

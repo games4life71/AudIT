@@ -30,7 +30,7 @@
 @inject IEntityAccesService _entityAccessService
 
 <RadzenStack Orientation="Orientation.Vertical">
-    <RadzenText Text="@($"Read acces {ReadAccess}")"></RadzenText>
+
     <RadzenStack JustifyContent="JustifyContent.SpaceBetween" Orientation="Orientation.Horizontal">
         <RadzenText TextStyle="TextStyle.H4" class="rz-my-6" Text="@($"Summary for {_objective.name}")"></RadzenText>
         <RadzenLink Path=@($"/audit-mission/{_auditMission.Id}")>

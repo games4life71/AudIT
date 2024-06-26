@@ -39,7 +39,17 @@
     </RadzenStack>
     <RadzenCard Variant="Variant.Outlined">
         <RadzenStack Orientation="Orientation.Vertical">
-            <RadzenDataGrid @ref="@grid" Data="_activities" TItem="BaseActivityViewmodel">
+            <RadzenDataGrid
+                @ref="@grid"
+                Data="_activities"
+                TItem="BaseActivityViewmodel"
+                AllowPaging="true"
+                PageSize="5"
+                AllowSorting="true"
+                AllowFiltering="true"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                AllowColumnResize="true"
+                >
                 <Columns>
                     <RadzenDataGridColumn Title="Name" Property="Name"></RadzenDataGridColumn>
                     <RadzenDataGridColumn Title="Type" Property="Type"></RadzenDataGridColumn>
