@@ -17,4 +17,6 @@ public interface IAuditMissionService
     public Task<BaseDTOResponse<BaseAuditMissionDto>> UpdateAuditMissionAsync(UpdateAuditMissionDto updateAuditMissionDto);
 
     public Task<BaseDTOResponse<BaseAuditMissionDto>> GetAuditMissionsByUserInstitution();
+
+    public Task<BaseDTOResponse<BaseAuditMissionDto>> GetAuditMissionByRecommendation(Guid recommendationId);
 }

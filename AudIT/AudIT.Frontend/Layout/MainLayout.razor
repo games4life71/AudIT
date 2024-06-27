@@ -8,6 +8,7 @@
 @using Frontend.Components.Activity
 @using Frontend.Components.Export
 @using Frontend.Contracts.Abstract_Services.Notification
+@using Frontend.Contracts.Abstract_Services.RecommendationService
 @using Frontend.EntityDtos.Notification
 @using Frontend.EntityViewModels.Notification
 @using Frontend.Services.AuthentificationServices
@@ -98,7 +99,7 @@
                                             @* <hr style="border: none; background-color: #0c0d0e; height: 1px; margin: 1rem 0;" /> *@
                                             <RadzenStack Orientation="Orientation.Horizontal">
                                                 <RadzenButton Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Secondary" Text="Mark as read" Icon="mark_chat_read" Click="@(() => MarkAsRead(notification))"></RadzenButton>
-                                                <RadzenButton Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Info" Text="Recommendation" Icon="assistant_direction" Click="@NavigateRecommendations"></RadzenButton>
+                                                <RadzenButton Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Info" Text="Recommendation" Icon="assistant_direction" Click="@(()=>NavigateToRecommendation(notification.Recommendation.Id))"></RadzenButton>
                                             </RadzenStack>
                                         </RadzenStack>
                                     </RadzenCard>
@@ -513,5 +514,25 @@
         notification.IsRead = true;
 
         var response = await _auditNotificationService.SetNotificationReadAsync(notification.Id);
+    }
+
+    private async  Task NavigateToRecommendation(Guid recommendationId)
+    {
+        var auditMission = await _auditMissionService.GetAuditMissionByRecommendation(recommendationId);
+
+        if (auditMission is { DtoResponse: not null, Success: true } && auditMission.DtoResponse.Id != Guid.Empty)
+        {
+            if (isAuditor)
+            {
+
+                NavigationManager.NavigateTo($"/recommendations?auditMissionId={auditMission.DtoResponse.Id}",forceLoad:true);
+
+            }
+
+            else if (isVerified)
+            {
+                NavigationManager.NavigateTo($"/view-recommendations?auditMissionId={auditMission.DtoResponse.Id}",forceLoad:true);
+            }
+        }
     }
 }

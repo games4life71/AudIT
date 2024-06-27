@@ -60,7 +60,9 @@
             if (response.Success)
             {
                 // Do something
-                _accesList = response.DtoResponses;
+                // _accesList = response.DtoResponses.Where(x => x.UserId != UserId.Item1.ToString()).ToList();
+                _accesList = response.DtoResponses.Where(x => x.UserId != x.GrantedByUserId).ToList();
+                // _accesList = response.DtoResponses;
             }
         }
     }

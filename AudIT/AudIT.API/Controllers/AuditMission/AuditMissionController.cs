@@ -6,6 +6,7 @@ using AudIT.Applicationa.Requests.AuditMission.Commands.Update;
 using AudIT.Applicationa.Requests.AuditMission.GetCurrentUserAuditMission;
 using AudIT.Applicationa.Requests.AuditMission.Queries.GetBy.GetByDepartmentId;
 using AudIT.Applicationa.Requests.AuditMission.Queries.GetBy.GetByOwnerId;
+using AudIT.Applicationa.Requests.AuditMission.Queries.GetBy.GetByRecommendation;
 using AudIT.Applicationa.Requests.AuditMission.Queries.GetBy.GetByUserInstitution;
 using AudIT.Applicationa.Requests.AuditMission.Queries.GetById;
 using AudIT.Domain.Misc;
@@ -20,6 +21,21 @@ public class AuditMissionController(
     IAuditMissionRepository auditMissionRepository
 ) : BaseController
 {
+    [HttpGet]
+    [Route("get-mission-by-recommendation/{recommendationId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetMissionByRecommendation(Guid recommendationId)
+    {
+        var result = await Mediator.Send(new GetAuditMissionByRecommendationQuery(recommendationId));
+        if (!result.Success)
+        {
+            return BadRequest(result.Message);
+        }
+
+        return Ok(result);
+    }
+
+
     [HttpPost]
     [Route("add-audit-mission")]
     [ProducesResponseType(StatusCodes.Status200OK)]

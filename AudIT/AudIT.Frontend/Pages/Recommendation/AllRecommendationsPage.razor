@@ -7,6 +7,7 @@
 @using Frontend.Contracts.Abstract_Services.ObjectiveService
 @using Frontend.Contracts.Abstract_Services.RecommendationService
 @using Frontend.EntityDtos.AuditMission
+@using Frontend.EntityDtos.Misc
 @using Frontend.EntityDtos.Notification
 @using Frontend.EntityDtos.Recommendation
 @using Frontend.EntityViewModels.CurrentUserAuditMissionViewModel
@@ -207,23 +208,60 @@
 
     private BaseAuditMissionDto _auditMission { get; set; } = new BaseAuditMissionDto();
 
+    private string? auditMissionQueryParameter = null;
 }
 
 @functions
 {
 
-    public async Task GetCurrentUserAuditMissionAsync()
+    private async Task FetchQueryParams()
     {
-        var result = await _currentUserAuditMissionService.GetCurrentUserAuditMissionAsync();
+        var uri = _navigationManager.Uri;
+        //get the query string parameters
+        var queryDictionary = QueryHelpers.ParseQuery(new Uri(uri).Query);
+        string?  auditMissionId = null;
+        //get the institutionId parameter
+        if (queryDictionary.TryGetValue("auditMissionId", out var missionId))
+        {
+            var value = missionId.FirstOrDefault();
+            if (!String.IsNullOrEmpty(value))
+            {
+                //use the institutionId
+                auditMissionQueryParameter = value;
+            }
 
-        if (result is { Success: true, DtoResponse: not null }) _currentUserAuditMission = result.DtoResponse;
-        var auditMissionResult = await _auditMissionService.GetAuditMissionById(_currentUserAuditMission.AuditMissionId);
+        }
 
-        if (auditMissionResult is { Success: true, DtoResponse: not null }) _auditMission = auditMissionResult.DtoResponse;
+
     }
 
-    protected override async Task OnInitializedAsync()
+    public async Task GetCurrentUserAuditMissionAsync()
     {
+
+        BaseDTOResponse<CurrentUserAuditMissionViewModel> result;
+
+        if (auditMissionQueryParameter != null)
+        {
+            var auditMissionResult = await _auditMissionService.GetAuditMissionById(Guid.Parse(auditMissionQueryParameter));
+
+            if (auditMissionResult is { Success: true, DtoResponse: not null }) _auditMission = auditMissionResult.DtoResponse;
+        }
+        else
+        {
+            result = await _currentUserAuditMissionService.GetCurrentUserAuditMissionAsync();
+
+            if (result is { Success: true, DtoResponse: not null }) _currentUserAuditMission = result.DtoResponse;
+            var auditMissionResult = await _auditMissionService.GetAuditMissionById(_currentUserAuditMission.AuditMissionId);
+
+            if (auditMissionResult is { Success: true, DtoResponse: not null }) _auditMission = auditMissionResult.DtoResponse;
+        }
+
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await FetchQueryParams();
         await GetCurrentUserAuditMissionAsync();
         await FetchAuditMissionParameter();
         await FetchRecommendations();

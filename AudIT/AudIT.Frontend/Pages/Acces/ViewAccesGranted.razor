@@ -82,7 +82,10 @@
             if (response.Success)
             {
                 // Do something
-                _accesList = response.DtoResponses;
+                //filter the acces to not contain the user that is logged in
+                // _accesList = response.DtoResponses.Where(x => x.UserId != UserId.Item1.ToString()).ToList();
+                _accesList = response.DtoResponses.Where(x => x.UserId != x.GrantedByUserId).ToList();
+                // _accesList = response.DtoResponses;
             }
         }
     }

@@ -14,10 +14,11 @@ public class EntityAccesRepository : BaseRepository<EntityAcces>, IEntityAccesRe
         _context = context;
     }
 
-    public async Task<Result<EntityAcces>> FindByEntityIdAsync(Guid entityId, EntityType entityType)
+    public async Task<Result<EntityAcces>> FindByEntityIdAsync(Guid entityId, EntityType entityType, string userId)
     {
         var entityAcces =
-            await _context.EntityAcces.FirstOrDefaultAsync(x => x.EntityId == entityId && x.Type == entityType);
+            await _context.EntityAcces
+                .FirstOrDefaultAsync(x => x.EntityId == entityId && x.Type == entityType && x.UserId == userId.ToString());
 
         if (entityAcces == null)
         {

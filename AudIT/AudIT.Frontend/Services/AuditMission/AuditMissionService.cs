@@ -92,7 +92,7 @@ public class AuditMissionService(HttpClient httpClient) : IAuditMissionService
         var content = await response.Content.ReadAsStringAsync();
 
         var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseAuditMissionDto>>(content);
-        if(result is {Success: true, DtoResponse: not null})
+        if (result is { Success: true, DtoResponse: not null })
         {
             return new BaseDTOResponse<BaseAuditMissionDto>(result.DtoResponse);
         }
@@ -136,5 +136,28 @@ public class AuditMissionService(HttpClient httpClient) : IAuditMissionService
         {
             return new BaseDTOResponse<BaseAuditMissionDto>("An error occurred " + result.Message, false);
         }
+    }
+
+    public async Task<BaseDTOResponse<BaseAuditMissionDto>> GetAuditMissionByRecommendation(Guid recommendationId)
+    {
+        var response =
+            await httpClient.GetAsync(
+                $"{IAuditMissionService.ApiPath}/get-mission-by-recommendation/{recommendationId}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return new BaseDTOResponse<BaseAuditMissionDto>("Failed to get audit mission by recommendation", false);
+        }
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var result = JsonConvert.DeserializeObject<BaseDTOResponse<BaseAuditMissionDto>>(content);
+
+        if (result is { Success: true, DtoResponse: not null })
+        {
+            return new BaseDTOResponse<BaseAuditMissionDto>(result.DtoResponse);
+        }
+
+        return new BaseDTOResponse<BaseAuditMissionDto>("Failed to get audit mission by recommendation", false);
     }
 }

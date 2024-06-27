@@ -16,7 +16,7 @@ public class CreateEntityAccesHandler(
     {
         try
         {
-            var existingEntity = await entityAccesRepository.FindByEntityIdAsync(request.EntityId, request.Type);
+            var existingEntity = await entityAccesRepository.FindByEntityIdAsync(request.EntityId, request.Type, request.UserId);
 
             if (existingEntity.IsSuccess)
             {

@@ -178,7 +178,7 @@
                 @if (templateDocumentSelected)
                 {
                     <RadzenLabel Text="Version" Component="version"></RadzenLabel>
-                    <RadzenNumeric TValue="int" @bind-Value="@documentVersion"></RadzenNumeric>
+                    <RadzenNumeric TValue="int" Min="0" @bind-Value="@documentVersion"></RadzenNumeric>
 
                     <RadzenLabel Text="State" Component="state"></RadzenLabel>
                     <RadzenListBox TValue="string" Value="@_selectedDocumentState" ValueChanged="OnDocumentTypeChanged" Data="@_documentTypes"/>
@@ -616,6 +616,16 @@
     {
         try
         {
+            //check if the institution and department are selected
+            if (_selectedInstitutionId == Guid.Empty || _selectedDepartmentId == Guid.Empty)
+            {
+                _notificationService.Notify(NotificationSeverity.Error, "Institution and Department are required", "Please select an institution and department");
+                return;
+            }
+
+
+
+
             //add the selected files to the attached documents list
             // _attachedDocuments.AddRange(_selectedFiles.Select(f => f.Name));
 
@@ -649,6 +659,8 @@
                     else
                     {
                         _notificationService.Notify(NotificationSeverity.Error, "Document upload failed");
+                        //remove the failed  uploaded file from the attached files
+                        _attachedDocuments.Remove(_selectedFiles.First().Name);
                     }
                 }
 
@@ -673,11 +685,36 @@
                     else
                     {
                         _notificationService.Notify(NotificationSeverity.Error, "Document upload failed");
+                        //remove the failed  uploaded file from the attached files
+                        foreach (var file in _selectedFiles)
+                        {
+                            _attachedDocuments.Remove(file.Name);
+                        }
                     }
                 }
             }
             else
             {
+                //check if the version is set
+                if (documentVersion == 0)
+                {
+                    _notificationService.Notify(NotificationSeverity.Error, "Version is required", "Please provide a version for the document");
+                    return;
+                }
+
+                if(_selectedDocumentState == String.Empty)
+                {
+                    _notificationService.Notify(NotificationSeverity.Error, "State is required", "Please provide a state for the document");
+                    return;
+                }
+
+                if(_selectedDocumentType == String.Empty)
+                {
+                    _notificationService.Notify(NotificationSeverity.Error, "Type is required", "Please provide a type for the document");
+                    return;
+                }
+
+
                 isBusySubmit = true;
                 var command = new BaseCreateTemplateDocumentDto();
 
@@ -703,6 +740,11 @@
                 else
                 {
                     _notificationService.Notify(NotificationSeverity.Error, "Document upload failed");
+                    //remove the failed  uploaded file from the attached files
+                    foreach (var file in _selectedFiles)
+                    {
+                        _attachedDocuments.Remove(file.Name);
+                    }
                 }
 
                 isBusySubmit = false;
@@ -712,6 +754,12 @@
         catch (Exception e)
         {
             _notificationService.Notify(NotificationSeverity.Error, e.Message);
+            //remove the failed  uploaded file from the attached files
+            foreach (var file in _selectedFiles)
+            {
+                _attachedDocuments.Remove(file.Name);
+            }
+            StateHasChanged();
             Console.WriteLine(e.Message);
         }
     }

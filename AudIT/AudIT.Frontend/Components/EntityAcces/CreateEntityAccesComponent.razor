@@ -38,7 +38,9 @@
                     <RadzenText Text="@user.Functie"></RadzenText>
                 </RadzenStack>
                 <RadzenStack Orientation="Orientation.Vertical">
-                    <RadzenToggleButton @bind-Value="@WtiteAccess" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Danger" Text="Write Access"></RadzenToggleButton>
+                    <RadzenLabel Text="Give write access:" ></RadzenLabel>
+                    <RadzenSwitch @bind-Value="@WtiteAccess" Name="forWriteAcces"></RadzenSwitch>
+                    @* <RadzenToggleButton @bind-Value="@WtiteAccess" ToggleButtonStyle="ButtonStyle.Success" ButtonStyle="ButtonStyle.Danger" Text="Write Access"></RadzenToggleButton> *@
                 </RadzenStack>
 
                 <RadzenStack Orientation="Orientation.Vertical">
